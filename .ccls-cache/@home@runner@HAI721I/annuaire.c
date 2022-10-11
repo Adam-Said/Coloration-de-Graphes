@@ -74,9 +74,10 @@ int main(int argc, char *argv[])
       char port[5];
       sprintf(port, "%d",  ntohs(sock_clt.sin_port)); 
       strcat(adr,inet_ntoa(sock_clt.sin_addr));
+      strcat(adr,":");
       strcat(adr,port);
       
-      ( *ptr )[1] = adr;
+      ( *ptr )[i] = adr;
     
       close(newConnection);
   }
