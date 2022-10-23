@@ -24,6 +24,36 @@ struct paquet {
     struct sockaddr_in adresse;
 };
 
+int sendTCP(int sock, void* msg, int sizeMsg) {
+    int res;
+    int sent = 0;
+    while(sent < sizeMsg) {
+        res = send(sock, msg+sent, sizeMsg-sent, 0);
+        sent += res;
+        if (res == -1) {
+            printf("Problème lors de l'envoi du message\n");
+            return -1;
+        }
+    }
+    return sent;
+}
+
+int recvTCP(int sock, void* msg, int sizeMsg) {
+    int res;
+    int received = 0;
+    while(received < sizeMsg) {
+        res = recv(sock, msg+received, sizeMsg-received, 0);
+        received += res;
+        if (res == -1) {
+            printf("Problème lors de la réception du message\n");
+            return -1;
+        } else if (res == 0) {
+            return 0;
+        }
+    }
+    return received;
+}
+
 
 int recv2TCP(int sock, void* msg, int sizeMsg) {
     int taille;
@@ -69,39 +99,56 @@ struct sockaddr_in bindSocket(char* port, int ds) {
     return ad;
 }
 
-int listenTCP(int ds) {
-    int resListen = listen(ds, 2);
+int listenTCP(int ds, int nbMaxAttente) {
+    int resListen = listen(ds, nbMaxAttente);
     if (resListen == -1) {
         printf("Problème lors de l'écoute\n");
         exit(1);    
     } else {
         printf("En écoute\n");
     }
+    
     return resListen;
 }
 
 int getListenAddr(int descripteur, struct sockaddr_in* sock) {
     struct paquet msg;
+    
     if (recv2TCP(descripteur, &msg, sizeof(struct paquet)) <= 0) {
         printf("[SERVEUR] Problème lors de la réception de l'adresse d'écoute\n");
         return -1;
     }
+    
     (*sock) = msg.adresse;
     return 1;
 }
 
-void removeRing(int descripteur, fd_set* set,int* currentMax,int* maxDescripteur,struct sousAnneau sousAnneaux[]
-) {
-    FD_CLR(descripteur, set);
-    printf("[SERVEUR] Un sous-anneau s'est déconnecté\n");
-    close(descripteur);
-    int newMax = removeRingList(sousAnneaux, descripteur, (*currentMax));
-    if (newMax == -1) {
-        printf("[SERVEUR] Problème: le sous-anneau n'était pas dans la liste\n");
-    } else {
-        (*currentMax)--;
-        (*maxDescripteur) = newMax;
+int sendAdrSubRing(struct sousAnneau sousAnneau[], int taille) {
+    if (taille < 3) {
+        printf("[SERVEUR] Impossible de créer un anneau avec moins de trois sous-anneaux\n");
+        return -1;
     }
+    struct paquet msg;
+    msg.requete = 3;
+    for (int i=0; i<taille-1; i++) {
+        msg.adresse = sousAnneau[i+1].sockaddr_in;
+        char adresse[INET_ADDRSTRLEN];
+        inet_ntop(AF_INET, &msg.adresse.sin_addr, adresse, INET_ADDRSTRLEN);
+        int port = htons(msg.adresse.sin_port);
+        printf("[SERVEUR] Envoi de l'adresse: %s:%i\n", adresse, port);
+        if (send2TCP(sousAnneau[i].descripteur, &msg, sizeof(struct paquet)) <= 0) {
+            printf("[SERVEUR] Problème lors de l'envoi des adresses\n");
+        }
+    }
+    msg.adresse = sousAnneau[0].sockaddr_in;
+    char adresse[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &msg.adresse.sin_addr, adresse, INET_ADDRSTRLEN);
+    int port = htons(msg.adresse.sin_port);
+    printf("[SERVEUR] Envoi de l'adresse: %s:%i\n", adresse, port);
+    if (send2TCP(sousAnneau[taille-1].descripteur, &msg, sizeof(struct paquet)) <= 0) {
+        printf("[SERVEUR] Problème lors de l'envoi des adresses\n");
+    }
+    return 0;
 }
 
 int removeRingList(struct sousAnneau sousAnneaux[], int descripteur, int taille) {
@@ -119,6 +166,25 @@ int removeRingList(struct sousAnneau sousAnneaux[], int descripteur, int taille)
         index++;
     }
     return max;
+}
+
+void removeRing(
+    int descripteur, 
+    fd_set* set,
+    int* currentMax,
+    int* maxDescripteur,
+    struct sousAnneau sousAnneaux[]
+) {
+    FD_CLR(descripteur, set);
+    printf("[SERVEUR] Un sous-anneau s'est déconnecté\n");
+    close(descripteur);
+    int newMax = removeRingList(sousAnneaux, descripteur, (*currentMax));
+    if (newMax == -1) {
+        printf("[SERVEUR] Problème: le sous-anneau n'était pas dans la liste\n");
+    } else {
+        (*currentMax)--;
+        (*maxDescripteur) = newMax;
+    }
 }
 
 int setRingNum(int descripteur, int* currentMax, struct sousAnneau sousAnneaux[], struct sockaddr_in sockClient, fd_set* set,int* maxDescripteur
@@ -139,14 +205,12 @@ int setRingNum(int descripteur, int* currentMax, struct sousAnneau sousAnneaux[]
 
 void dispListRing(struct sousAnneau sousAnneaux[], int taille) {
     char adresse[INET_ADDRSTRLEN];
-    afficheLigne();
     printf("[SERVEUR] Liste des sous-anneaux:\n");
     for (int i=0; i<taille; i++) {
         inet_ntop(AF_INET, &sousAnneaux[i].sockaddr_in.sin_addr, adresse, INET_ADDRSTRLEN);
         int port = htons(sousAnneaux[i].sockaddr_in.sin_port);
         printf("[SERVEUR] %i) %i : %s:%i\n", i, sousAnneaux[i].descripteur, adresse, port);
     }
-    afficheLigne();
 }
 
 
@@ -163,64 +227,58 @@ int main(int argc, char *argv[])
   int nombreSousAnneaux = atoi(argv[2]);
   int ds = createSocket();
   bindSocket(argv[1],ds);
-  listenTCP(ds);
+  listenTCP(ds, 100);
 
   // Création de la socket client
-  fd_set set, settmp;
-  int dsClient;
-  FD_ZERO(&set);
-  FD_SET(ds, &set);
-  int maxDs = ds;
-  struct sockaddr_in sockClient; 
-  socklen_t lgAdr;
-  int MAX_RING = 100;
-  struct sousAnneau sousAnneaux[MAX_RING];
-  int currentNbRing = 0;
+   fd_set set, settmp;
+    int dsClient;
+    FD_ZERO(&set);
+    FD_SET(ds, &set);
+    int maxDescripteur = ds;
+    struct sockaddr_in sockClient; 
+    socklen_t lgAdr;
+    int nbMaxAnneau = 100;
+    struct sousAnneau sousAnneaux[nbMaxAnneau];
+    int currentMaxAnneau = 0;
 
-  while (1)
-  {
-    settmp = set;
-      if (select(maxDs+1, &settmp, NULL, NULL, NULL) == -1) {
-        printf("[SERVEUR] Problème lors du select\n");
-        continue;
-      }
-
-      for (int df=2; df <= maxDs; df++) {
-        if (!FD_ISSET(df, &settmp)) {
+    while (1) {
+        settmp = set;
+        if (select(maxDescripteur+1, &settmp, NULL, NULL, NULL) == -1) {
+            printf("[SERVEUR] Problème lors du select\n");
             continue;
         }
 
-        if (df == ds) {
-            dsClient = accept(ds, (struct sockaddr*)&sockClient, &lgAdr);
-            if (getListenAddr(dsClient, &sockClient) < 0) {
+        for (int df=2; df <= maxDescripteur; df++) {
+            if (!FD_ISSET(df, &settmp)) {
                 continue;
             }
-            if (setRingNum(dsClient, &currentNbRing, sousAnneaux, sockClient, &set, &maxDs) <= 0) {
-                removeRing(dsClient, &set, &currentNbRing, &maxDs, sousAnneaux);
-            } else {
-                dispListRing(sousAnneaux, currentNbRing);
-            }
-            continue;
-        }
-      }
 
-      if (maxDs == nombreSousAnneaux) {
+            if (df == ds) {
+                dsClient = accept(ds, (struct sockaddr*)&sockClient, &lgAdr);
+                if (getListenAddr(dsClient, &sockClient) < 0) {
+                    continue;
+                }
+                if (setRingNum(dsClient, &currentMaxAnneau, sousAnneaux, sockClient, &set, &maxDescripteur) <= 0) {
+                    removeRing(dsClient, &set, &currentMaxAnneau, &maxDescripteur, sousAnneaux);
+                } else {
+                    dispListRing(sousAnneaux, currentMaxAnneau);
+                }
+                continue;
+            }
+        }
+
+        if (currentMaxAnneau == nombreSousAnneaux) {
             printf("[SERVEUR] Tous les anneaux sont connectés, envoi des adresses\n");
-            if (envoyerAdressesSousAnneaux(sousAnneaux, maxDs) == -1) {
+            if (sendAdrSubRing(sousAnneaux, currentMaxAnneau) == -1) {
                 printf("[SERVEUR] Problème lors de l'envoi des adresses\n");
             } else {
                 printf("[SERVEUR] Envoi réussi\n");
             }
             if (close(ds) == -1) {
                 printf("[SERVEUR] Problème lors de la fermeture du descripteur\n");
-                afficheErreur();
             }
             printf("[SERVEUR] Au revoir.\n");
             exit(0);
         }
-
-
-  }
-  
-
+    }
 }
