@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <ctype.h>
+
 
 struct sousAnneau {
     int descripteur;
@@ -228,6 +230,11 @@ int getNodeNumber(char *fileName){
 	return atoi(nombre);
 }
 
+int prefix(const char *pre, const char *str)
+{
+    return strncmp(pre, str, strlen(pre)) == 0;
+}
+
 
 int main(int argc, char *argv[])
 {
@@ -236,6 +243,12 @@ int main(int argc, char *argv[])
   {
     printf("[Server] Utilisation : [port_serveur] [File_Name]\n");
     exit(1);
+  }
+
+  if(prefix("salut", "sal")){
+    printf("Contient bien la chaine : %i", prefix("salut", "sal"));
+  } else {
+    printf("ne contient pas ")
   }
 
   printf("Fichier à parser %s \n", argv[2]);
@@ -289,6 +302,7 @@ int main(int argc, char *argv[])
   fclose(file); 
 
   printf("Fichier : Le nombre d'anneaux nécessaires est %i \n", nodeNumber);
+  int edges [nodeNumber][2];
   //fclose(file); 
    
   //printf("Fichier : Lecture terminée, total lu : %d octets \n", total_lu); 
