@@ -212,6 +212,22 @@ void dispListRing(struct sousAnneau sousAnneaux[], int taille) {
     }
 }
 
+int getNodeNumber(char *fileName){
+    char* texte = fileName;
+	char nombre[10];
+	char * ptexte = texte ;
+	char * pnombre = nombre ;
+	while(*ptexte && !isdigit(*ptexte)) ptexte++;
+    while(isdigit(*ptexte))
+	{
+		*pnombre = *ptexte ;
+		pnombre++;
+		ptexte++;
+	}
+	*pnombre = '\0' ; 
+	return atoi(nombre);
+}
+
 
 int main(int argc, char *argv[])
 {
@@ -222,6 +238,28 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
+  printf("Fichier à parser %s \n", argv[2]);
+
+  //récupération du nombre de noeuds
+  int nodeNumber = getNodeNumber(argv[2]);
+
+  //récupération filepath
+  char* filepath = malloc(strlen(argv[2]) + 16); // ./Files/+nom fichier +\0
+  filepath[0] = '\0';
+  strcat(filepath, "./Files/");
+  strcat(filepath, argv[2]);
+  //printf("Le fichier est : %s\n", filepath);
+
+  // obtenir la taille du fichier
+  struct stat attributes;
+  if(stat(filepath, &attributes) == -1){
+    perror("Fichier : erreur stat");
+    free(filepath);
+    exit(1);
+  }
+
+  int file_size = attributes.st_size;
+
   // Lecture du fichier
   FILE* file = fopen(filepath, "rb");
   if(file == NULL){
@@ -229,19 +267,12 @@ int main(int argc, char *argv[])
     free(filepath);
     exit(1);   
   }
-  free(filepath);
 
-  int nodeNumber = 0;
   int total_lu = 0;
   char buffer[file_size];
-  char * ptr;
-  int ch = 'p';
   while(total_lu < file_size){
     
-    size_t read = fread(buffer, sizeof(char), MAX_BUFFER_SIZE, file);
-    ptr = strchr( buffer1, ch );
-    printf( "The first occurrence of %c in '%s' is '%s'\n", ch, buffer, ptr );
-
+    size_t read = fread(buffer, sizeof(char), file_size, file);
     if(read == 0){
       if(ferror(file) != 0){
         perror("Fichier : erreur lors de la lecture du fichier \n");
@@ -249,17 +280,18 @@ int main(int argc, char *argv[])
         exit(1);
       }
       else{
-        printf("Fichier : arrivé a la fin du la lecture du fichier\n");
 	      break;
       }
     }
     total_lu += read;
   }
 
-  printf("Fichier : Le nombre d'anneaux nécessaires est : %i \n", nodeNumber);
   fclose(file); 
+
+  printf("Fichier : Le nombre d'anneaux nécessaires est %i \n", nodeNumber);
+  //fclose(file); 
    
-  printf("Fichier : Lecture terminée, total lu : %d octets \n", total_lu); 
+  //printf("Fichier : Lecture terminée, total lu : %d octets \n", total_lu); 
 
   // Création du serveur
   int nombreSousAnneaux = nodeNumber;
