@@ -1,6 +1,5 @@
 // Modifié à partir du code de Robin L'Huilier
 
-
 #include <netinet/in.h>
 #include <stdio.h> //perror
 #include <sys/types.h>
@@ -219,12 +218,51 @@ int main(int argc, char *argv[])
   // Mise en place du serveur
   if (argc != 3)
   {
-    printf("[Server] Utilisation : [port_serveur] [number_of_ring]\n");
+    printf("[Server] Utilisation : [port_serveur] [File_Name]\n");
     exit(1);
   }
 
+  // Lecture du fichier
+  FILE* file = fopen(filepath, "rb");
+  if(file == NULL){
+    perror("Fichier : erreur ouverture fichier \n");
+    free(filepath);
+    exit(1);   
+  }
+  free(filepath);
+
+  int nodeNumber = 0;
+  int total_lu = 0;
+  char buffer[file_size];
+  char * ptr;
+  int ch = 'p';
+  while(total_lu < file_size){
+    
+    size_t read = fread(buffer, sizeof(char), MAX_BUFFER_SIZE, file);
+    ptr = strchr( buffer1, ch );
+    printf( "The first occurrence of %c in '%s' is '%s'\n", ch, buffer, ptr );
+
+    if(read == 0){
+      if(ferror(file) != 0){
+        perror("Fichier : erreur lors de la lecture du fichier \n");
+        fclose(file);
+        exit(1);
+      }
+      else{
+        printf("Fichier : arrivé a la fin du la lecture du fichier\n");
+	      break;
+      }
+    }
+    total_lu += read;
+  }
+
+  printf("Fichier : Le nombre d'anneaux nécessaires est : %i \n", nodeNumber);
+  fclose(file); 
+   
+  printf("Fichier : Lecture terminée, total lu : %d octets \n", total_lu); 
+
   // Création du serveur
-  int nombreSousAnneaux = atoi(argv[2]);
+  int nombreSousAnneaux = nodeNumber;
   int ds = createSocket();
   bindSocket(argv[1],ds);
   listenTCP(ds, 100);
