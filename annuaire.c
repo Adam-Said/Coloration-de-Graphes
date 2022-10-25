@@ -245,11 +245,11 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
-  if(prefix("salut", "sal")){
+  /*if(prefix("sal", "salut")){
     printf("Contient bien la chaine : %i", prefix("salut", "sal"));
   } else {
-    printf("ne contient pas ")
-  }
+    printf("ne contient pas ");
+  }*/
 
   printf("Fichier à parser %s \n", argv[2]);
 
@@ -263,46 +263,26 @@ int main(int argc, char *argv[])
   strcat(filepath, argv[2]);
   //printf("Le fichier est : %s\n", filepath);
 
-  // obtenir la taille du fichier
-  struct stat attributes;
-  if(stat(filepath, &attributes) == -1){
-    perror("Fichier : erreur stat");
-    free(filepath);
-    exit(1);
-  }
-
-  int file_size = attributes.st_size;
-
   // Lecture du fichier
   FILE* file = fopen(filepath, "rb");
+  char c;
   if(file == NULL){
     perror("Fichier : erreur ouverture fichier \n");
     free(filepath);
     exit(1);   
   }
 
-  int total_lu = 0;
-  char buffer[file_size];
-  while(total_lu < file_size){
-    
-    size_t read = fread(buffer, sizeof(char), file_size, file);
-    if(read == 0){
-      if(ferror(file) != 0){
-        perror("Fichier : erreur lors de la lecture du fichier \n");
-        fclose(file);
-        exit(1);
-      }
-      else{
-	      break;
-      }
-    }
-    total_lu += read;
+  int bufferLength = 255;
+  char buffer[bufferLength];
+
+  while(fgets(buffer, bufferLength, file)) {
+    printf("%s\n", buffer);
   }
 
   fclose(file); 
 
   printf("Fichier : Le nombre d'anneaux nécessaires est %i \n", nodeNumber);
-  int edges [nodeNumber][2];
+  char edges [nodeNumber][2];
   //fclose(file); 
    
   //printf("Fichier : Lecture terminée, total lu : %d octets \n", total_lu); 
