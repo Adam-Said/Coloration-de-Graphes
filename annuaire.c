@@ -237,10 +237,10 @@ int * extractNumbers(char* line, int number)
     if (2 == sscanf(s, "%*[^0123456789]%i%*[^0123456789]%i", &i1, &i2))
     {
         if(number == 0)
-            return &i1;
+            return i1;
         else if (number == 1)
         {
-            return &i2;
+            return i2;
         } else {
             exit;
         }
@@ -302,7 +302,10 @@ int main(int argc, char *argv[])
     free(filepath);
     exit(1);   
   }
-  char* edges [nodeNumber][2];
+  char* edges [nodeNumber];
+  for(int i = 0; i < nodeNumber; i++){
+    edges[i] = "";
+  }
 
   int bufferLength = 255;
   char buffer[bufferLength];
@@ -313,10 +316,15 @@ int main(int argc, char *argv[])
         int n1 = extractNumbers(buffer, 0);
         int n2 = extractNumbers(buffer, 1);
         printf("Noeud %i connecté au noeud %i\n", n1, n2);
+        //edges[n1] = strcat(edges[n1], itoa(n2));
     }
   }
 
   fclose(file); 
+
+  /*for(int j = 0; j < nodeNumber; j++){
+    printf("Noeud %i")
+  }*/
 
   printf("Fichier : Le nombre d'anneaux nécessaires est %i \n", nodeNumber);
   //fclose(file); 
