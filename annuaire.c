@@ -214,7 +214,7 @@ void dispListRing(struct sousAnneau sousAnneaux[], int taille) {
     }
 }
 
-int getNodeNumber(char *fileName){
+int getFirstNumber(char *fileName){
     char* texte = fileName;
 	char nombre[10];
 	char * ptexte = texte ;
@@ -230,11 +230,48 @@ int getNodeNumber(char *fileName){
 	return atoi(nombre);
 }
 
+int * extractNumbers(char* line, int number)
+{
+    const char* s = line;
+    int i1, i2;
+    if (2 == sscanf(s, "%*[^0123456789]%i%*[^0123456789]%i", &i1, &i2))
+    {
+        if(number == 0)
+            return &i1;
+        else if (number == 1)
+        {
+            return &i2;
+        } else {
+            exit;
+        }
+    }
+}
+
+int getAllDigits(char *line){
+    char* texte = line;
+	char nombre[20];
+	char * ptexte = texte ;
+	char * pnombre = nombre ;
+	while(*ptexte) {
+        if(!isdigit(*ptexte)){
+            ptexte++;
+        }
+
+        if(isdigit(*ptexte))
+        {
+            *pnombre = *ptexte ;
+            pnombre++;
+            ptexte++;
+        }
+    }
+	*pnombre = '\0' ; 
+	return atoi(nombre);
+}
+
 int prefix(const char *pre, const char *str)
 {
     return strncmp(pre, str, strlen(pre)) == 0;
 }
-
 
 int main(int argc, char *argv[])
 {
@@ -245,16 +282,10 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
-  /*if(prefix("sal", "salut")){
-    printf("Contient bien la chaine : %i", prefix("salut", "sal"));
-  } else {
-    printf("ne contient pas ");
-  }*/
-
   printf("Fichier à parser %s \n", argv[2]);
 
   //récupération du nombre de noeuds
-  int nodeNumber = getNodeNumber(argv[2]);
+  int nodeNumber = getFirstNumber(argv[2]);
 
   //récupération filepath
   char* filepath = malloc(strlen(argv[2]) + 16); // ./Files/+nom fichier +\0
@@ -264,25 +295,30 @@ int main(int argc, char *argv[])
   //printf("Le fichier est : %s\n", filepath);
 
   // Lecture du fichier
-  FILE* file = fopen(filepath, "rb");
+  FILE* file = fopen(filepath, "r");
   char c;
   if(file == NULL){
     perror("Fichier : erreur ouverture fichier \n");
     free(filepath);
     exit(1);   
   }
+  char* edges [nodeNumber][2];
 
   int bufferLength = 255;
   char buffer[bufferLength];
-
+  
   while(fgets(buffer, bufferLength, file)) {
-    printf("%s\n", buffer);
+    if(buffer[0] == 'e'){
+        printf("%s\n", buffer);
+        int n1 = extractNumbers(buffer, 0);
+        int n2 = extractNumbers(buffer, 1);
+        printf("Noeud %i connecté au noeud %i\n", n1, n2);
+    }
   }
 
   fclose(file); 
 
   printf("Fichier : Le nombre d'anneaux nécessaires est %i \n", nodeNumber);
-  char edges [nodeNumber][2];
   //fclose(file); 
    
   //printf("Fichier : Lecture terminée, total lu : %d octets \n", total_lu); 
