@@ -316,7 +316,9 @@ int main(int argc, char *argv[])
   while(fgets(buffer, bufferLength, file)) {
       if(buffer[0] == 'e'){ 
         int n = extractNumbers(buffer, 0);
+        int n2 = extractNumbers(buffer, 1);
         nodesTab[n]++;
+        nodesTab[n2]++;
       }
   }
 
@@ -337,6 +339,7 @@ int main(int argc, char *argv[])
         int n = extractNumbers(buffer, 0);
         int n2 = extractNumbers(buffer, 1);
         edgesConnexionTab[n] = n2;
+        edgesConnexionTab[n2] = n;
       }
   }
 
@@ -405,4 +408,9 @@ int main(int argc, char *argv[])
             exit(0);
         }
     }
+
+    //libération des tableaux
+    for(int i = 0; i < nodeNumber; i++){
+        free(edgesConnexionTab[i]);
+    } 
 }
