@@ -313,16 +313,11 @@ int main(int argc, char *argv[])
   int nodesTabSize = nodeNumber;
   int nodesTab[250] = {0};
 
-  for(int i = 0; i < nodesTabSize; i++){
-    int cpt = 0;
-    while(fgets(buffer, bufferLength, file)) {
-        if(buffer[0] == 'e'){
-            if(extractNumbers(buffer, 0) == i){
-                cpt++;
-            }
-        }
-    }
-    nodesTab[i] = cpt;
+  while(fgets(buffer, bufferLength, file)) {
+      if(buffer[0] == 'e'){ 
+        int n = extractNumbers(buffer, 0);
+        nodesTab[n]++;
+      }
   }
 
   for(int i = 0; i < nodesTabSize; i++){
@@ -330,12 +325,22 @@ int main(int argc, char *argv[])
         printf("Tableau nodes indice : %i nombre de noeuds connectés : %i\n", i, nodesTab[i]);
     }
   }
+  
+  int* edgesConnexionTab[250] = {0};
+
+  for(int i = 0; i < nodeNumber; i++){
+    edgesConnexionTab[i] = malloc(sizeof(int) * nodesTab[i]);
+  }  
+
+  while(fgets(buffer, bufferLength, file)) {
+      if(buffer[0] == 'e'){ 
+        int n = extractNumbers(buffer, 0);
+        int n2 = extractNumbers(buffer, 1);
+        edgesConnexionTab[n] = n2;
+      }
+  }
 
   fclose(file); 
-
-  /*for(int j = 0; j < nodeNumber; j++){
-    printf("Noeud %i")
-  }*/
 
   printf("Fichier : Le nombre d'anneaux nécessaires est %i \n", nodeNumber);
   //fclose(file); 
