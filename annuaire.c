@@ -309,14 +309,25 @@ int main(int argc, char *argv[])
 
   int bufferLength = 255;
   char buffer[bufferLength];
-  
-  while(fgets(buffer, bufferLength, file)) {
-    if(buffer[0] == 'e'){
-        printf("%s\n", buffer);
-        int n1 = extractNumbers(buffer, 0);
-        int n2 = extractNumbers(buffer, 1);
-        printf("Noeud %i connecté au noeud %i\n", n1, n2);
-        //edges[n1] = strcat(edges[n1], itoa(n2));
+
+  int nodesTabSize = nodeNumber;
+  int nodesTab[250] = {0};
+
+  for(int i = 0; i < nodesTabSize; i++){
+    int cpt = 0;
+    while(fgets(buffer, bufferLength, file)) {
+        if(buffer[0] == 'e'){
+            if(extractNumbers(buffer, 0) == i){
+                cpt++;
+            }
+        }
+    }
+    nodesTab[i] = cpt;
+  }
+
+  for(int i = 0; i < nodesTabSize; i++){
+    if(nodesTab[i] != 0){
+        printf("Tableau nodes indice : %i nombre de noeuds connectés : %i\n", i, nodesTab[i]);
     }
   }
 
