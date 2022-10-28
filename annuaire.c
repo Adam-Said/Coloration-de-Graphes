@@ -247,32 +247,6 @@ int * extractNumbers(char* line, int number)
     }
 }
 
-int getAllDigits(char *line){
-    char* texte = line;
-	char nombre[20];
-	char * ptexte = texte ;
-	char * pnombre = nombre ;
-	while(*ptexte) {
-        if(!isdigit(*ptexte)){
-            ptexte++;
-        }
-
-        if(isdigit(*ptexte))
-        {
-            *pnombre = *ptexte ;
-            pnombre++;
-            ptexte++;
-        }
-    }
-	*pnombre = '\0' ; 
-	return atoi(nombre);
-}
-
-int prefix(const char *pre, const char *str)
-{
-    return strncmp(pre, str, strlen(pre)) == 0;
-}
-
 int main(int argc, char *argv[])
 {
   // Mise en place du serveur
@@ -310,6 +284,8 @@ int main(int argc, char *argv[])
   int bufferLength = 255;
   char buffer[bufferLength];
 
+  //Récupération du nombres de noeuds connectés à chaque noeuds
+
   int nodesTabSize = nodeNumber;
   int nodesTab[250] = {0};
 
@@ -327,6 +303,8 @@ int main(int argc, char *argv[])
         printf("Tableau nodes indice : %i nombre de noeuds connectés : %i\n", i, nodesTab[i]);
     }
   }
+
+  //Nouvelle boucle pour stocker les noeuds connectés
   
   int* edgesConnexionTab[250] = {0};
 
@@ -342,6 +320,19 @@ int main(int argc, char *argv[])
         edgesConnexionTab[n2] = n;
       }
   }
+  intk = 0;
+  for (int i = 0; i < nodeNumber; i++) {
+        // pointer to hold the address of the row
+        int* ptr = edgesConnexionTab[i];
+        
+        for (int j = 0; j < nodesTab[k]; j++) {
+            printf("%d ", *ptr);
+            ptr++;
+        }
+        printf("\n");
+        k++;
+        edgesConnexionTab[i]++;
+    }
 
   fclose(file); 
 
