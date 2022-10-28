@@ -247,6 +247,15 @@ int * extractNumbers(char* line, int number)
     }
 }
 
+int nextPlace(int tab[]){
+    int tabSize = sizeof(tab)/sizeof(tab[0]), i = 0;
+    while (i <= tabSize && tab[i] != 0){
+        i++;
+    }
+    return i;
+}
+    
+
 int main(int argc, char *argv[])
 {
   // Mise en place du serveur
@@ -304,8 +313,16 @@ int main(int argc, char *argv[])
     }
   }
 
+  fclose(file); 
+
   //Nouvelle boucle pour stocker les noeuds connectés
-  
+  FILE* file2 = fopen(filepath, "r");
+  if(file2 == NULL){
+    perror("Fichier : erreur ouverture fichier \n");
+    free(filepath);
+    exit(1);   
+  }
+
   int* edgesConnexionTab[250] = {0};
 
   for(int i = 0; i < nodeNumber; i++){
@@ -316,11 +333,12 @@ int main(int argc, char *argv[])
       if(buffer[0] == 'e'){ 
         int n = extractNumbers(buffer, 0);
         int n2 = extractNumbers(buffer, 1);
-        edgesConnexionTab[n] = n2;
-        edgesConnexionTab[n2] = n;
+        edgesConnexionTab[n][nextPlace(edgesConnexionTab[n])] = n2;
+        edgesConnexionTab[n2][nextPlace(edgesConnexionTab[n2])] = n;
       }
   }
-  intk = 0;
+
+  int k = 0;
   for (int i = 0; i < nodeNumber; i++) {
         // pointer to hold the address of the row
         int* ptr = edgesConnexionTab[i];
@@ -334,7 +352,7 @@ int main(int argc, char *argv[])
         edgesConnexionTab[i]++;
     }
 
-  fclose(file); 
+  fclose(file2); 
 
   printf("Fichier : Le nombre d'anneaux nécessaires est %i \n", nodeNumber);
   //fclose(file); 
