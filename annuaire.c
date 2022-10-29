@@ -247,9 +247,9 @@ int * extractNumbers(char* line, int number)
     }
 }
 
-int nextPlace(int tab[]){
-    int tabSize = sizeof(tab)/sizeof(tab[0]), i = 0;
-    while (i <= tabSize && tab[i] != 0){
+int nextPlace(int tab[], int size){
+    int i = 0;
+    while (i <= size && tab[i] != 0){
         i++;
     }
     return i;
@@ -333,16 +333,16 @@ int main(int argc, char *argv[])
       if(buffer[0] == 'e'){ 
         int n = extractNumbers(buffer, 0);
         int n2 = extractNumbers(buffer, 1);
-        edgesConnexionTab[n][nextPlace(edgesConnexionTab[n])] = n2;
-        edgesConnexionTab[n2][nextPlace(edgesConnexionTab[n2])] = n;
+        edgesConnexionTab[n][nextPlace(edgesConnexionTab[n], nodesTab[n])] = n2;
+        edgesConnexionTab[n2][nextPlace(edgesConnexionTab[n2], nodesTab[n2])] = n;
       }
   }
 
   int k = 0;
-  for (int i = 0; i < nodeNumber; i++) {
+  for (int i = 1; i <= nodeNumber; i++) {
         // pointer to hold the address of the row
         int* ptr = edgesConnexionTab[i];
-        
+        printf("%i | Noeuds connectées : ", i);
         for (int j = 0; j < nodesTab[k]; j++) {
             printf("%d ", *ptr);
             ptr++;
