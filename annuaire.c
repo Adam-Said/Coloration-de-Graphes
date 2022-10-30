@@ -285,10 +285,6 @@ int main(int argc, char *argv[])
     free(filepath);
     exit(1);   
   }
-  char* edges [nodeNumber];
-  for(int i = 0; i < nodeNumber; i++){
-    edges[i] = "";
-  }
 
   int bufferLength = 255;
   char buffer[bufferLength];
@@ -307,7 +303,7 @@ int main(int argc, char *argv[])
       }
   }
 
-  for(int i = 0; i < nodesTabSize; i++){
+  for(int i = 0; i <= nodesTabSize; i++){
     if(nodesTab[i] != 0){
         printf("Tableau nodes indice : %i nombre de noeuds connectés : %i\n", i, nodesTab[i]);
     }
@@ -339,7 +335,7 @@ int main(int argc, char *argv[])
   }
 
   int k = 0;
-  for (int i = 1; i <= nodeNumber; i++) {
+  for (int i = 0; i < nodeNumber; i++) {
         // pointer to hold the address of the row
         int* ptr = edgesConnexionTab[i];
         printf("%i | Noeuds connectées : ", i);
