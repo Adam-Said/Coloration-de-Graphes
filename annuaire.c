@@ -1,5 +1,3 @@
-// Modifié à partir du code de Robin L'Huilier
-
 #include <netinet/in.h>
 #include <stdio.h> //perror
 #include <sys/types.h>
@@ -230,21 +228,21 @@ int getFirstNumber(char *fileName){
 	return atoi(nombre);
 }
 
-int * extractNumbers(char* line, int number)
+int extractNumbers(char* line, int number)
 {
     const char* s = line;
     int i1, i2;
     if (2 == sscanf(s, "%*[^0123456789]%i%*[^0123456789]%i", &i1, &i2))
     {
-        if(number == 0)
+        if(number == 0) {
             return i1;
+          }
         else if (number == 1)
         {
             return i2;
-        } else {
-            exit;
         }
     }
+  return 0;
 }
 
 int nextPlace(int tab[], int size){
@@ -279,7 +277,6 @@ int main(int argc, char *argv[])
 
   // Lecture du fichier
   FILE* file = fopen(filepath, "r");
-  char c;
   if(file == NULL){
     perror("Fichier : erreur ouverture fichier \n");
     free(filepath);
