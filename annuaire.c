@@ -286,27 +286,37 @@ int main(int argc, char *argv[])
   int bufferLength = 255;
   char buffer[bufferLength];
 
-  //Récupération du nombres de noeuds connectés à chaque noeuds
+  //Récupération du nombres de noeuds connectés à chaque noeud
 
-  int nodesTabSize = nodeNumber;
-  int nodesTab[250] = {0};
+  int* nodesTab = (int*)malloc(nodeNumber * sizeof(int));
+  int* edgesConnexionTab = (int*)malloc(nodeNumber * sizeof(int));
+
+  for(int i = 0; i < nodeNumber; i++){
+    nodesTab[i] = 0;
+    edgesConnexionTab[i] = 0;
+  }
 
   while(fgets(buffer, bufferLength, file)) {
-      if(buffer[0] == 'e'){ 
+      if(buffer[0] == 'e'){
         int n = extractNumbers(buffer, 0);
-        int n2 = extractNumbers(buffer, 1);
+        //int n2 = extractNumbers(buffer, 1);
         nodesTab[n]++;
-        nodesTab[n2]++;
+        //nodesTab[n2]++;
       }
   }
 
-  for(int i = 0; i <= nodesTabSize; i++){
+  for(int i = 1; i <= nodeNumber; i++){
     if(nodesTab[i] != 0){
         printf("Tableau nodes indice : %i nombre de noeuds connectés : %i\n", i, nodesTab[i]);
     }
   }
 
   fclose(file); 
+
+  
+  for(int i = 1; i <= nodeNumber; i++){
+    edgesConnexionTab[i] = malloc(sizeof(int) * nodesTab[i]);
+  }  
 
   //Nouvelle boucle pour stocker les noeuds connectés
   FILE* file2 = fopen(filepath, "r");
@@ -316,23 +326,17 @@ int main(int argc, char *argv[])
     exit(1);   
   }
 
-  int* edgesConnexionTab[250] = {0};
-
-  for(int i = 0; i < nodeNumber; i++){
-    edgesConnexionTab[i] = malloc(sizeof(int) * nodesTab[i]);
-  }  
-
   while(fgets(buffer, bufferLength, file)) {
-      if(buffer[0] == 'e'){ 
+      if(buffer[0] == 'e'){
         int n = extractNumbers(buffer, 0);
         int n2 = extractNumbers(buffer, 1);
         edgesConnexionTab[n][nextPlace(edgesConnexionTab[n], nodesTab[n])] = n2;
-        edgesConnexionTab[n2][nextPlace(edgesConnexionTab[n2], nodesTab[n2])] = n;
+        //edgesConnexionTab[n2][nextPlace(edgesConnexionTab[n2], nodesTab[n2])] = n;
       }
   }
 
-  int k = 0;
-  for (int i = 0; i < nodeNumber; i++) {
+  int k = 1;
+  for (int i = 1; i <= nodeNumber; i++) {
         // pointer to hold the address of the row
         int* ptr = edgesConnexionTab[i];
         printf("%i | Noeuds connectées : ", i);
@@ -345,7 +349,7 @@ int main(int argc, char *argv[])
         edgesConnexionTab[i]++;
     }
 
-  fclose(file2); 
+  fclose(file2);
 
   printf("Fichier : Le nombre d'anneaux nécessaires est %i \n", nodeNumber);
   //fclose(file); 
