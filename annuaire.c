@@ -245,7 +245,7 @@ int extractNumbers(char* line, int number)
   return 0;
 }
 
-int nextPlace(int tab[], int size){
+int nextPlace(int * tab, int size){
     int i = 0;
     while (i <= size && tab[i] != 0){
         i++;
@@ -289,11 +289,10 @@ int main(int argc, char *argv[])
   //Récupération du nombres de noeuds connectés à chaque noeud
 
   int* nodesTab = (int*)malloc(nodeNumber * sizeof(int));
-  int* edgesConnexionTab = (int*)malloc(nodeNumber * sizeof(int));
+  int** edgesConnexionTab = (int**)malloc(nodeNumber * sizeof(int*));
 
   for(int i = 0; i < nodeNumber; i++){
     nodesTab[i] = 0;
-    edgesConnexionTab[i] = 0;
   }
 
   while(fgets(buffer, bufferLength, file)) {
@@ -315,7 +314,7 @@ int main(int argc, char *argv[])
 
   
   for(int i = 1; i <= nodeNumber; i++){
-    edgesConnexionTab[i] = malloc(sizeof(int) * nodesTab[i]);
+    edgesConnexionTab[i] = (int*)malloc(sizeof(int*) * nodesTab[i]);
   }  
 
   //Nouvelle boucle pour stocker les noeuds connectés
@@ -335,7 +334,7 @@ int main(int argc, char *argv[])
       }
   }
 
-  int k = 1;
+  /*int k = 1;
   for (int i = 1; i <= nodeNumber; i++) {
         // pointer to hold the address of the row
         int* ptr = edgesConnexionTab[i];
@@ -347,7 +346,7 @@ int main(int argc, char *argv[])
         printf("\n");
         k++;
         edgesConnexionTab[i]++;
-    }
+    }*/
 
   fclose(file2);
 
