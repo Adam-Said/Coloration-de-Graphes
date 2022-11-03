@@ -2,12 +2,12 @@
 #~ définitions
 ########################################
 
-BIN=bin/anneaux  bin/annuaire
+BIN=bin/client  bin/server
 
 
 # liste des fichiers sources 
-SRCS0=anneaux.c
-SRCS1=annuaire.c
+SRCS0=client.c
+SRCS1=server.c
 
 default: $(BIN)
 
@@ -18,11 +18,11 @@ default: $(BIN)
 obj/%.o: %.c
 	gcc -Wall -Iinclude -c $< -o $@
 
-bin/anneaux: $(SRCS0:%.c=obj/%.o)
-	gcc -o $@ $+
+bin/client: $(SRCS0:%.c=obj/%.o)
+	gcc -o $@ $+ -lpthread
 
-bin/annuaire: $(SRCS1:%.c=obj/%.o)
-	gcc -o $@ $+
+bin/server: $(SRCS1:%.c=obj/%.o)
+	gcc -o $@ $+ -lpthread
 
 
 

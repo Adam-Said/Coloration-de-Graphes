@@ -361,8 +361,8 @@ int main(int argc, char *argv[])
   bindSocket(argv[1],ds);
   listenTCP(ds, 100);
 
-  // Création de la socket client
-   fd_set set, settmp;
+    // Création de la socket client
+    fd_set set, settmp;
     int dsClient;
     FD_ZERO(&set);
     FD_SET(ds, &set);
