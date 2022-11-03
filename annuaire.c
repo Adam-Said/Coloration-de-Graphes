@@ -405,7 +405,7 @@ int main(int argc, char *argv[])
                 printf("[SERVEUR] Problème lors de l'envoi des adresses\n");
             } else {
                 printf("[SERVEUR] Envoi réussi\n");
-                printf("[SERVEUR] Attente ...\n")
+                printf("[SERVEUR] Attente ...\n");
             }
             /*if (close(ds) == -1) {
                 printf("[SERVEUR] Problème lors de la fermeture du descripteur\n");
@@ -418,6 +418,6 @@ int main(int argc, char *argv[])
     //libération des tableaux
     for(int i = 0; i < nodeNumber; i++){
         free(edgesConnexionTab[i]);
-        free(nodesTab[i]);
+        free(&nodesTab[i]);
     } 
 }

@@ -1,0 +1,15 @@
+c FILE: fileTest3.txt
+c
+c SOURCE: David Johnson (dsj@research.att.com)
+c
+c DESCRIPTION: Random graph used in the paper
+c              "Optimization by Simulated Annealing: An
+c               Experimental Evaluation; Part II, Graph
+c               Coloring and Number Partitioning" by
+c              David S. Johnson, Cecilia R. Aragon, 
+c              Lyle A. McGeoch and Catherine Schevon
+c              Operations Research, 39, 378-406 (1991)
+c
+p edge 3
+e 2 1
+e 3 2
