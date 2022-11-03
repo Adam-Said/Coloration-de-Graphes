@@ -369,7 +369,7 @@ int main(int argc, char *argv[])
     int maxDescripteur = ds;
     struct sockaddr_in sockClient; 
     socklen_t lgAdr;
-    int nbMaxAnneau = 100;
+    int nbMaxAnneau = 1000;
     struct sousAnneau sousAnneaux[nbMaxAnneau];
     int currentMaxAnneau = 0;
 
@@ -405,17 +405,19 @@ int main(int argc, char *argv[])
                 printf("[SERVEUR] Problème lors de l'envoi des adresses\n");
             } else {
                 printf("[SERVEUR] Envoi réussi\n");
+                printf("[SERVEUR] Attente ...\n")
             }
-            if (close(ds) == -1) {
+            /*if (close(ds) == -1) {
                 printf("[SERVEUR] Problème lors de la fermeture du descripteur\n");
             }
             printf("[SERVEUR] Au revoir.\n");
-            exit(0);
+            exit(0);*/
         }
     }
 
     //libération des tableaux
     for(int i = 0; i < nodeNumber; i++){
         free(edgesConnexionTab[i]);
+        free(nodesTab[i]);
     } 
 }
