@@ -9,6 +9,7 @@
 #include<arpa/inet.h>
 #include<string.h>
 #include <sys/stat.h>
+#include <math.h>
 
 struct paquet {
     int requete;
@@ -118,32 +119,33 @@ int main(int argc, char *argv[]) {
     }
     printf("Client : socket client sur écoute.\n");
 
-  fd_set set, settmp;
+  fd_set set;
+  fd_set settmp;
   FD_ZERO(&set); //initialisation à 0 des booléens de scrutation
   FD_SET(sock_list, &set); //ajout de la socket client au tableau de scrutation
   FD_SET(dsServ, &set); //ajout de la socket client au tableau de scrutation
-  int maxDesc = sock_list;
-
+  int maxDesc = (sock_list > dsServ ) ? sock_list : dsServ;
+  printf("Client : attente de connexion du serveur.\n");
   while(1){
     settmp = set;
     if (select(maxDesc+1, &settmp, NULL, NULL, NULL) == -1) {
       printf("[CLIENT] Problème lors du select\n");
-      continue;
     }
-    select(maxDesc+1, &settmp, NULL, NULL, NULL);
     for(int df = 2; df <= maxDesc; df++){
       if(!FD_ISSET(df, &settmp)) continue;
-      if(df == ds){
-        int dsC = accept(sock_list, NULL, NULL);
+      if(df != dsServ){
+        struct sockaddr_in sock_clt;
+        socklen_t size = sizeof(sock_clt);
+        int dsC = accept(sock_list, (struct sockaddr *)&sock_clt, &size);
+        printf("[SERVEUR] Le client connecté est %s:%i.\n",inet_ntoa(sock_clt.sin_addr), ntohs(sock_clt.sin_port));
+        char msg[4000];
+        if(recv(df, msg, sizeof(msg), 0) != 0){
+          FD_CLR(df, &set); 
+          printf("la socket se retire\n");
+          close(df);
+        }
         FD_SET(dsC, &set);
         if(maxDesc < dsC) maxDesc = dsC;
-        continue;
-      }
-      char msg[4000];
-      if(recv(df, msg, sizeof(msg), 0) <= 0){
-        FD_CLR(df, &set); 
-        printf("la socket se retire\n");
-        close(df);
         continue;
       }
       char len[400];

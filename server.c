@@ -44,6 +44,7 @@ void request(void *arg) {
       
       args->ptr = adr;
     
+      int res = send(newConnection, "Bienvenue sur le serveur !", 26, 0);
       close(newConnection);
       pthread_exit(NULL);
 }
