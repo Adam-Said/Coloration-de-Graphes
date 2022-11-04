@@ -9,6 +9,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <pthread.h>
+#include <ctype.h>
 
 
 struct thread_args {
@@ -230,25 +231,17 @@ int main(int argc, char *argv[])
         args.ptr = ".";
         pthread_create(&threads[i], NULL, request, &args);
         ( *ptr )[i] = args.ptr;
-
-        
     }
 
     for (int i = 0; i < numberClient; i++) // Attente réponses
     {
+      printf("[Serveur] Attente de tous les noeuds\n");
       pthread_join(threads[i], NULL);
     }
     printf("Serveur : c'est fini\n");
 
   for (int i = 0; i < numberClient; i++) {
     printf("String %i : %s\n", i+1, adresses[i] );
-  }
-
-  for (int i = 0; i < numberClient; i++) {
-    if(i == numberClient - 1){
-      printf("envoi ici du dernier élément avec le premier\n");
-    }
-    printf("Affectation des adresses aux clients : client %i : %s\n reçois %i : %s", i+1, adresses[i], i+2, adresses[i+1]);
   }
 
     close(srv);
