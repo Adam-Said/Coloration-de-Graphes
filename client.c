@@ -125,20 +125,20 @@ int main(int argc, char *argv[]) {
 
         //étape 1 : réception du nombre de noeuds auxquels se connecter
         printf("[Client] Réception du nombre de voisins\n");
-        size_t neighbors;
-        int res = recvTCP(sock_list, &neighbors, sizeof(neighbors));
+        int neighbors;
+        int res = recvTCP(dsServ, &neighbors, sizeof(int));
         if (res == -1 || res == 0) {
             perror("[Client] Erreur lors de la reception du nombre de noeuds voisins\n");
             exit(0);
         }
-        printf("[Client] Nombre de voisins en attente : %zu voisins\n", neighbors);
+        printf("[Client] Nombre de voisins en attente : %i voisins\n", neighbors);
         //étape 2 : boucle avec for et i<nombreNoeud reception un part un de chaque adresses de noeuds et stockage dans la struct + création socket
         printf("[Client] Reception et stockage des adresses voisines\n");
         struct paquet* voisinsAdr = (struct paquet*)malloc(neighbors * sizeof(struct paquet));
 
         for(int i = 0; i < neighbors; i++){
             struct paquet adr;
-            int reception = recvTCP(sock_list, &adr, sizeof(adr));
+            int reception = recvTCP(dsServ, &adr, sizeof(adr));
             if(reception == -1 || reception == 0){
               perror("[Client] Erreur lors de la reception de l'adresse d'un voisin\n");
               exit(0);
@@ -174,7 +174,7 @@ int main(int argc, char *argv[]) {
       } else {
         //Acceptation de la connexion d'un autre client
         //Ajout de la socket au tableau de scrutation
-        int dsC = accept(sock_list, (struct sockaddr *)&sock_clt, &size);
+        int dsC = accept(dsC, (struct sockaddr *)&sock_clt, &size);
         FD_SET(dsC, &set);
         if(maxDesc < dsC) maxDesc = dsC;
       }

@@ -13,20 +13,21 @@
 
 
 struct thread_args {
+    struct paquet *paquet;
+    int numberOfEdges;
+};
+struct paquet {
     int socket;
-    struct sockaddr_in sock_srv;
-    int ** edgeConnectionsTab;
-    int index;
-    char * ptr;
+    struct sockaddr_in adresse;
 };
 
-void request(void *arg) {
+void * request(void *arg) {
     struct thread_args *args = (struct thread_args *)arg;
-    int sock = args->socket;
-    struct sockaddr_in sock_srv = args->sock_srv;
+    struct paquet *paquet = args->paquet;
     struct sockaddr_in sock_clt;
+    int ds = paquet->socket;
     socklen_t size = sizeof(sock_clt);
-    int newConnection = accept(sock, (struct sockaddr *)&sock_clt, &size);
+    int newConnection = accept(ds, (struct sockaddr *)&sock_clt, &size);
 
     if (newConnection == -1)
     {
@@ -36,15 +37,17 @@ void request(void *arg) {
 
       printf("[SERVEUR] Le client connecté est %s:%i.\n",inet_ntoa(sock_clt.sin_addr), ntohs(sock_clt.sin_port));
 
-      char adr[23];
-      char port[5];
-      sprintf(port, "%d",  ntohs(sock_clt.sin_port)); 
-      strcat(adr,inet_ntoa(sock_clt.sin_addr));
-      strcat(adr,port);
+      paquet->adresse = sock_clt;
+      paquet->adresse.sin_addr =  sock_clt.sin_addr;
+      paquet->adresse.sin_port =  ntohs(sock_clt.sin_port);
       
-      args->ptr = adr;
-    
-      int res = send(newConnection, "Bienvenue sur le serveur !", 26, 0);
+      args->paquet = paquet;
+      int numberOfEdges = args->numberOfEdges;
+      int res = send(newConnection, &numberOfEdges, sizeof(int), 0);
+      if(res == -1) {
+          perror("[Serveur] : problème lors de l'envoi du nombre d'arêtes");
+          exit(1);
+      }
       close(newConnection);
       pthread_exit(NULL);
 }
@@ -180,12 +183,7 @@ int main(int argc, char *argv[])
 
     int numberClient = nodeNumber;
 
-    char *adresses[numberClient];
-    char * ( *ptr )[numberClient] = &adresses;
-    
-    for (int i = 0; i < numberClient; i++) {
-        ( *ptr )[i] = ".";
-    }
+    struct paquet* clientAdr = (struct paquet*)malloc(numberClient* sizeof(struct paquet));
 
     /* etape 1 : creer une socket d'écoute des demandes de connexions*/
     int srv = socket(PF_INET, SOCK_STREAM, 0);
@@ -197,7 +195,6 @@ int main(int argc, char *argv[])
     printf("Serveur : création de la socket réussi !\n");
     /* etape 2 : nommage de la socket */
     struct sockaddr_in socket_srv;
-    socklen_t size = sizeof(struct sockaddr_in);
     socket_srv.sin_family = AF_INET;
     socket_srv.sin_addr.s_addr = INADDR_ANY;
     socket_srv.sin_port = htons((short)atoi(argv[1]));
@@ -223,17 +220,17 @@ int main(int argc, char *argv[])
 
     pthread_t threads[numberClient];
     
-    for (size_t i = 0; i < numberClient; i++) {
+    for (size_t i = 1; i <= numberClient; i++) {
+        struct paquet paquet;
+        paquet.socket = srv;
         struct thread_args args;
-        args.socket = srv;
-        args.sock_srv = socket_srv;
-        args.edgeConnectionsTab = edgesConnexionTab;
-        args.index = i;
-        args.ptr = ".";
-        pthread_create(&threads[i], NULL, request, &args);
-        ( *ptr )[i] = args.ptr;
+        args.paquet = &paquet;
+        printf("nodesTab : %i\n", nodesTab[i]);
+        args.numberOfEdges = nodesTab[i];
+        pthread_create(&threads[i], NULL, &request, &args);
+        clientAdr[i] = *args.paquet;
     }
-
+ 
     for (int i = 0; i < numberClient; i++) // Attente réponses
     {
       printf("[Serveur] Attente de tous les noeuds\n");
@@ -241,10 +238,7 @@ int main(int argc, char *argv[])
     }
     printf("Serveur : c'est fini\n");
 
-  for (int i = 0; i < numberClient; i++) {
-    printf("String %i : %s\n", i+1, adresses[i] );
-  }
-
+    
     close(srv);
 
     for(int i = 0; i < nodeNumber; i++){
