@@ -2,12 +2,13 @@
 #~ définitions
 ########################################
 
-BIN=bin/client  bin/server
+BIN=bin/client  bin/server bin/serverMultiplex
 
 
 # liste des fichiers sources 
 SRCS0=client.c
-SRCS1=server.c
+SRCS1=serverMultiplex.c
+SRCS2=server.c
 
 default: $(BIN)
 
@@ -21,7 +22,10 @@ obj/%.o: %.c
 bin/client: $(SRCS0:%.c=obj/%.o)
 	gcc -o $@ $+ -lpthread
 
-bin/server: $(SRCS1:%.c=obj/%.o)
+bin/serverMultiplex: $(SRCS1:%.c=obj/%.o)
+	gcc -o $@ $+ -lpthread
+
+bin/server: $(SRCS2:%.c=obj/%.o)
 	gcc -o $@ $+ -lpthread
 
 

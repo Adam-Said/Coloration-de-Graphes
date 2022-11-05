@@ -10,47 +10,13 @@
 #include <sys/stat.h>
 #include <pthread.h>
 #include <ctype.h>
+#include <sys/select.h>
+#include <math.h>
 
-
-struct thread_args {
-    struct paquet *paquet;
-    int numberOfEdges;
-};
 struct paquet {
     int socket;
     struct sockaddr_in adresse;
 };
-
-void * request(void *arg) {
-    struct thread_args *args = (struct thread_args *)arg;
-    struct paquet *paquet = args->paquet;
-    struct sockaddr_in sock_clt;
-    int ds = paquet->socket;
-    socklen_t size = sizeof(sock_clt);
-    int newConnection = accept(ds, (struct sockaddr *)&sock_clt, &size);
-
-    if (newConnection == -1)
-    {
-        perror("[Serveur] : problème lors de la connexion d'un client");
-        exit(1);
-    }
-
-      printf("[SERVEUR] Le client connecté est %s:%i.\n",inet_ntoa(sock_clt.sin_addr), ntohs(sock_clt.sin_port));
-
-      paquet->adresse = sock_clt;
-      paquet->adresse.sin_addr =  sock_clt.sin_addr;
-      paquet->adresse.sin_port =  ntohs(sock_clt.sin_port);
-      
-      args->paquet = paquet;
-      int numberOfEdges = args->numberOfEdges;
-      int res = send(newConnection, &numberOfEdges, sizeof(int), 0);
-      if(res == -1) {
-          perror("[Serveur] : problème lors de l'envoi du nombre d'arêtes");
-          exit(1);
-      }
-      close(newConnection);
-      pthread_exit(NULL);
-}
 
 int getFirstNumber(char *fileName){
     char* texte = fileName;
@@ -180,26 +146,23 @@ int main(int argc, char *argv[])
 
     // Fin parser
 
-
     int numberClient = nodeNumber;
 
     struct paquet* clientAdr = (struct paquet*)malloc(numberClient* sizeof(struct paquet));
 
     /* etape 1 : creer une socket d'écoute des demandes de connexions*/
     int srv = socket(PF_INET, SOCK_STREAM, 0);
-    if (srv == -1)
-    {
+    if (srv == -1){
         perror("Serveur : problème lors de la création de la socket");
         exit(1);
     }
     printf("Serveur : création de la socket réussi !\n");
     /* etape 2 : nommage de la socket */
-    struct sockaddr_in socket_srv;
-    socket_srv.sin_family = AF_INET;
-    socket_srv.sin_addr.s_addr = INADDR_ANY;
-    socket_srv.sin_port = htons((short)atoi(argv[1]));
-    int res = bind(srv, (struct sockaddr *)&socket_srv, sizeof(socket_srv));
-
+    struct sockaddr_in sock_srv;
+    sock_srv.sin_family = AF_INET;
+    sock_srv.sin_addr.s_addr = INADDR_ANY;
+    sock_srv.sin_port = htons((short)atoi(argv[1]));
+    int res = bind(srv, (struct sockaddr *)&sock_srv, sizeof(sock_srv));
     if (res == -1){
         perror("Serveur : problème lors du nommage de la socket");
         exit(1);
@@ -216,24 +179,34 @@ int main(int argc, char *argv[])
   
     /* etape 4 : plus qu'a attendre la demande d'un client */
 
-    pthread_t threads[numberClient];
-    
-    for (size_t i = 1; i <= numberClient; i++) {
-        struct paquet paquet;
-        paquet.socket = srv;
-        struct thread_args args;
-        args.paquet = &paquet;
-        printf("nodesTab : %i\n", nodesTab[i]);
-        args.numberOfEdges = nodesTab[i];
-        pthread_create(&threads[i], NULL, &request, &args);
-        clientAdr[i] = *args.paquet;
+    fd_set set, settmp;
+    FD_ZERO(&set); //initialisation à 0 des booléens de scrutation
+    FD_SET(srvListen, &set); //ajout de la socket serveur au tableau de scrutation
+    int maxDesc = srvListen;
+    printf("[Serveur] : attente de connexion des clients.\n");
+    while(1){
+        struct paquet* voisinsAdr = (struct paquet*)malloc(nodeNumber * sizeof(struct paquet));
+        settmp = set;
+        if (select(maxDesc+1, &settmp, NULL, NULL, NULL) == -1) {
+            printf("[Serveur] Problème lors du select\n");
+        }
+        for(int df = 2; df <= maxDesc; df++){
+            //Acceptation de la connexion d'un client
+            socklen_t size = sizeof(sock_srv);
+            int dsC = accept(srvListen, (struct sockaddr *)&sock_srv, &size);
+            printf("[SERVEUR] Le client connecté est %s:%i.\n",inet_ntoa(sock_srv.sin_addr), ntohs(sock_srv.sin_port));
+            if(!FD_ISSET(df, &settmp)) FD_SET(dsC, &set);
+            if(maxDesc < dsC) maxDesc = dsC;
+            continue;
+        }
     }
- 
-    for (int i = 0; i < numberClient; i++) // Attente réponses
-    {
-      printf("[Serveur] Attente de tous les noeuds\n");
-      pthread_join(threads[i], NULL);
+
+    // fermeture socket
+    if(close(srv) == -1) {
+        printf("[Serveur] : pb fermeture socket\n");
+        exit(1);
     }
+    printf("Serveur : socket fermée !\n");
     printf("Serveur : c'est fini\n");
 
     

@@ -99,10 +99,10 @@ int main(int argc, char *argv[]) {
   int sock_list = listen(ds, 1000);
     if (sock_list == -1)
     {
-        perror("Client : problème lors de la mise en écoute de la socket");
+        perror("[Client] : problème lors de la mise en écoute de la socket");
         exit(1);
     }
-    printf("Client : socket client sur écoute.\n");
+    printf("[Client] : socket client sur écoute.\n");
 
   fd_set set;
   fd_set settmp;
@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
   FD_SET(sock_list, &set); //ajout de la socket client au tableau de scrutation
   FD_SET(dsServ, &set); //ajout de la socket client au tableau de scrutation
   int maxDesc = (sock_list > dsServ ) ? sock_list : dsServ;
-  printf("Client : attente de connexion du serveur.\n");
+  printf("[Client] : attente de connexion du serveur.\n");
   while(1){
     settmp = set;
     if (select(maxDesc+1, &settmp, NULL, NULL, NULL) == -1) {
@@ -119,7 +119,6 @@ int main(int argc, char *argv[]) {
     for(int df = 2; df <= maxDesc; df++){
       if(!FD_ISSET(df, &settmp)) continue;
       if(df == dsServ){
-        struct sockaddr_in sock_clt;
         socklen_t size = sizeof(sock_clt);
         int dsC = accept(sock_list, (struct sockaddr *)&sock_clt, &size);
 
@@ -174,10 +173,12 @@ int main(int argc, char *argv[]) {
       } else {
         //Acceptation de la connexion d'un autre client
         //Ajout de la socket au tableau de scrutation
-        int dsC = accept(dsC, (struct sockaddr *)&sock_clt, &size);
+        int dsC = accept(sock_list, (struct sockaddr *)&sock_clt, &size);
+        printf("Connexion d'un client");
         FD_SET(dsC, &set);
         if(maxDesc < dsC) maxDesc = dsC;
       }
+      printf("Je vais me faire foutre");
       char len[400];
       send(df, len, strlen(len) + 1, 0);
     }
