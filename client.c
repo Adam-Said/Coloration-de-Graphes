@@ -12,9 +12,7 @@
 #include <math.h>
 
 struct paquet {
-    int requete;
-    int information;
-    int information2;
+    int socket;
     struct sockaddr_in adresse;
 };
 
@@ -98,19 +96,6 @@ int main(int argc, char *argv[]) {
     exit(0);
   }
 
-  struct paquet msg;
-  msg.requete = 1;
-  /*if (sendTCP(dsServ, &msg, sizeof(struct paquet)) <= 0)
-  {
-      printf("Problème lors de l'envoi de l'adresse d'écoute\n");
-  }
-
-  if (recvTCP(dsServ, &msg, sizeof(struct paquet)) <= 0)
-  {
-      printf("Probleme lors de la réception du numéro attribué\n");
-      exit(0);
-  }*/
-
   int sock_list = listen(ds, 1000);
     if (sock_list == -1)
     {
@@ -133,20 +118,65 @@ int main(int argc, char *argv[]) {
     }
     for(int df = 2; df <= maxDesc; df++){
       if(!FD_ISSET(df, &settmp)) continue;
-      if(df != dsServ){
+      if(df == dsServ){
         struct sockaddr_in sock_clt;
         socklen_t size = sizeof(sock_clt);
         int dsC = accept(sock_list, (struct sockaddr *)&sock_clt, &size);
-        printf("[SERVEUR] Le client connecté est %s:%i.\n",inet_ntoa(sock_clt.sin_addr), ntohs(sock_clt.sin_port));
-        char msg[4000];
-        if(recv(df, msg, sizeof(msg), 0) != 0){
-          FD_CLR(df, &set); 
-          printf("la socket se retire\n");
-          close(df);
+
+        //étape 1 : réception du nombre de noeuds auxquels se connecter
+        printf("[Client] Réception du nombre de voisins\n");
+        size_t neighbors;
+        int res = recvTCP(sock_list, &neighbors, sizeof(neighbors));
+        if (res == -1 || res == 0) {
+            perror("[Client] Erreur lors de la reception du nombre de noeuds voisins\n");
+            exit(0);
         }
-        FD_SET(dsC, &set);
+        printf("[Client] Nombre de voisins en attente : %zu voisins\n", neighbors);
+        //étape 2 : boucle avec for et i<nombreNoeud reception un part un de chaque adresses de noeuds et stockage dans la struct + création socket
+        printf("[Client] Reception et stockage des adresses voisines\n");
+        struct paquet* voisinsAdr = (struct paquet*)malloc(neighbors * sizeof(struct paquet));
+
+        for(int i = 0; i < neighbors; i++){
+            struct paquet adr;
+            int reception = recvTCP(sock_list, &adr, sizeof(adr));
+            if(reception == -1 || reception == 0){
+              perror("[Client] Erreur lors de la reception de l'adresse d'un voisin\n");
+              exit(0);
+            }
+
+            voisinsAdr[i].adresse = adr.adresse;
+            int dsVoisins = socket(PF_INET, SOCK_STREAM, 0);
+            if (dsVoisins == -1)
+            {
+                perror("[Client] Problème lors de la creation de la socket pour la connexion voisine\n");
+                exit(1);
+            }
+            voisinsAdr[i].socket = dsVoisins;
+            printf("[Client] Une adresse voisine est %s:%i.\n", inet_ntoa(voisinsAdr[i].adresse.sin_addr), ntohs(voisinsAdr[i].adresse.sin_port));
+        }
+        //étape 3 : boucle de connexion
+        for(int j = 0; j < neighbors; j++){
+          struct sockaddr_in sock_voisin;
+          sock_voisin.sin_family = AF_INET;
+          sock_voisin.sin_addr.s_addr = inet_ntoa(voisinsAdr[j].adresse.sin_addr);
+          sock_voisin.sin_port = htons(voisinsAdr[j].adresse.sin_port);
+          socklen_t lgAdr = sizeof(struct sockaddr_in);
+          printf("Création de la socket réussie \n");
+          int co = connect(voisinsAdr[j].socket, (struct sockaddr *)&sock_voisin, lgAdr);
+          if(co == -1){
+            perror("[Client] Erreur lors de la connexion au voisin\n");
+            exit(0);
+          } 
+          printf("[Client] Connexion au voisin %s:%i réussie\n", inet_ntoa(voisinsAdr[j].adresse.sin_addr), ntohs(voisinsAdr[j].adresse.sin_port));
+        }
         if(maxDesc < dsC) maxDesc = dsC;
         continue;
+      } else {
+        //Acceptation de la connexion d'un autre client
+        //Ajout de la socket au tableau de scrutation
+        int dsC = accept(sock_list, (struct sockaddr *)&sock_clt, &size);
+        FD_SET(dsC, &set);
+        if(maxDesc < dsC) maxDesc = dsC;
       }
       char len[400];
       send(df, len, strlen(len) + 1, 0);
