@@ -18,6 +18,36 @@ struct paquet {
     struct sockaddr_in adresse;
 };
 
+int sendTCP(int sock, void* msg, int sizeMsg) {
+    int res;
+    int sent = 0;
+    while(sent < sizeMsg) {
+        res = send(sock, msg+sent, sizeMsg-sent, 0);
+        sent += res;
+        if (res == -1) {
+            printf("Problème lors de l'envoi du message\n");
+            return -1;
+        }
+    }
+    return sent;
+}
+
+int recvTCP(int sock, void* msg, int sizeMsg) {
+    int res;
+    int received = 0;
+    while(received < sizeMsg) {
+        res = recv(sock, msg+received, sizeMsg-received, 0);
+        received += res;
+        if (res == -1) {
+            printf("Problème lors de la réception du message\n");
+            return -1;
+        } else if (res == 0) {
+            return 0;
+        }
+    }
+    return received;
+}
+
 int getFirstNumber(char *fileName){
     char* texte = fileName;
 	char nombre[10];
@@ -34,6 +64,15 @@ int getFirstNumber(char *fileName){
 	return atoi(nombre);
 }
 
+int createSocket() {
+    int ds = socket(PF_INET, SOCK_STREAM, 0);
+    if (ds == -1){
+        perror("[Serveur] Problème lors de la création de la socket :");
+        exit(1); 
+    }
+    printf("[Serveur] Création de la socket réussie \n");
+    return ds;
+}
 
 int extractNumbers(char* line, int number)
 {
@@ -59,7 +98,6 @@ int nextPlace(int * tab, int size){
     }
     return i;
 }
-
 
 int main(int argc, char *argv[])
 {
@@ -146,17 +184,8 @@ int main(int argc, char *argv[])
 
     // Fin parser
 
-    int numberClient = nodeNumber;
-
-    struct paquet* clientAdr = (struct paquet*)malloc(numberClient* sizeof(struct paquet));
-
     /* etape 1 : creer une socket d'écoute des demandes de connexions*/
-    int srv = socket(PF_INET, SOCK_STREAM, 0);
-    if (srv == -1){
-        perror("Serveur : problème lors de la création de la socket");
-        exit(1);
-    }
-    printf("Serveur : création de la socket réussi !\n");
+    int srv = createSocket();
     /* etape 2 : nommage de la socket */
     struct sockaddr_in sock_srv;
     sock_srv.sin_family = AF_INET;
@@ -164,10 +193,10 @@ int main(int argc, char *argv[])
     sock_srv.sin_port = htons((short)atoi(argv[1]));
     int res = bind(srv, (struct sockaddr *)&sock_srv, sizeof(sock_srv));
     if (res == -1){
-        perror("Serveur : problème lors du nommage de la socket");
+        perror("[Serveur] : problème lors du nommage de la socket");
         exit(1);
     }
-    printf("Serveur : nommage de la socket réussi !\n");
+    printf("[Serveur] : nommage de la socket réussi !\n");
 
     /* etape 3 : mise en ecoute des demandes de connexions */
     int srvListen = listen(srv, 1000);
@@ -175,29 +204,76 @@ int main(int argc, char *argv[])
         perror("Serveur : problème lors de la mise en écoute de la socket");
         exit(1);
     }
-    printf("Serveur : socket serveur sur écoute.\n");
+    printf("[Serveur] : socket serveur sur écoute.\n");
   
     /* etape 4 : plus qu'a attendre la demande d'un client */
 
     fd_set set, settmp;
+    int dsClient;
     FD_ZERO(&set); //initialisation à 0 des booléens de scrutation
-    FD_SET(srvListen, &set); //ajout de la socket serveur au tableau de scrutation
-    int maxDesc = srvListen;
+    FD_SET(srv, &set); //ajout de la socket serveur au tableau de scrutation
+    int maxDesc = srv;
+    struct sockaddr_in sockClient; 
+    socklen_t lgAdr;
     printf("[Serveur] : attente de connexion des clients.\n");
+    //struct paquet* voisinsAdr = (struct paquet*)malloc(nodeNumber * sizeof(struct paquet));
+    struct paquet voisins[nodeNumber];
+    int nodeIndex = 1;
     while(1){
-        struct paquet* voisinsAdr = (struct paquet*)malloc(nodeNumber * sizeof(struct paquet));
         settmp = set;
         if (select(maxDesc+1, &settmp, NULL, NULL, NULL) == -1) {
             printf("[Serveur] Problème lors du select\n");
         }
         for(int df = 2; df <= maxDesc; df++){
+            if(df == srv){
+                //socklen_t size = sizeof(sockClient);
+                if (!FD_ISSET(df, &settmp)) {continue;}
+
+                dsClient = accept(srv, (struct sockaddr *)&sockClient, &lgAdr);
+                if (recvTCP(dsClient, &voisins, sizeof(struct paquet)) <= 0) {
+                    printf("[Serveur] Problème lors de la réception de l'adresse d'écoute\n");
+                    exit(0);
+                }
+                char adresse[INET_ADDRSTRLEN];
+                inet_ntop(AF_INET, &voisins[nodeIndex].adresse.sin_addr, adresse, INET_ADDRSTRLEN);
+                int port = htons(voisins[nodeIndex].adresse.sin_port);
+                printf("[Serveur] %i) %s:%i\n", nodeIndex, adresse, port);
+                
+                voisins[nodeIndex].adresse = sockClient; 
+                printf("[Serveur] : Envoi du nombre de voisins du noeuds %i\n", nodeIndex);
+                res = sendTCP(dsClient, &nodesTab[nodeIndex], sizeof(int));
+                if(res == -1) {
+                    perror("[Serveur] : problème lors de l'envoi du nombre d'arêtes");
+                    exit(1);
+                }
+                printf("[Serveur] Nombre de voisins du noeuds %i envoyé avec succès\n", nodeIndex);
+
+
+
+
+
+                
+                if(!FD_ISSET(df, &settmp)) FD_SET(dsClient, &set);
+                if(maxDesc < dsClient) maxDesc = dsClient;
+                nodeIndex++;
+                continue;
+            }
             //Acceptation de la connexion d'un client
-            socklen_t size = sizeof(sock_srv);
-            int dsC = accept(srvListen, (struct sockaddr *)&sock_srv, &size);
-            printf("[SERVEUR] Le client connecté est %s:%i.\n",inet_ntoa(sock_srv.sin_addr), ntohs(sock_srv.sin_port));
-            if(!FD_ISSET(df, &settmp)) FD_SET(dsC, &set);
-            if(maxDesc < dsC) maxDesc = dsC;
-            continue;
+        }
+
+        if (nodeIndex == nodeNumber) {
+            printf("[Serveur] Tous les anneaux sont connectés, envoi des adresses\n");
+            /*if (sendAdrSubRing(sousAnneaux, currentMaxAnneau) == -1) {
+                printf("[SERVEUR] Problème lors de l'envoi des adresses\n");
+            } else {
+                printf("[SERVEUR] Envoi réussi\n");
+                printf("[SERVEUR] Attente ...\n");
+            }
+            if (close(ds) == -1) {
+                printf("[SERVEUR] Problème lors de la fermeture du descripteur\n");
+            }
+            printf("[SERVEUR] Au revoir.\n");
+            exit(0);*/
         }
     }
 
@@ -206,8 +282,8 @@ int main(int argc, char *argv[])
         printf("[Serveur] : pb fermeture socket\n");
         exit(1);
     }
-    printf("Serveur : socket fermée !\n");
-    printf("Serveur : c'est fini\n");
+    printf("[Serveur] : socket fermée !\n");
+    printf("[Serveur] : c'est fini\n");
 
     
     close(srv);

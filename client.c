@@ -97,12 +97,28 @@ int main(int argc, char *argv[]) {
   }
 
   int sock_list = listen(ds, 1000);
-    if (sock_list == -1)
-    {
+  if (sock_list == -1){
         perror("[Client] : problème lors de la mise en écoute de la socket");
         exit(1);
-    }
-    printf("[Client] : socket client sur écoute.\n");
+  }
+  struct sockaddr_in sock_ecoute; 
+  socklen_t sizeList = sizeof(struct sockaddr_in);
+  sock_ecoute.sin_family = AF_INET;
+  sock_ecoute.sin_addr.s_addr = INADDR_ANY;
+  sock_ecoute.sin_port = htons((short)atoi(argv[3]));
+  int bd = bind(sock_list, (struct sockaddr *)&sock_ecoute, sizeof(sock_ecoute));
+  if (bd == 0){
+        printf("Socket nommée avec succès\n");
+  }
+  printf("[Client] : socket client sur écoute.\n");
+
+  struct paquet msg;
+  
+  msg.adresse = sock_ecoute;
+  if (sendTCP(dsServ, &msg, sizeof(struct paquet)) <= 0){
+      printf("[Client] Problème lors de l'envoi de l'adresse d'écoute\n");
+  }
+  printf("[Client] Envoi de l'adresse d'écoute réussi\n");
 
   fd_set set;
   fd_set settmp;
