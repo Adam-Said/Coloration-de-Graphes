@@ -240,6 +240,7 @@ int main(int argc, char *argv[])
                 printf("[Serveur] %i) %s:%i\n", nodeIndex, adresse, port);
                 
                 voisins[nodeIndex].adresse = sockClient; 
+                voisins[nodeIndex].socket = dsClient;
                 printf("[Serveur] : Envoi du nombre de voisins du noeuds %i\n", nodeIndex);
                 res = sendTCP(dsClient, &nodesTab[nodeIndex], sizeof(int));
                 if(res == -1) {
@@ -253,26 +254,33 @@ int main(int argc, char *argv[])
                 nodeIndex++;
                 continue;
             }
-            //Acceptation de la connexion d'un client
         }
 
-        if (nodeIndex == nodeNumber) {
+        if (nodeIndex == nodeNumber+1) {
             printf("[Serveur] Tous les anneaux sont connectés, envoi des adresses\n");
             //récupération des adresses correspondantes aux nombres dans edgesConnexionTab
             struct paquet ssAdr;
-            for (int i = 0; i<nodeNumber-1; i++) {
-                for(int j = 0; j < nodesTab[i]; j++){
-                    ssAdr.adresse = voisins[*edgesConnexionTab[j]].adresse;
-                    char adresses[INET_ADDRSTRLEN];
-                    inet_ntop(AF_INET, &ssAdr.adresse.sin_addr, adresses, INET_ADDRSTRLEN);
-                    int port = htons(ssAdr.adresse.sin_port);
-                    printf("[SERVEUR] Envoi de l'adresse: %s:%i\n", adresses, port);
-                    if (sendTCP(voisins[i].socket, &ssAdr, sizeof(struct paquet)) <= 0) {
-                        printf("[SERVEUR] Problème lors de l'envoi des adresses\n");
+            for (int i = 1; i<=nodeNumber; i++) {
+                if(nodesTab[i] != 0){
+                    printf("[Serveur/Envoi] Début de l'envoi des voisins du noeud %i\n", i);
+                    for(int j = 0; j < nodesTab[i]; j++){ //parcours du sous tableau
+                        ssAdr.adresse = voisins[edgesConnexionTab[i][j]].adresse;
+                        printf("[Serveur/Envoi] Envoi de l'adresse du noeud %i\n", edgesConnexionTab[i][j]);
+                        char adresses[INET_ADDRSTRLEN];
+                        inet_ntop(AF_INET, &ssAdr.adresse.sin_addr, adresses, INET_ADDRSTRLEN);
+                        int port = htons(ssAdr.adresse.sin_port);
+                        printf("[Serveur/Envoi] ---> Envoi de l'adresse: %s:%i\n", adresses, port);
+                        if (sendTCP(voisins[i].socket, &ssAdr, sizeof(struct paquet)) <= 0) {
+                            printf("[Serveur/Envoi] Problème lors de l'envoi des adresses\n");
+                        }
                     }
+                    printf("[Serveur/Envoi] Toutes les adresses voisines du noeud %i ont été envoyées\n", i);
+                } else {
+                    printf("[Serveur/Envoi] Aucun noeuds à envoyer au noeuds %i, je passe au prochain\n", i);
                 }
             }
         }
+        printf("[Serveur] Serveur en attente de travail\n");
     } 
 
     // fermeture socket
