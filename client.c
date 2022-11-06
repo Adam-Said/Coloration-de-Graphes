@@ -72,8 +72,8 @@ int main(int argc, char *argv[]) {
       perror("[Client] : pb nommage socket :\n");
       exit(1);
   }
-  /* etape 2 : designer la socket du serveur */
 
+  /* etape 2 : designer la socket du serveur */
   int dsServ = socket(PF_INET, SOCK_STREAM, 0);
   if (dsServ == -1)
   {
@@ -101,20 +101,11 @@ int main(int argc, char *argv[]) {
         perror("[Client] : problème lors de la mise en écoute de la socket");
         exit(1);
   }
-  struct sockaddr_in sock_ecoute; 
-  socklen_t sizeList = sizeof(struct sockaddr_in);
-  sock_ecoute.sin_family = AF_INET;
-  sock_ecoute.sin_addr.s_addr = INADDR_ANY;
-  sock_ecoute.sin_port = htons((short)atoi(argv[3]));
-  int bd = bind(sock_list, (struct sockaddr *)&sock_ecoute, sizeof(sock_ecoute));
-  if (bd == 0){
-        printf("Socket nommée avec succès\n");
-  }
   printf("[Client] : socket client sur écoute.\n");
 
   struct paquet msg;
   
-  msg.adresse = sock_ecoute;
+  msg.adresse = sock_clt;
   if (sendTCP(dsServ, &msg, sizeof(struct paquet)) <= 0){
       printf("[Client] Problème lors de l'envoi de l'adresse d'écoute\n");
   }
@@ -123,7 +114,7 @@ int main(int argc, char *argv[]) {
   fd_set set;
   fd_set settmp;
   FD_ZERO(&set); //initialisation à 0 des booléens de scrutation
-  FD_SET(sock_list, &set); //ajout de la socket client au tableau de scrutation
+  FD_SET(ds, &set); //ajout de la socket client au tableau de scrutation
   FD_SET(dsServ, &set); //ajout de la socket client au tableau de scrutation
   int maxDesc = (sock_list > dsServ ) ? sock_list : dsServ;
   printf("[Client] : attente de connexion du serveur.\n");
@@ -134,9 +125,10 @@ int main(int argc, char *argv[]) {
     }
     for(int df = 2; df <= maxDesc; df++){
       if(!FD_ISSET(df, &settmp)) continue;
+
       if(df == dsServ){
         socklen_t size = sizeof(sock_clt);
-        int dsC = accept(sock_list, (struct sockaddr *)&sock_clt, &size);
+        // int dsC = accept(sock_list, (struct sockaddr *)&sock_clt, &size);
 
         //étape 1 : réception du nombre de noeuds auxquels se connecter
         printf("[Client/Reception] Réception du nombre de voisins\n");
@@ -160,12 +152,6 @@ int main(int argc, char *argv[]) {
             }
 
             voisinsAdr[i].adresse = adr.adresse;
-            int dsVoisins = socket(PF_INET, SOCK_STREAM, 0);
-            if (dsVoisins == -1){
-                perror("[Client] Problème lors de la creation de la socket pour la connexion voisine\n");
-                exit(1);
-            }
-            voisinsAdr[i].socket = dsVoisins;
             printf("[Client] Une adresse voisine est %s:%i.\n", inet_ntoa(voisinsAdr[i].adresse.sin_addr), ntohs(voisinsAdr[i].adresse.sin_port));
           }
           
@@ -173,41 +159,35 @@ int main(int argc, char *argv[]) {
           printf("[Client/Connexions] Démarrage des connexions aux voisins\n");
           for(int j = 0; j < neighbors; j++){
             printf("[Client/Connexions] Tentative de connexion au noeud %i\n", j);
-            struct sockaddr_in sock_voisin;
-            sock_voisin.sin_family = AF_INET;
-            sock_voisin.sin_addr.s_addr = inet_ntoa(voisinsAdr[j].adresse.sin_addr);
-            sock_voisin.sin_port = htons(voisinsAdr[j].adresse.sin_port);
+            struct sockaddr_in sock_voisin = voisinsAdr[j].adresse;
+            
             socklen_t lgAdr = sizeof(struct sockaddr_in);
-            int co = connect(voisinsAdr[j].socket, (struct sockaddr *)&sock_voisin, lgAdr);
+            int dsVoisins = socket(PF_INET, SOCK_STREAM, 0);
+            if (dsVoisins == -1){
+                perror("[Client] Problème lors de la creation de la socket pour la connexion voisine\n");
+                exit(1);
+            }
+            int co = connect(dsVoisins, (struct sockaddr *)&sock_voisin, lgAdr);
             if(co == -1){
               perror("[Client/Connexion] Erreur lors de la connexion au voisin\n");
               exit(0);
             }
+            voisinsAdr[j].socket = dsVoisins;
             printf("[Client/Connexion] Connexion au voisin %i (%s:%i) réussie\n", j, inet_ntoa(voisinsAdr[j].adresse.sin_addr), ntohs(voisinsAdr[j].adresse.sin_port));
           }
-          if(maxDesc < dsC) maxDesc = dsC;
           continue;
         }
+        
       } else {
         //Acceptation de la connexion d'un autre client
         //Ajout de la socket au tableau de scrutation
-        dsC = accept(sock_list, (struct sockaddr *)&sock_clt, &size);
+        int dsC = accept(ds, (struct sockaddr *)&sock_clt, &size);
         printf("[Client/ReceptionConnexion] Connexion d'un client entrante\n");
         FD_SET(dsC, &set);
         if(maxDesc < dsC) maxDesc = dsC;
       }
     }
   }
-
-
-  /* etape 3 : demander une connexion 
-  int dsConnect = connect(ds, (struct sockaddr*)&sock_srv, sizeof(sock_srv));
-  if (dsConnect == -1){
-      perror("[Client] : pb connexion serveur :\n");
-      exit(1);
-  }
-  printf("[Client] : connexion réussie\n");*/
-
 
   printf("Travail terminé le client s'arrête\n");
  

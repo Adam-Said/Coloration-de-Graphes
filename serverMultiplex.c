@@ -160,7 +160,9 @@ int main(int argc, char *argv[])
     
     for(int i = 1; i <= nodeNumber; i++){
         edgesConnexionTab[i] = (int*)malloc(sizeof(int*) * nodesTab[i]);
+        for (int j=0; j<nodesTab[i]; j++) edgesConnexionTab[i][j] = 0;
     }  
+
 
     //Nouvelle boucle pour stocker les noeuds connectés
     FILE* file2 = fopen(filepath, "r");
@@ -175,10 +177,23 @@ int main(int argc, char *argv[])
             int n = extractNumbers(buffer, 0);
             int n2 = extractNumbers(buffer, 1);
             edgesConnexionTab[n][nextPlace(edgesConnexionTab[n], nodesTab[n])] = n2;
+            printf("%i %i %i\n", n, n2, nextPlace(edgesConnexionTab[n], nodesTab[n]));
         }
     }
 
     fclose(file2);
+
+    int k= 1;
+    for (int i = 1; i <= nodeNumber; i++) {
+        // pointer to hold the address of the row
+        // int* ptr = edgesConnexionTab[i];
+        printf("%i | Noeuds connectées : ", i);
+        for (int j = 0; j < nodesTab[k]; j++) {
+            printf("(%i %i) %i ",i,j, edgesConnexionTab[i][j]);
+        }
+        printf("\n");
+        k++;
+    }
 
     printf("Fichier : Le nombre d'anneaux nécessaires est %i \n", nodeNumber);
 
@@ -230,16 +245,19 @@ int main(int argc, char *argv[])
                 if (!FD_ISSET(df, &settmp)) {continue;}
 
                 dsClient = accept(srv, (struct sockaddr *)&sockClient, &lgAdr);
-                if (recvTCP(dsClient, &voisins, sizeof(struct paquet)) <= 0) {
+                struct paquet msg;
+                if (recvTCP(dsClient, &voisins[nodeIndex], sizeof(struct paquet)) <= 0) {
                     printf("[Serveur] Problème lors de la réception de l'adresse d'écoute\n");
                     exit(0);
                 }
+                
                 char adresse[INET_ADDRSTRLEN];
                 inet_ntop(AF_INET, &voisins[nodeIndex].adresse.sin_addr, adresse, INET_ADDRSTRLEN);
                 int port = htons(voisins[nodeIndex].adresse.sin_port);
+
                 printf("[Serveur] %i) %s:%i\n", nodeIndex, adresse, port);
                 
-                voisins[nodeIndex].adresse = sockClient; 
+                // voisins[nodeIndex].adresse = sockClient; 
                 voisins[nodeIndex].socket = dsClient;
                 printf("[Serveur] : Envoi du nombre de voisins du noeuds %i\n", nodeIndex);
                 res = sendTCP(dsClient, &nodesTab[nodeIndex], sizeof(int));
@@ -258,17 +276,20 @@ int main(int argc, char *argv[])
 
         if (nodeIndex == nodeNumber+1) {
             printf("[Serveur] Tous les anneaux sont connectés, envoi des adresses\n");
+
             //récupération des adresses correspondantes aux nombres dans edgesConnexionTab
             struct paquet ssAdr;
+
             for (int i = 1; i<=nodeNumber; i++) {
-                if(nodesTab[i] != 0){
+                if (nodesTab[i] != 0) {
                     printf("[Serveur/Envoi] Début de l'envoi des voisins du noeud %i\n", i);
                     for(int j = 0; j < nodesTab[i]; j++){ //parcours du sous tableau
+                        printf("%i %i %i %i\n", i, j, nodesTab[i], edgesConnexionTab[i][j]);
                         ssAdr.adresse = voisins[edgesConnexionTab[i][j]].adresse;
                         printf("[Serveur/Envoi] Envoi de l'adresse du noeud %i\n", edgesConnexionTab[i][j]);
                         char adresses[INET_ADDRSTRLEN];
-                        inet_ntop(AF_INET, &ssAdr.adresse.sin_addr, adresses, INET_ADDRSTRLEN);
-                        int port = htons(ssAdr.adresse.sin_port);
+                        inet_ntop(AF_INET, &voisins[edgesConnexionTab[i][j]].adresse.sin_addr, adresses, INET_ADDRSTRLEN);
+                        int port = htons(voisins[edgesConnexionTab[i][j]].adresse.sin_port);
                         printf("[Serveur/Envoi] ---> Envoi de l'adresse: %s:%i\n", adresses, port);
                         if (sendTCP(voisins[i].socket, &ssAdr, sizeof(struct paquet)) <= 0) {
                             printf("[Serveur/Envoi] Problème lors de l'envoi des adresses\n");
@@ -291,7 +312,6 @@ int main(int argc, char *argv[])
     printf("[Serveur] : socket fermée !\n");
     printf("[Serveur] : c'est fini\n");
 
-    
     close(srv);
 
     for(int i = 0; i < nodeNumber; i++){
@@ -300,3 +320,5 @@ int main(int argc, char *argv[])
     } 
 
 }
+
+
