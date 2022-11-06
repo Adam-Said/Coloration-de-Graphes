@@ -150,7 +150,6 @@ int main(int argc, char *argv[]) {
         //étape 2 : boucle avec for et i<nombreNoeud reception un part un de chaque adresses de noeuds et stockage dans la struct + création socket
         printf("[Client] Reception et stockage des adresses voisines\n");
         struct paquet* voisinsAdr = (struct paquet*)malloc(neighbors * sizeof(struct paquet));
-
         for(int i = 0; i < neighbors; i++){
             struct paquet adr;
             int reception = recvTCP(dsServ, &adr, sizeof(adr));

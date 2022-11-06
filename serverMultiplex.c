@@ -248,11 +248,6 @@ int main(int argc, char *argv[])
                 }
                 printf("[Serveur] Nombre de voisins du noeuds %i envoyé avec succès\n", nodeIndex);
 
-
-
-
-
-                
                 if(!FD_ISSET(df, &settmp)) FD_SET(dsClient, &set);
                 if(maxDesc < dsClient) maxDesc = dsClient;
                 nodeIndex++;
@@ -263,19 +258,22 @@ int main(int argc, char *argv[])
 
         if (nodeIndex == nodeNumber) {
             printf("[Serveur] Tous les anneaux sont connectés, envoi des adresses\n");
-            /*if (sendAdrSubRing(sousAnneaux, currentMaxAnneau) == -1) {
-                printf("[SERVEUR] Problème lors de l'envoi des adresses\n");
-            } else {
-                printf("[SERVEUR] Envoi réussi\n");
-                printf("[SERVEUR] Attente ...\n");
+            //récupération des adresses correspondantes aux nombres dans edgesConnexionTab
+            struct paquet ssAdr;
+            for (int i = 0; i<nodeNumber-1; i++) {
+                for(int j = 0; j < nodesTab[i]; j++){
+                    ssAdr.adresse = voisins[*edgesConnexionTab[j]].adresse;
+                    char adresses[INET_ADDRSTRLEN];
+                    inet_ntop(AF_INET, &ssAdr.adresse.sin_addr, adresses, INET_ADDRSTRLEN);
+                    int port = htons(ssAdr.adresse.sin_port);
+                    printf("[SERVEUR] Envoi de l'adresse: %s:%i\n", adresses, port);
+                    if (sendTCP(voisins[i].socket, &ssAdr, sizeof(struct paquet)) <= 0) {
+                        printf("[SERVEUR] Problème lors de l'envoi des adresses\n");
+                    }
+                }
             }
-            if (close(ds) == -1) {
-                printf("[SERVEUR] Problème lors de la fermeture du descripteur\n");
-            }
-            printf("[SERVEUR] Au revoir.\n");
-            exit(0);*/
         }
-    }
+    } 
 
     // fermeture socket
     if(close(srv) == -1) {
