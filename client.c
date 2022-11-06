@@ -136,14 +136,14 @@ int main(int argc, char *argv[]) {
         struct paquet* voisinsAdr = (struct paquet*)malloc(neighbors * sizeof(struct paquet));
 
         for(int i = 0; i < neighbors; i++){
-            struct paquet adr;
-            int reception = recvTCP(dsServ, &adr, sizeof(adr));
+            int nbVoisins=0;
+            int reception = recvTCP(dsServ, &nbVoisins, sizeof(int));
             if(reception == -1 || reception == 0){
               perror("[Client] Erreur lors de la reception de l'adresse d'un voisin\n");
               exit(0);
             }
 
-            voisinsAdr[i].adresse = adr.adresse;
+            //voisinsAdr[i].adresse = adr.adresse;
             int dsVoisins = socket(PF_INET, SOCK_STREAM, 0);
             if (dsVoisins == -1)
             {

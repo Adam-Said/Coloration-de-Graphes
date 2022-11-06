@@ -181,8 +181,8 @@ int main(int argc, char *argv[])
 
     fd_set set, settmp;
     FD_ZERO(&set); //initialisation à 0 des booléens de scrutation
-    FD_SET(srvListen, &set); //ajout de la socket serveur au tableau de scrutation
-    int maxDesc = srvListen;
+    FD_SET(srv, &set); //ajout de la socket serveur au tableau de scrutation
+    int maxDesc = srv;
     printf("[Serveur] : attente de connexion des clients.\n");
     while(1){
         struct paquet* voisinsAdr = (struct paquet*)malloc(nodeNumber * sizeof(struct paquet));
@@ -190,14 +190,23 @@ int main(int argc, char *argv[])
         if (select(maxDesc+1, &settmp, NULL, NULL, NULL) == -1) {
             printf("[Serveur] Problème lors du select\n");
         }
+        printf("[Serveur] : select réussi !\n");
         for(int df = 2; df <= maxDesc; df++){
             //Acceptation de la connexion d'un client
             socklen_t size = sizeof(sock_srv);
-            int dsC = accept(srvListen, (struct sockaddr *)&sock_srv, &size);
+            int dsC = accept(srv, (struct sockaddr *)&sock_srv, &size);
             printf("[SERVEUR] Le client connecté est %s:%i.\n",inet_ntoa(sock_srv.sin_addr), ntohs(sock_srv.sin_port));
+            struct paquet paquet;
+
+            int res = sendTCP(dsC, &nodesTab[df], sizeof(int), 0);
+            if(res == -1) {
+                perror("[Serveur] : problème lors de l'envoi du nombre d'arêtes");
+                exit(1);
+            }
             if(!FD_ISSET(df, &settmp)) FD_SET(dsC, &set);
             if(maxDesc < dsC) maxDesc = dsC;
-            continue;
+            close(dsC);
+            
         }
     }
 
