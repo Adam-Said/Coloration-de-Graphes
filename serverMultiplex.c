@@ -318,7 +318,7 @@ int main(int argc, char *argv[])
         free(edgesConnexionTab[i]);
         free(&nodesTab[i]);
     } 
-
+    //version fonctionnelle mac 
 }
 
 
