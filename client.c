@@ -47,7 +47,6 @@ int recvTCP(int sock, void* msg, int sizeMsg) {
 }
 
 int main(int argc, char *argv[]) {
-
   if (argc != 4){
     printf("utilisation : client ip_serveur port_serveur port_client\n");
     exit(0);
@@ -193,6 +192,10 @@ int main(int argc, char *argv[]) {
  
   // fermeture socket
   if(close(ds) == -1) {
+    printf("[Client] : pb fermeture socket\n");
+    exit(1);
+  }
+  if(close(dsServ) == -1) {
     printf("[Client] : pb fermeture socket\n");
     exit(1);
   }

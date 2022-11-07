@@ -155,6 +155,12 @@ int main(int argc, char *argv[])
         }
     }
 
+    int totalConnexions = 0;
+    for(int i = 0; i < nodeNumber; i++){
+        totalConnexions = totalConnexions + nodesTab[i];
+    }
+    printf("[Serveur] Nombres de connexions (sockets) attendues : %i\n", totalConnexions);
+
     fclose(file); 
 
     
@@ -177,7 +183,6 @@ int main(int argc, char *argv[])
             int n = extractNumbers(buffer, 0);
             int n2 = extractNumbers(buffer, 1);
             edgesConnexionTab[n][nextPlace(edgesConnexionTab[n], nodesTab[n])] = n2;
-            printf("%i %i %i\n", n, n2, nextPlace(edgesConnexionTab[n], nodesTab[n]));
         }
     }
 
@@ -189,7 +194,7 @@ int main(int argc, char *argv[])
         // int* ptr = edgesConnexionTab[i];
         printf("%i | Noeuds connectées : ", i);
         for (int j = 0; j < nodesTab[k]; j++) {
-            printf("(%i %i) %i ",i,j, edgesConnexionTab[i][j]);
+            printf(" %i ", edgesConnexionTab[i][j]);
         }
         printf("\n");
         k++;
