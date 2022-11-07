@@ -138,7 +138,7 @@ int main(int argc, char *argv[])
     int* nodesTab = (int*)malloc(nodeNumber * sizeof(int));
     int** edgesConnexionTab = (int**)malloc(nodeNumber * sizeof(int*));
 
-    for(int i = 0; i < nodeNumber; i++){
+    for(int i = 1; i <= nodeNumber; i++){
         nodesTab[i] = 0;
     }
 
