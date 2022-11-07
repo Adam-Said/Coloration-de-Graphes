@@ -136,9 +136,6 @@ int main(int argc, char *argv[]) {
       if(!FD_ISSET(df, &settmp)) continue;
 
       if(df == dsServ){
-        socklen_t size = sizeof(sock_clt);
-        // int dsC = accept(sock_list, (struct sockaddr *)&sock_clt, &size);
-
         //étape 1 : réception du nombre de noeuds auxquels se connecter
         printf("[Client/Reception] Réception du nombre de voisins\n");
         int neighbors;
@@ -159,11 +156,22 @@ int main(int argc, char *argv[]) {
               printf("%s[Client] Erreur lors de la reception de l'adresse d'un voisin%s\n", AC_RED, AC_WHITE);
               exit(0);
             }
-
             voisinsAdr[i].adresse = adr.adresse;
             printf("[Client] Une adresse voisine est %s:%i.\n", inet_ntoa(voisinsAdr[i].adresse.sin_addr), ntohs(voisinsAdr[i].adresse.sin_port));
           }
-          
+          printf("%s[Client] Attente de l'ordre pour démarrer les connexions%s\n", AC_MAGENTA, AC_WHITE);
+          //Reception de l'ordre de démarrer les connexions
+          int ordre;
+          int ordreReception = recvTCP(dsServ, &ordre, sizeof(ordre));
+          if(ordreReception == -1 || ordreReception == 0){
+            printf("%s[Client] Erreur lors de la reception de l'ordre de connexion%s\n", AC_RED, AC_WHITE);
+            exit(0);
+          }
+
+          sleep(10);
+
+          printf("%s[Client] Ordre de connexion reçu, je démarre les connexions%s\n", AC_MAGENTA, AC_WHITE);
+
           //étape 3 : boucle de connexion
           printf("[Client/Connexions] Démarrage des connexions aux voisins\n");
           for(int j = 0; j < neighbors; j++){

@@ -137,47 +137,34 @@ int main(int argc, char *argv[])
 
     int* nodesTab = (int*)malloc(nodeNumber * sizeof(int));
     int** edgesConnexionTab = (int**)malloc(nodeNumber * sizeof(int*));
-
     for(int i = 1; i <= nodeNumber; i++){
         nodesTab[i] = 0;
     }
-
     while(fgets(buffer, bufferLength, file)) {
         if(buffer[0] == 'e'){
             int n = extractNumbers(buffer, 0);
             nodesTab[n]++;
         }
     }
-
     for(int i = 1; i <= nodeNumber; i++){
         if(nodesTab[i] != 0){
             printf("Tableau nodes indice : %i nombre de noeuds connectés : %i\n", i, nodesTab[i]);
         }
     }
-
     int totalConnexions = 0;
     for(int i = 0; i < nodeNumber; i++){
         totalConnexions = totalConnexions + nodesTab[i];
     }
     printf("[Serveur] Nombres de connexions (sockets) attendues : %i\n", totalConnexions);
-
-    fclose(file); 
-
     
     for(int i = 1; i <= nodeNumber; i++){
         edgesConnexionTab[i] = (int*)malloc(sizeof(int*) * nodesTab[i]);
         for (int j=0; j<nodesTab[i]; j++) edgesConnexionTab[i][j] = 0;
-    }  
-
-
-    //Nouvelle boucle pour stocker les noeuds connectés
-    FILE* file2 = fopen(filepath, "r");
-    if(file2 == NULL){
-        perror("Fichier : erreur ouverture fichier \n");
-        free(filepath);
-        exit(1);   
     }
 
+    //Nouvelle boucle pour stocker les noeuds connectés
+    fseek(file, 0, SEEK_SET);
+    
     while(fgets(buffer, bufferLength, file)) {
         if(buffer[0] == 'e'){
             int n = extractNumbers(buffer, 0);
@@ -185,10 +172,9 @@ int main(int argc, char *argv[])
             edgesConnexionTab[n][nextPlace(edgesConnexionTab[n], nodesTab[n])] = n2;
         }
     }
+    fclose(file);
 
-    fclose(file2);
-
-    int k= 1;
+    int k = 1;
     for (int i = 1; i <= nodeNumber; i++) {
         // pointer to hold the address of the row
         // int* ptr = edgesConnexionTab[i];
@@ -303,6 +289,20 @@ int main(int argc, char *argv[])
                     printf("[Serveur/Envoi] Toutes les adresses voisines du noeud %i ont été envoyées\n", i);
                 } else {
                     printf("[Serveur/Envoi] Aucun noeuds à envoyer au noeuds %i, je passe au prochain\n", i);
+                }
+            }
+
+            int ordre = 1;
+            for (int i = 1; i<=nodeNumber; i++) {
+                if (nodesTab[i] != 0) {
+                    printf("[Serveur/Ordre] envoi de l'ordre de connexion au noeud %i\n", i);
+                    for(int j = 0; j < nodesTab[i]; j++){ //parcours du sous tableau
+                        if (sendTCP(voisins[i].socket, &ordre, sizeof(ordre)) <= 0) {
+                            printf("[Serveur/Ordre] Problème lors de l'envoi de l'ordre\n");
+                        }
+                    }
+                } else {
+                    printf("[Serveur/Envoi] Aucun ordre à envoyer pour le noeud%i\n", i);
                 }
             }
         }
