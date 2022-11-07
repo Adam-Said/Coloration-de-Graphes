@@ -11,6 +11,16 @@
 #include <sys/stat.h>
 #include <math.h>
 
+#define AC_BLACK "\x1b[30m"
+#define AC_RED "\x1b[31m"
+#define AC_GREEN "\x1b[32m"
+#define AC_YELLOW "\x1b[33m"
+#define AC_BLUE "\x1b[34m"
+#define AC_MAGENTA "\x1b[35m"
+#define AC_CYAN "\x1b[36m"
+#define AC_WHITE "\x1b[37m"
+#define AC_NORMAL "\x1b[m"
+
 struct paquet {
     int socket;
     struct sockaddr_in adresse;
@@ -106,7 +116,7 @@ int main(int argc, char *argv[]) {
   
   msg.adresse = sock_clt;
   if (sendTCP(dsServ, &msg, sizeof(struct paquet)) <= 0){
-      printf("[Client] Problème lors de l'envoi de l'adresse d'écoute\n");
+      printf("%s[Client] Problème lors de l'envoi de l'adresse d'écoute%s\n", AC_RED, AC_WHITE);
   }
   printf("[Client] Envoi de l'adresse d'écoute réussi\n");
 
@@ -120,7 +130,7 @@ int main(int argc, char *argv[]) {
   while(1){
     settmp = set;
     if (select(maxDesc+1, &settmp, NULL, NULL, NULL) == -1) {
-      printf("[CLIENT] Problème lors du select\n");
+      printf("%s[CLIENT] Problème lors du select%s\n", AC_RED, AC_WHITE);
     }
     for(int df = 2; df <= maxDesc; df++){
       if(!FD_ISSET(df, &settmp)) continue;
@@ -134,7 +144,7 @@ int main(int argc, char *argv[]) {
         int neighbors;
         int res = recvTCP(dsServ, &neighbors, sizeof(int));
         if (res == -1 || res == 0) {
-            perror("[Client] Erreur lors de la reception du nombre de noeuds voisins\n");
+            printf("%s[Client] Erreur lors de la reception du nombre de noeuds voisins%s\n", AC_RED, AC_WHITE);
             exit(0);
         }
         printf("[Client] Nombre de voisins en attente : %i voisins\n", neighbors);
@@ -146,7 +156,7 @@ int main(int argc, char *argv[]) {
             struct paquet adr;
             int reception = recvTCP(dsServ, &adr, sizeof(adr));
             if(reception == -1 || reception == 0){
-              perror("[Client] Erreur lors de la reception de l'adresse d'un voisin\n");
+              printf("%s[Client] Erreur lors de la reception de l'adresse d'un voisin%s\n", AC_RED, AC_WHITE);
               exit(0);
             }
 
@@ -163,16 +173,16 @@ int main(int argc, char *argv[]) {
             socklen_t lgAdr = sizeof(struct sockaddr_in);
             int dsVoisins = socket(PF_INET, SOCK_STREAM, 0);
             if (dsVoisins == -1){
-                perror("[Client] Problème lors de la creation de la socket pour la connexion voisine\n");
+                printf("%s[Client] Problème lors de la creation de la socket pour la connexion voisine%s\n", AC_RED, AC_WHITE);
                 exit(1);
             }
             int co = connect(dsVoisins, (struct sockaddr *)&sock_voisin, lgAdr);
             if(co == -1){
-              perror("[Client/Connexion] Erreur lors de la connexion au voisin\n");
+              printf("%s[Client/Connexion] Erreur lors de la connexion au voisin%s\n", AC_RED, AC_WHITE);
               exit(0);
             }
             voisinsAdr[j].socket = dsVoisins;
-            printf("[Client/Connexion] Connexion au voisin %i (%s:%i) réussie\n", j, inet_ntoa(voisinsAdr[j].adresse.sin_addr), ntohs(voisinsAdr[j].adresse.sin_port));
+            printf("%s[Client/Connexion] Connexion au voisin %i (%s:%i) réussie%s\n", AC_GREEN, j, inet_ntoa(voisinsAdr[j].adresse.sin_addr), ntohs(voisinsAdr[j].adresse.sin_port), AC_WHITE);
           }
           continue;
         }
@@ -181,26 +191,26 @@ int main(int argc, char *argv[]) {
         //Acceptation de la connexion d'un autre client
         //Ajout de la socket au tableau de scrutation
         int dsC = accept(ds, (struct sockaddr *)&sock_clt, &size);
-        printf("[Client/ReceptionConnexion] Connexion d'un client entrante\n");
+        printf("%s[Client/ReceptionConnexion] Connexion d'un client entrante%s\n", AC_CYAN, AC_WHITE);
         FD_SET(dsC, &set);
         if(maxDesc < dsC) maxDesc = dsC;
       }
     }
   }
 
-  printf("Travail terminé le client s'arrête\n");
+  printf("[Travail] terminé le client s'arrête\n");
  
   // fermeture socket
   if(close(ds) == -1) {
-    printf("[Client] : pb fermeture socket\n");
+    printf("[Client] : Problème lors de la fermeture socket\n");
     exit(1);
   }
   if(close(dsServ) == -1) {
-    printf("[Client] : pb fermeture socket\n");
+    printf("[Client] : Problème lors de la fermeture socket\n");
     exit(1);
   }
-  printf("Client : socket fermée !\n");
-  printf("Client : c'est fini\n");
+  printf("[Client] : socket fermée !\n");
+  printf("[Client] : c'est fini\n");
 
   return 0;
 }
