@@ -120,6 +120,7 @@ int main(int argc, char *argv[]) {
   }
   printf("[Client] Envoi de l'adresse d'écoute réussi\n");
 
+  int number;
   fd_set set;
   fd_set settmp;
   FD_ZERO(&set); //initialisation à 0 des booléens de scrutation
@@ -168,12 +169,20 @@ int main(int argc, char *argv[]) {
             exit(0);
           }
 
+          printf("%s[Client] Attente de mon numéro d'identification...%s\n", AC_MAGENTA, AC_WHITE);
+          //Reception du numéro de noeud
+          int nodenumberReception = recvTCP(dsServ, &number, sizeof(number));
+          if(nodenumberReception == -1 || nodenumberReception == 0){
+            printf("%s[Client] Erreur lors de la reception du numéro d'identification%s\n", AC_RED, AC_WHITE);
+            exit(0);
+          }
+
           sleep(10);
 
-          printf("%s[Client] Ordre de connexion reçu, je démarre les connexions%s\n", AC_MAGENTA, AC_WHITE);
+          printf("%s[Client] %i) Ordre de connexion reçu, je démarre les connexions%s\n", AC_MAGENTA, number, AC_WHITE);
 
           //étape 3 : boucle de connexion
-          printf("[Client/Connexions] Démarrage des connexions aux voisins\n");
+          printf("[Client/Connexions] Le noeuds %i démarre les connexions aux voisins\n", number);
           for(int j = 0; j < neighbors; j++){
             printf("[Client/Connexions] Tentative de connexion au noeud %i\n", j);
             struct sockaddr_in sock_voisin = voisinsAdr[j].adresse;

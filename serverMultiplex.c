@@ -296,13 +296,18 @@ int main(int argc, char *argv[])
             for (int i = 1; i<=nodeNumber; i++) {
                 if (nodesTab[i] != 0) {
                     printf("[Serveur/Ordre] envoi de l'ordre de connexion au noeud %i\n", i);
-                    for(int j = 0; j < nodesTab[i]; j++){ //parcours du sous tableau
-                        if (sendTCP(voisins[i].socket, &ordre, sizeof(ordre)) <= 0) {
+                    if (sendTCP(voisins[i].socket, &ordre, sizeof(ordre)) <= 0) {
                             printf("[Serveur/Ordre] Problème lors de l'envoi de l'ordre\n");
-                        }
                     }
+                    /*for(int j = 0; j < nodesTab[i]; j++){ //parcours du sous tableau
+                        
+                    }*/
                 } else {
                     printf("[Serveur/Envoi] Aucun ordre à envoyer pour le noeud%i\n", i);
+                }
+                int nodeN = i;
+                if (sendTCP(voisins[i].socket, &nodeN, sizeof(nodeN)) <= 0) {
+                    printf("[Serveur/Ordre] Problème lors de l'envoi du numéro de noeuds\n");
                 }
             }
         }
