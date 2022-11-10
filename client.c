@@ -149,7 +149,7 @@ int main(int argc, char *argv[]) {
         //étape 2 : boucle avec for et i<nombreNoeud reception un part un de chaque adresses de noeuds et stockage dans la struct + création socket
         struct paquet* voisinsAdr = (struct paquet*)malloc(neighbors * sizeof(struct paquet));
         if(neighbors != 0){
-          printf("[Client/Reception] Reception et stockage des adresses voisines\n");
+          //printf("[Client/Reception] Reception et stockage des adresses voisines\n");
           for(int i = 0; i < neighbors; i++){
             struct paquet adr;
             int reception = recvTCP(dsServ, &adr, sizeof(adr));
@@ -158,7 +158,7 @@ int main(int argc, char *argv[]) {
               exit(0);
             }
             voisinsAdr[i].adresse = adr.adresse;
-            printf("[Client] Une adresse voisine est %s:%i.\n", inet_ntoa(voisinsAdr[i].adresse.sin_addr), ntohs(voisinsAdr[i].adresse.sin_port));
+            //printf("[Client] Une adresse voisine est %s:%i.\n", inet_ntoa(voisinsAdr[i].adresse.sin_addr), ntohs(voisinsAdr[i].adresse.sin_port));
           }
           printf("%s[Client] Attente de l'ordre pour démarrer les connexions%s\n", AC_MAGENTA, AC_WHITE);
           //Reception de l'ordre de démarrer les connexions

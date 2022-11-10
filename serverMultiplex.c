@@ -13,6 +13,16 @@
 #include <sys/select.h>
 #include <math.h>
 
+#define AC_BLACK "\x1b[30m"
+#define AC_RED "\x1b[31m"
+#define AC_GREEN "\x1b[32m"
+#define AC_YELLOW "\x1b[33m"
+#define AC_BLUE "\x1b[34m"
+#define AC_MAGENTA "\x1b[35m"
+#define AC_CYAN "\x1b[36m"
+#define AC_WHITE "\x1b[37m"
+#define AC_NORMAL "\x1b[m"
+
 struct paquet {
     int socket;
     struct sockaddr_in adresse;
@@ -152,7 +162,7 @@ int main(int argc, char *argv[])
         }
     }
     int totalConnexions = 0;
-    for(int i = 0; i < nodeNumber; i++){
+    for(int i = 0; i <= nodeNumber; i++){
         totalConnexions = totalConnexions + nodesTab[i];
     }
     printf("[Serveur] Nombres de connexions (sockets) attendues : %i\n", totalConnexions);
@@ -186,7 +196,7 @@ int main(int argc, char *argv[])
         k++;
     }
 
-    printf("Fichier : Le nombre d'anneaux nécessaires est %i \n", nodeNumber);
+    printf("Fichier : Le nombre de noeuds nécessaires est %i \n", nodeNumber);
 
     // Fin parser
 
@@ -256,7 +266,7 @@ int main(int argc, char *argv[])
                     perror("[Serveur] : problème lors de l'envoi du nombre d'arêtes");
                     exit(1);
                 }
-                printf("[Serveur] Nombre de voisins du noeuds %i envoyé avec succès\n", nodeIndex);
+                printf("%s[Serveur] Nombre de voisins du noeuds %i envoyé avec succès%s\n", AC_GREEN, nodeIndex, AC_NORMAL);
 
                 if(!FD_ISSET(df, &settmp)) FD_SET(dsClient, &set);
                 if(maxDesc < dsClient) maxDesc = dsClient;
@@ -316,15 +326,14 @@ int main(int argc, char *argv[])
 
     // fermeture socket
     if(close(srv) == -1) {
-        printf("[Serveur] : pb fermeture socket\n");
+        printf("[Serveur] : Problème lors de la fermeture de la socket\n");
         exit(1);
     }
-    printf("[Serveur] : socket fermée !\n");
-    printf("[Serveur] : c'est fini\n");
+    printf("[Serveur] : Socket fermée !\n");
 
     close(srv);
 
-    for(int i = 0; i < nodeNumber; i++){
+    for(int i = 0; i <= nodeNumber; i++){
         free(edgesConnexionTab[i]);
         free(&nodesTab[i]);
     } 
