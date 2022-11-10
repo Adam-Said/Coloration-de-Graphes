@@ -184,7 +184,7 @@ int main(int argc, char *argv[]) {
           //étape 3 : boucle de connexion
           printf("[Client/Connexions] Le noeuds %i démarre les connexions aux voisins\n", number);
           for(int j = 0; j < neighbors; j++){
-            printf("[Client/Connexions] Tentative de connexion au noeud %i\n", j);
+            //printf("[Client/Connexions] Tentative de connexion au noeud %i\n", j);
             struct sockaddr_in sock_voisin = voisinsAdr[j].adresse;
             
             socklen_t lgAdr = sizeof(struct sockaddr_in);
@@ -199,10 +199,12 @@ int main(int argc, char *argv[]) {
               exit(0);
             }
             voisinsAdr[j].socket = dsVoisins;
-            printf("%s[Client/Connexion] Connexion au voisin %i (%s:%i) réussie%s\n", AC_GREEN, j, inet_ntoa(voisinsAdr[j].adresse.sin_addr), ntohs(voisinsAdr[j].adresse.sin_port), AC_WHITE);
+            //printf("%s[Client/Connexion] Connexion au voisin %i (%s:%i) réussie%s\n", AC_GREEN, j, inet_ntoa(voisinsAdr[j].adresse.sin_addr), ntohs(voisinsAdr[j].adresse.sin_port), AC_WHITE);
           }
+          printf("%s[Client/Connexion] Noeud %i, toutes les connexions sont réussies%s\n", AC_GREEN, number, AC_WHITE);
           continue;
         }
+        FD_CLR(df, &set);
         
       } else {
         //Acceptation de la connexion d'un autre client
