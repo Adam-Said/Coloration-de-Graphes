@@ -169,7 +169,6 @@ int main(int argc, char *argv[]) {
             exit(0);
           }
 
-          printf("%s[Client] Attente de mon numéro d'identification...%s\n", AC_MAGENTA, AC_WHITE);
           //Reception du numéro de noeud
           int nodenumberReception = recvTCP(dsServ, &number, sizeof(number));
           if(nodenumberReception == -1 || nodenumberReception == 0){
@@ -177,7 +176,7 @@ int main(int argc, char *argv[]) {
             exit(0);
           }
 
-          sleep(10);
+          sleep(8);
 
           printf("%s[Client] %i) Ordre de connexion reçu, je démarre les connexions%s\n", AC_MAGENTA, number, AC_WHITE);
 
@@ -204,13 +203,17 @@ int main(int argc, char *argv[]) {
           printf("%s[Client/Connexion] Noeud %i, toutes les connexions sont réussies%s\n", AC_GREEN, number, AC_WHITE);
           continue;
         }
-        FD_CLR(df, &set);
+        FD_CLR(dsServ, &set);
+        /*if(close(dsServ) == -1) {
+          printf("[Client] : Problème lors de la fermeture socket\n");
+          exit(1);
+        }
+        printf("Fermeture de la socket serveur\n");*/
         
       } else {
         //Acceptation de la connexion d'un autre client
-        //Ajout de la socket au tableau de scrutation
         int dsC = accept(ds, (struct sockaddr *)&sock_clt, &size);
-        printf("%s[Client/ReceptionConnexion] Connexion d'un client entrante%s\n", AC_CYAN, AC_WHITE);
+        //printf("%s[Client/ReceptionConnexion] Connexion d'un client entrante%s\n", AC_CYAN, AC_WHITE);
         FD_SET(dsC, &set);
         if(maxDesc < dsC) maxDesc = dsC;
       }
@@ -224,12 +227,7 @@ int main(int argc, char *argv[]) {
     printf("[Client] : Problème lors de la fermeture socket\n");
     exit(1);
   }
-  if(close(dsServ) == -1) {
-    printf("[Client] : Problème lors de la fermeture socket\n");
-    exit(1);
-  }
-  printf("[Client] : socket fermée !\n");
-  printf("[Client] : c'est fini\n");
+  printf("[Client] : Socket fermée !\n");
 
   return 0;
 }

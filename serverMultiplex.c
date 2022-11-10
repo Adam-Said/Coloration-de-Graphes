@@ -168,8 +168,10 @@ int main(int argc, char *argv[])
     printf("[Serveur] Nombres de connexions (sockets) attendues : %i\n", totalConnexions);
     
     for(int i = 1; i <= nodeNumber; i++){
-        edgesConnexionTab[i] = (int*)malloc(sizeof(int*) * nodesTab[i]);
-        for (int j=0; j<nodesTab[i]; j++) edgesConnexionTab[i][j] = 0;
+        if(nodesTab[i] != 0){
+            edgesConnexionTab[i] = (int*)malloc(sizeof(int*) * nodesTab[i]);
+            for (int j=0; j<nodesTab[i]; j++) edgesConnexionTab[i][j] = 0;
+        } 
     }
 
     //Nouvelle boucle pour stocker les noeuds connectés
@@ -212,7 +214,6 @@ int main(int argc, char *argv[])
         perror("[Serveur] : problème lors du nommage de la socket");
         exit(1);
     }
-    printf("[Serveur] : nommage de la socket réussi !\n");
 
     /* etape 3 : mise en ecoute des demandes de connexions */
     int srvListen = listen(srv, 1000);
@@ -220,7 +221,6 @@ int main(int argc, char *argv[])
         perror("Serveur : problème lors de la mise en écoute de la socket");
         exit(1);
     }
-    printf("[Serveur] : socket serveur sur écoute.\n");
   
     /* etape 4 : plus qu'a attendre la demande d'un client */
 
@@ -231,7 +231,6 @@ int main(int argc, char *argv[])
     int maxDesc = srv;
     struct sockaddr_in sockClient; 
     socklen_t lgAdr;
-    printf("[Serveur] : attente de connexion des clients.\n");
     //struct paquet* voisinsAdr = (struct paquet*)malloc(nodeNumber * sizeof(struct paquet));
     struct paquet voisins[nodeNumber];
     int nodeIndex = 1;
@@ -303,9 +302,9 @@ int main(int argc, char *argv[])
             }
 
             int ordre = 1;
+            printf("[Serveur/Ordre] Envoi des ordres de connexion%i\n");
             for (int i = 1; i<=nodeNumber; i++) {
                 if (nodesTab[i] != 0) {
-                    printf("[Serveur/Ordre] envoi de l'ordre de connexion au noeud %i\n", i);
                     if (sendTCP(voisins[i].socket, &ordre, sizeof(ordre)) <= 0) {
                             printf("[Serveur/Ordre] Problème lors de l'envoi de l'ordre\n");
                     }
@@ -321,17 +320,14 @@ int main(int argc, char *argv[])
                 }
             }
         }
-        printf("[Serveur] Serveur en attente de travail\n");
     } 
 
-    // fermeture socket
-    if(close(srv) == -1) {
-        printf("[Serveur] : Problème lors de la fermeture de la socket\n");
-        exit(1);
-    }
-    printf("[Serveur] : Socket fermée !\n");
-
-    close(srv);
+    /*FD_CLR(srv, &set);
+        if(close(srv) == -1) {
+            printf("[Serveur] : Problème lors de la fermeture de la socket\n");
+            exit(1);
+        }
+    printf("[Serveur] : Socket fermée !\n");*/
 
     for(int i = 0; i <= nodeNumber; i++){
         free(edgesConnexionTab[i]);
