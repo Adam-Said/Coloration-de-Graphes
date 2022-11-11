@@ -1,3 +1,4 @@
+#include <asm-generic/socket.h>
 #include <netinet/in.h>
 #include <stdio.h> 
 #include <unistd.h>
@@ -63,12 +64,14 @@ int main(int argc, char *argv[]) {
   }
 
   /* etape 1 : créer une socket */   
+  int option = 1;
   int ds = socket(PF_INET, SOCK_STREAM, 0);
+  setsockopt(ds, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
   if (ds == -1){
     perror("[Client] : pb creation socket :\n");
     exit(1);
   }
-  printf("[Client] : creation de la socket réussie \n");
+  //printf("[Client] : creation de la socket réussie \n");
   /* etape 1.2 : nommage de la socket client */
   struct sockaddr_in sock_clt;
   socklen_t size =sizeof(struct sockaddr_in);
@@ -84,12 +87,13 @@ int main(int argc, char *argv[]) {
 
   /* etape 2 : designer la socket du serveur */
   int dsServ = socket(PF_INET, SOCK_STREAM, 0);
+  setsockopt(dsServ, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
   if (dsServ == -1)
   {
       perror("Problème creation socket :");
       exit(1);
   }
-  printf("Création de la socket réussie \n");
+  //printf("Création de la socket réussie \n");
 
   struct sockaddr_in sock_srv;
   sock_srv.sin_family = AF_INET;
@@ -99,7 +103,7 @@ int main(int argc, char *argv[]) {
   
   int resConnexion = connect(dsServ, (struct sockaddr *)&sock_srv, lgAdr);
   if( resConnexion == 0){
-    printf("[Client] Première connexion au serveur réussie\n");
+    printf("%s[Client] Première connexion au serveur réussie%s\n", AC_GREEN, AC_NORMAL);
   } else {
     perror("Erreur lors de la connexion au serveur\n");
     exit(0);
@@ -110,7 +114,7 @@ int main(int argc, char *argv[]) {
         perror("[Client] : problème lors de la mise en écoute de la socket");
         exit(1);
   }
-  printf("[Client] : socket client sur écoute.\n");
+  //printf("[Client] : socket client sur écoute.\n");
 
   struct paquet msg;
   
@@ -118,7 +122,7 @@ int main(int argc, char *argv[]) {
   if (sendTCP(dsServ, &msg, sizeof(struct paquet)) <= 0){
       printf("%s[Client] Problème lors de l'envoi de l'adresse d'écoute%s\n", AC_RED, AC_WHITE);
   }
-  printf("[Client] Envoi de l'adresse d'écoute réussi\n");
+  printf("%s[Client] Envoi de l'adresse d'écoute réussi%s\n", AC_GREEN, AC_NORMAL);
 
   int number;
   fd_set set;
@@ -127,7 +131,7 @@ int main(int argc, char *argv[]) {
   FD_SET(ds, &set); //ajout de la socket client au tableau de scrutation
   FD_SET(dsServ, &set); //ajout de la socket client au tableau de scrutation
   int maxDesc = (sock_list > dsServ ) ? sock_list : dsServ;
-  printf("[Client] : attente de connexion du serveur.\n");
+  //printf("[Client] : attente de connexion du serveur.\n");
   while(1){
     settmp = set;
     if (select(maxDesc+1, &settmp, NULL, NULL, NULL) == -1) {
@@ -138,7 +142,7 @@ int main(int argc, char *argv[]) {
 
       if(df == dsServ){
         //étape 1 : réception du nombre de noeuds auxquels se connecter
-        printf("[Client/Reception] Réception du nombre de voisins\n");
+        //printf("[Client/Reception] Réception du nombre de voisins\n");
         int neighbors;
         int res = recvTCP(dsServ, &neighbors, sizeof(int));
         if (res == -1 || res == 0) {
@@ -178,7 +182,7 @@ int main(int argc, char *argv[]) {
 
           sleep(8);
 
-          printf("%s[Client] %i) Ordre de connexion reçu, je démarre les connexions%s\n", AC_MAGENTA, number, AC_WHITE);
+          //printf("%s[Client] %i) Ordre de connexion reçu, je démarre les connexions%s\n", AC_MAGENTA, number, AC_WHITE);
 
           //étape 3 : boucle de connexion
           printf("[Client/Connexions] Le noeuds %i démarre les connexions aux voisins\n", number);
@@ -188,6 +192,7 @@ int main(int argc, char *argv[]) {
             
             socklen_t lgAdr = sizeof(struct sockaddr_in);
             int dsVoisins = socket(PF_INET, SOCK_STREAM, 0);
+            setsockopt(dsVoisins, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
             if (dsVoisins == -1){
                 printf("%s[Client] Problème lors de la creation de la socket pour la connexion voisine%s\n", AC_RED, AC_WHITE);
                 exit(1);
@@ -198,22 +203,19 @@ int main(int argc, char *argv[]) {
               exit(0);
             }
             voisinsAdr[j].socket = dsVoisins;
-            //printf("%s[Client/Connexion] Connexion au voisin %i (%s:%i) réussie%s\n", AC_GREEN, j, inet_ntoa(voisinsAdr[j].adresse.sin_addr), ntohs(voisinsAdr[j].adresse.sin_port), AC_WHITE);
+            printf("%s[Client/Connexion] Connexion au voisin %i (%s:%i) réussie%s\n", AC_GREEN, j, inet_ntoa(voisinsAdr[j].adresse.sin_addr), ntohs(voisinsAdr[j].adresse.sin_port), AC_WHITE);
           }
           printf("%s[Client/Connexion] Noeud %i, toutes les connexions sont réussies%s\n", AC_GREEN, number, AC_WHITE);
           continue;
         }
+
         FD_CLR(dsServ, &set);
-        /*if(close(dsServ) == -1) {
-          printf("[Client] : Problème lors de la fermeture socket\n");
-          exit(1);
-        }
-        printf("Fermeture de la socket serveur\n");*/
+        printf("Fermeture de la socket serveur\n");
         
       } else {
         //Acceptation de la connexion d'un autre client
         int dsC = accept(ds, (struct sockaddr *)&sock_clt, &size);
-        //printf("%s[Client/ReceptionConnexion] Connexion d'un client entrante%s\n", AC_CYAN, AC_WHITE);
+        setsockopt(dsC, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
         FD_SET(dsC, &set);
         if(maxDesc < dsC) maxDesc = dsC;
       }
