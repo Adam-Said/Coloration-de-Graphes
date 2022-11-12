@@ -177,7 +177,7 @@ int main(int argc, char *argv[]) {
             exit(0);
           }
 
-          sleep(10);
+          //sleep(10);
 
           printf("%s[Client] %i) Ordre de connexion reçu, je démarre les connexions%s\n", AC_MAGENTA, number, AC_WHITE);
 

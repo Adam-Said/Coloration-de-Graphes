@@ -336,8 +336,8 @@ int main(int argc, char *argv[])
     for(int i = 0; i <= nodeNumber; i++){
         free(edgesConnexionTab[i]);
         free(&nodesTab[i]);
-    } 
-    //version fonctionnelle mac 
+    }
+    //version fonctionnelle mac
 }
 
 
