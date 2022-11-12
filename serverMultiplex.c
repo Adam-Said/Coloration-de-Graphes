@@ -245,7 +245,7 @@ int main(int argc, char *argv[])
                 if (!FD_ISSET(df, &settmp)) {continue;}
 
                 dsClient = accept(srv, (struct sockaddr *)&sockClient, &lgAdr);
-                struct paquet msg;
+                //struct paquet msg; useless
                 if (recvTCP(dsClient, &voisins[nodeIndex], sizeof(struct paquet)) <= 0) {
                     printf("[Serveur] Problème lors de la réception de l'adresse d'écoute\n");
                     exit(0);
@@ -288,7 +288,7 @@ int main(int argc, char *argv[])
                         //printf("[Serveur/Envoi] Envoi de l'adresse du noeud %i\n", edgesConnexionTab[i][j]);
                         char adresses[INET_ADDRSTRLEN];
                         inet_ntop(AF_INET, &voisins[edgesConnexionTab[i][j]].adresse.sin_addr, adresses, INET_ADDRSTRLEN);
-                        int port = htons(voisins[edgesConnexionTab[i][j]].adresse.sin_port);
+                        //int port = htons(voisins[edgesConnexionTab[i][j]].adresse.sin_port);
                         //printf("[Serveur/Envoi] ---> Envoi de l'adresse: %s:%i\n", adresses, port);
                         if (sendTCP(voisins[i].socket, &ssAdr, sizeof(struct paquet)) <= 0) {
                             printf("[Serveur/Envoi] Problème lors de l'envoi des adresses\n");
@@ -301,7 +301,7 @@ int main(int argc, char *argv[])
             }
 
             int ordre = 1;
-            printf("[Serveur/Ordre] Envoi des ordres de connexion%i\n");
+            printf("[Serveur/Ordre] Envoi des ordres de connexion%i\n", ordre);
             for (int i = 1; i<=nodeNumber; i++) {
                 if (nodesTab[i] != 0) {
                     if (sendTCP(voisins[i].socket, &ordre, sizeof(ordre)) <= 0) {

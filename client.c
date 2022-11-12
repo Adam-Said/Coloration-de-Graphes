@@ -203,7 +203,7 @@ int main(int argc, char *argv[]) {
               exit(0);
             }
             voisinsAdr[j].socket = dsVoisins;
-            printf("%s[Client/Connexion] Connexion au voisin %i (%s:%i) réussie%s\n", AC_GREEN, j, inet_ntoa(voisinsAdr[j].adresse.sin_addr), ntohs(voisinsAdr[j].adresse.sin_port), AC_WHITE);
+            //printf("%s[Client/Connexion] Connexion au voisin %i (%s:%i) réussie%s\n", AC_GREEN, j, inet_ntoa(voisinsAdr[j].adresse.sin_addr), ntohs(voisinsAdr[j].adresse.sin_port), AC_WHITE);
           }
           printf("%s[Client/Connexion] Noeud %i, toutes les connexions sont réussies%s\n", AC_GREEN, number, AC_WHITE);
           continue;
