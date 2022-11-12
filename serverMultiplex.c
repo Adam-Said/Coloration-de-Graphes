@@ -75,7 +75,9 @@ int getFirstNumber(char *fileName){
 }
 
 int createSocket() {
+    int option = 1;
     int ds = socket(PF_INET, SOCK_STREAM, 0);
+    setsockopt(ds, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
     if (ds == -1){
         perror("[Serveur] Problème lors de la création de la socket :");
         exit(1); 
@@ -168,8 +170,10 @@ int main(int argc, char *argv[])
     printf("[Serveur] Nombres de connexions (sockets) attendues : %i\n", totalConnexions);
     
     for(int i = 1; i <= nodeNumber; i++){
-        edgesConnexionTab[i] = (int*)malloc(sizeof(int*) * nodesTab[i]);
-        for (int j=0; j<nodesTab[i]; j++) edgesConnexionTab[i][j] = 0;
+        if(nodesTab[i] != 0){
+            edgesConnexionTab[i] = (int*)malloc(sizeof(int*) * nodesTab[i]);
+            for (int j=0; j<nodesTab[i]; j++) edgesConnexionTab[i][j] = 0;
+        } 
     }
 
     //Nouvelle boucle pour stocker les noeuds connectés
@@ -186,8 +190,6 @@ int main(int argc, char *argv[])
 
     int k = 1;
     for (int i = 1; i <= nodeNumber; i++) {
-        // pointer to hold the address of the row
-        // int* ptr = edgesConnexionTab[i];
         printf("%i | Noeuds connectées : ", i);
         for (int j = 0; j < nodesTab[k]; j++) {
             printf(" %i ", edgesConnexionTab[i][j]);
@@ -212,7 +214,6 @@ int main(int argc, char *argv[])
         perror("[Serveur] : problème lors du nommage de la socket");
         exit(1);
     }
-    printf("[Serveur] : nommage de la socket réussi !\n");
 
     /* etape 3 : mise en ecoute des demandes de connexions */
     int srvListen = listen(srv, 1000);
@@ -220,7 +221,6 @@ int main(int argc, char *argv[])
         perror("Serveur : problème lors de la mise en écoute de la socket");
         exit(1);
     }
-    printf("[Serveur] : socket serveur sur écoute.\n");
   
     /* etape 4 : plus qu'a attendre la demande d'un client */
 
@@ -231,7 +231,6 @@ int main(int argc, char *argv[])
     int maxDesc = srv;
     struct sockaddr_in sockClient; 
     socklen_t lgAdr;
-    printf("[Serveur] : attente de connexion des clients.\n");
     //struct paquet* voisinsAdr = (struct paquet*)malloc(nodeNumber * sizeof(struct paquet));
     struct paquet voisins[nodeNumber];
     int nodeIndex = 1;
@@ -276,7 +275,7 @@ int main(int argc, char *argv[])
         }
 
         if (nodeIndex == nodeNumber+1) {
-            printf("[Serveur] Tous les anneaux sont connectés, envoi des adresses\n");
+            //printf("[Serveur] Tous les anneaux sont connectés, envoi des adresses\n");
 
             //récupération des adresses correspondantes aux nombres dans edgesConnexionTab
             struct paquet ssAdr;
@@ -285,13 +284,12 @@ int main(int argc, char *argv[])
                 if (nodesTab[i] != 0) {
                     printf("[Serveur/Envoi] Début de l'envoi des voisins du noeud %i\n", i);
                     for(int j = 0; j < nodesTab[i]; j++){ //parcours du sous tableau
-                        printf("%i %i %i %i\n", i, j, nodesTab[i], edgesConnexionTab[i][j]);
                         ssAdr.adresse = voisins[edgesConnexionTab[i][j]].adresse;
-                        printf("[Serveur/Envoi] Envoi de l'adresse du noeud %i\n", edgesConnexionTab[i][j]);
+                        //printf("[Serveur/Envoi] Envoi de l'adresse du noeud %i\n", edgesConnexionTab[i][j]);
                         char adresses[INET_ADDRSTRLEN];
                         inet_ntop(AF_INET, &voisins[edgesConnexionTab[i][j]].adresse.sin_addr, adresses, INET_ADDRSTRLEN);
                         int port = htons(voisins[edgesConnexionTab[i][j]].adresse.sin_port);
-                        printf("[Serveur/Envoi] ---> Envoi de l'adresse: %s:%i\n", adresses, port);
+                        //printf("[Serveur/Envoi] ---> Envoi de l'adresse: %s:%i\n", adresses, port);
                         if (sendTCP(voisins[i].socket, &ssAdr, sizeof(struct paquet)) <= 0) {
                             printf("[Serveur/Envoi] Problème lors de l'envoi des adresses\n");
                         }
@@ -303,15 +301,12 @@ int main(int argc, char *argv[])
             }
 
             int ordre = 1;
+            printf("[Serveur/Ordre] Envoi des ordres de connexion%i\n");
             for (int i = 1; i<=nodeNumber; i++) {
                 if (nodesTab[i] != 0) {
-                    printf("[Serveur/Ordre] envoi de l'ordre de connexion au noeud %i\n", i);
                     if (sendTCP(voisins[i].socket, &ordre, sizeof(ordre)) <= 0) {
                             printf("[Serveur/Ordre] Problème lors de l'envoi de l'ordre\n");
                     }
-                    /*for(int j = 0; j < nodesTab[i]; j++){ //parcours du sous tableau
-                        
-                    }*/
                 } else {
                     printf("[Serveur/Envoi] Aucun ordre à envoyer pour le noeud%i\n", i);
                 }
@@ -321,17 +316,14 @@ int main(int argc, char *argv[])
                 }
             }
         }
-        printf("[Serveur] Serveur en attente de travail\n");
     } 
 
-    // fermeture socket
-    if(close(srv) == -1) {
-        printf("[Serveur] : Problème lors de la fermeture de la socket\n");
-        exit(1);
-    }
-    printf("[Serveur] : Socket fermée !\n");
-
-    close(srv);
+    /*FD_CLR(srv, &set);
+        if(close(srv) == -1) {
+            printf("[Serveur] : Problème lors de la fermeture de la socket\n");
+            exit(1);
+        }
+    printf("[Serveur] : Socket fermée !\n");*/
 
     for(int i = 0; i <= nodeNumber; i++){
         free(edgesConnexionTab[i]);
