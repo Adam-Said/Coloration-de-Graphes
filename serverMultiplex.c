@@ -74,18 +74,6 @@ int getFirstNumber(char *fileName){
 	return atoi(nombre);
 }
 
-int createSocket() {
-    int option = 1;
-    int ds = socket(PF_INET, SOCK_STREAM, 0);
-    setsockopt(ds, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
-    if (ds == -1){
-        perror("[Serveur] Problème lors de la création de la socket :");
-        exit(1); 
-    }
-    printf("[Serveur] Création de la socket réussie \n");
-    return ds;
-}
-
 int extractNumbers(char* line, int number)
 {
     const char* s = line;
@@ -203,7 +191,15 @@ int main(int argc, char *argv[])
     // Fin parser
 
     /* etape 1 : creer une socket d'écoute des demandes de connexions*/
-    int srv = createSocket();
+    int option = 1;
+    int srv = socket(PF_INET, SOCK_STREAM, 0);
+    setsockopt(srv, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
+    if (srv == -1){
+        perror("[Serveur] Problème lors de la création de la socket :");
+        exit(1); 
+    }
+    printf("[Serveur] Création de la socket réussie \n");
+    
     /* etape 2 : nommage de la socket */
     struct sockaddr_in sock_srv;
     sock_srv.sin_family = AF_INET;
