@@ -35,21 +35,4 @@ for x in range(0,nbNode) :
   os.system(call)
   
 
-time.sleep(20)
-print("[Runner] Fin du programme\n[Runner] Destruction des processus")
 
-res = Popen(["ps", "aux"], stdout=PIPE)
-res = ''.join(map(chr, (res.communicate())[0]))
-
-
-for r in res.split('\n'):
-    if (("bin/client" in r) or ("bin/serverMultiplex" in r)):
-        num = r.split(' ')
-        for n in num:
-            if len(n) > 0 and n[0] in '0123456789':
-                os.system("kill " + n)
-                break
-        if "client" in r:
-            print("[Runner] Killed client.")
-        else:
-            print("[Runner] Killed server.")

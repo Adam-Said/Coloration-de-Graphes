@@ -2,6 +2,9 @@ import os
 import time
 from subprocess import Popen, PIPE
 
+print("Destruction des fichiers générés")
+os.system("make clean")
+
 print("Destruction des processus")
 
 res = Popen(["ps", "aux"], stdout=PIPE)

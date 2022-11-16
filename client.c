@@ -125,6 +125,7 @@ int main(int argc, char *argv[]) {
   printf("%s[Client] Envoi de l'adresse d'écoute réussi%s\n", AC_GREEN, AC_NORMAL);
 
   int number;
+  int color = 0;
   fd_set set;
   fd_set settmp;
   FD_ZERO(&set); //initialisation à 0 des booléens de scrutation
@@ -175,6 +176,8 @@ int main(int argc, char *argv[]) {
 
           //Reception du numéro de noeud
           int nodenumberReception = recvTCP(dsServ, &number, sizeof(number));
+          color = ((number%6)+1) + '0';
+          printf("Couleur : %i", color);
           if(nodenumberReception == -1 || nodenumberReception == 0){
             printf("%s[Client] Erreur lors de la reception du numéro d'identification%s\n", AC_RED, AC_WHITE);
             exit(0);
@@ -182,12 +185,12 @@ int main(int argc, char *argv[]) {
 
           sleep(10);
 
-          printf("%s[Client] %i) Ordre de connexion reçu, je démarre les connexions%s\n", AC_MAGENTA, number, AC_WHITE);
+          printf("\x1B[3%cm[Client] %i) Ordre de connexion reçu, je démarre les connexions%s\n", color, number, AC_WHITE);
 
           //étape 3 : boucle de connexion
-          printf("[Client/Connexions] Le noeuds %i démarre les connexions aux voisins\n", number);
+          printf("\x1B[3%cm[Client/Connexions] Le noeuds %i démarre les connexions aux voisins%s\n",color, number, AC_WHITE);
           for(int j = 0; j < neighbors; j++){
-            printf("[Client/Connexions] Tentative de connexion au noeud %i\n", j);
+            printf("\x1B[3%cm[Client/Connexions] Tentative de connexion au noeud %i %s\n",color, j, AC_WHITE);
             struct sockaddr_in sock_voisin = voisinsAdr[j].adresse;
             
             socklen_t lgAdr = sizeof(struct sockaddr_in);
@@ -203,9 +206,9 @@ int main(int argc, char *argv[]) {
               exit(0);
             }
             voisinsAdr[j].socket = dsVoisins;
-            printf("%s[Client/Connexion] Connexion au voisin %i (%s:%i) réussie%s\n", AC_GREEN, j, inet_ntoa(voisinsAdr[j].adresse.sin_addr), ntohs(voisinsAdr[j].adresse.sin_port), AC_WHITE);
+            printf("\x1B[3%cm[Client/Connexion] Connexion au voisin %i (%s:%i) réussie%s\n", color, j, inet_ntoa(voisinsAdr[j].adresse.sin_addr), ntohs(voisinsAdr[j].adresse.sin_port), AC_WHITE);
           }
-          printf("%s[Client/Connexion] Noeud %i, toutes les connexions sont réussies%s\n", AC_GREEN, number, AC_WHITE);
+          printf("\x1B[3%cm[Client/Connexion] Noeud %i, toutes les connexions sont réussies%s\n", color, number, AC_WHITE);
           continue;
         }
 
