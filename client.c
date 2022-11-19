@@ -176,14 +176,18 @@ int main(int argc, char *argv[]) {
 
           //Reception du numéro de noeud
           int nodenumberReception = recvTCP(dsServ, &number, sizeof(number));
-          color = ((number%6)+1) + '0';
-          printf("Couleur : %i", color);
+          color = ((number%6)+1);
+          if(color == 1) {
+            color = 7 + '0';
+          }
+          color = color + '0';
+          //printf("Couleur : %i", color);
           if(nodenumberReception == -1 || nodenumberReception == 0){
             printf("%s[Client] Erreur lors de la reception du numéro d'identification%s\n", AC_RED, AC_WHITE);
             exit(0);
           }
 
-          sleep(10);
+          sleep(2);
 
           printf("\x1B[3%cm[Client] %i) Ordre de connexion reçu, je démarre les connexions%s\n", color, number, AC_WHITE);
 
@@ -208,7 +212,7 @@ int main(int argc, char *argv[]) {
             voisinsAdr[j].socket = dsVoisins;
             printf("\x1B[3%cm[Client/Connexion] Connexion au voisin %i (%s:%i) réussie%s\n", color, j, inet_ntoa(voisinsAdr[j].adresse.sin_addr), ntohs(voisinsAdr[j].adresse.sin_port), AC_WHITE);
           }
-          printf("\x1B[3%cm[Client/Connexion] Noeud %i, toutes les connexions sont réussies%s\n", color, number, AC_WHITE);
+          printf("\e[0;100m\x1B[3%cm[Client/Connexion] Noeud %i, toutes les connexions sont réussies\e[0m%s\n", color, number, AC_WHITE);
           continue;
         }
 
