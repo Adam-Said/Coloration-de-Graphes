@@ -8,6 +8,9 @@ Il s'agit de créer un serveur afin de récupérer le schéma du réseau et de s
 
 ### Utilisation
 
+- Extrayez tous les dossiers et fichiers de l'archive
+- Ouvrez un terminal dans le dossier courant contenant tous les fichiers du projet
+
 Pour lancer le réseau il est nécessaire d'avoir :
 - `Python`
 - `Make`
@@ -21,7 +24,7 @@ ou
 ```bash
 python runner.py
 ```
-A son lancement le script vous demande un fichier à parser, il doit être contenu dans un dossier `Files` dans le dossier courant du projet. Mais trois fichiers de test bien placé sint déjà présents par défaut, "fileTest3.txt", "fileTest10.txt" et "dsjc250.5.txt". Il faut taper le nom sans les guillemets. Mais si vous souhaitez en créer un c’est possible mais il faut garder la structure de ce par défaut avec le nombre de clients dans le nom du fichier.
+A son lancement le script vous demande un fichier à parser, il doit être contenu dans un dossier `Files` dans le dossier courant du projet. Mais trois fichiers de test bien placé sont déjà présents par défaut, "fileTest3.txt", "fileTest10.txt" et "dsjc250.5.txt". Il faut **taper le nom sans les guillemets**. Mais si vous souhaitez en créer un c’est possible mais il faut garder la structure de ce par défaut avec **le nombre de clients dans le nom du fichier**.
 
 Enfin, le programme demande un numéro de port. Vous pouvez mettre celui que vous voulez mais garder à l’esprit que les ports des clients seront celui du serveur plus le numéro du client, il est donc nécessaire que les ports d’après soient égalements disponibles.
 
@@ -34,6 +37,6 @@ Vous pouvez voir alors dans l’ordre et dans le terminal :
 
 Une fois terminé, vous pouvez lancer la commande
 ```bash
-make clean
+python3 killer.py
 ```
-dans le terminal afin de nettoyer le projet.
+dans le terminal afin de nettoyer le projet et fermer les programmes.
