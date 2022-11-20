@@ -178,7 +178,7 @@ int main(int argc, char *argv[]) {
           int nodenumberReception = recvTCP(dsServ, &number, sizeof(number));
           color = ((number%6)+1);
           if(color == 1) {
-            color = 7 + '0';
+            color = 7;
           }
           color = color + '0';
           //printf("Couleur : %i", color);
