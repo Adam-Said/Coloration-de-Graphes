@@ -1,5 +1,6 @@
 import os
 import time
+import socket
 from subprocess import Popen, PIPE
 
 print("Compilation...")
@@ -7,6 +8,9 @@ os.system("mkdir obj")
 os.system("mkdir bin")
 os.system("make")
 print("Démarrage du programme")
+
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.connect(("8.8.8.8", 80))
 
 print("Fichier à parser \n")
 fileName = str(input())
@@ -30,8 +34,8 @@ time.sleep(1)
 for x in range(0,nbNode) :
   time.sleep(0.05)
   tmpPort = port+x+1
-  print("[Runner] Démarrage du client" , x , "sur" , str(tmpPort) ,"au serveur", str(port))
-  call = "./bin/client 127.0.0.1 " + str(port) + " " + str(tmpPort) +" &"
+  print("[Runner] Démarrage du client" , x , "sur" , str(s.getsockname()[0]) + ":" + str(tmpPort) ,"au serveur")
+  call = "./bin/client "+ str(s.getsockname()[0]) + " " + str(port) + " " + str(s.getsockname()[0]) + " " + str(tmpPort) +" &"
   os.system(call)
   
 

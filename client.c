@@ -58,8 +58,8 @@ int recvTCP(int sock, void* msg, int sizeMsg) {
 }
 
 int main(int argc, char *argv[]) {
-  if (argc != 4){
-    printf("utilisation : client ip_serveur port_serveur port_client\n");
+  if (argc != 5){
+    printf("utilisation : client ip_serveur port_serveur ip_client port_client\n");
     exit(0);
   }
 
@@ -76,8 +76,8 @@ int main(int argc, char *argv[]) {
   struct sockaddr_in sock_clt;
   socklen_t size =sizeof(struct sockaddr_in);
   sock_clt.sin_family = AF_INET;
-  sock_clt.sin_addr.s_addr = INADDR_ANY;
-  sock_clt.sin_port = htons((short)atoi(argv[3]));
+  sock_clt.sin_addr.s_addr = inet_addr(argv[3]);
+  sock_clt.sin_port = htons((short)atoi(argv[4]));
   int res = bind(ds, (struct sockaddr*) &sock_clt, size);
 
   if (res == -1){
