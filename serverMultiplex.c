@@ -136,19 +136,25 @@ int main(int argc, char *argv[])
     //Récupération du nombres de noeuds connectés à chaque noeud
 
     int* nodesTab = (int*)malloc(nodeNumber * sizeof(int));
+    int* incomingTab = (int*)malloc(nodeNumber * sizeof(int));
     int** edgesConnexionTab = (int**)malloc(nodeNumber * sizeof(int*));
     for(int i = 1; i <= nodeNumber; i++){
         nodesTab[i] = 0;
+        incomingTab[i] = 0;
     }
     while(fgets(buffer, bufferLength, file)) {
         if(buffer[0] == 'e'){
             int n = extractNumbers(buffer, 0);
+            int n2 = extractNumbers(buffer, 1);
             nodesTab[n]++;
+            incomingTab[n2]++;
         }
     }
     for(int i = 1; i <= nodeNumber; i++){
         if(nodesTab[i] != 0){
             printf("Tableau nodes indice : %i nombre de noeuds connectés : %i\n", i, nodesTab[i]);
+            printf("%i attend %i connexions\n", i, incomingTab[i]);
+
         }
     }
     int totalConnexions = 0;
@@ -262,6 +268,14 @@ int main(int argc, char *argv[])
                     exit(1);
                 }
                 printf("%s[Serveur] Nombre de voisins du noeuds %i envoyé avec succès%s\n", AC_GREEN, nodeIndex, AC_NORMAL);
+
+                res = sendTCP(dsClient, &incomingTab[nodeIndex], sizeof(int));
+                if(res == -1) {
+                    perror("[Serveur] : problème lors de l'envoi du nombre de connexions entrantes");
+                    exit(1);
+                }
+                printf("%s[Serveur] Nombre de connexions entrantes du noeuds %i envoyé avec succès%s\n", AC_GREEN, nodeIndex, AC_NORMAL);
+
 
                 if(!FD_ISSET(df, &settmp)) FD_SET(dsClient, &set);
                 if(maxDesc < dsClient) maxDesc = dsClient;

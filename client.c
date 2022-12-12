@@ -151,6 +151,13 @@ int main(int argc, char *argv[]) {
             exit(0);
         }
         printf("[Client] Nombre de voisins en attente : %i voisins\n", neighbors);
+        int incoming = 0;
+        res = recvTCP(dsServ, &incoming, sizeof(int));
+        if (res == -1 || res == 0) {
+            printf("%s[Client] Erreur lors de la reception du nombre de connexions entrantes %s\n", AC_RED, AC_WHITE);
+            exit(0);
+        }
+        printf("[Client] Nombre de connexions en attente : %i voisins\n", incoming);
         //étape 2 : boucle avec for et i<nombreNoeud reception un part un de chaque adresses de noeuds et stockage dans la struct + création socket
         struct paquet* voisinsAdr = (struct paquet*)malloc(neighbors * sizeof(struct paquet));
         if(neighbors != 0){
@@ -213,13 +220,15 @@ int main(int argc, char *argv[]) {
             printf("\x1B[3%cm[Client/Connexion] Connexion au voisin %i (%s:%i) réussie%s\n", color, j, inet_ntoa(voisinsAdr[j].adresse.sin_addr), ntohs(voisinsAdr[j].adresse.sin_port), AC_WHITE);
           }
           printf("\e[0;100m\x1B[3%cm[Client/Connexion] Noeud %i, toutes les connexions sont réussies\e[0m%s\n", color, number, AC_WHITE);
-          continue;
+          printf("JAI TOUT FINI\n");
+          break;
         }
 
-        FD_CLR(dsServ, &set);
-        printf("Fermeture de la socket serveur\n");
+/*         printf("Fermeture de la socket serveur\n");
+        FD_CLR(dsServ, &set); */
         
       } else {
+        // TODO Ajouter un compteur pour incrémenter le nombre de personne reçues et arrêter la boucle quand on a reçu tout le monde et commencer la coloration
         //Acceptation de la connexion d'un autre client
         int dsC = accept(ds, (struct sockaddr *)&sock_clt, &size);
         setsockopt(dsC, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
