@@ -258,7 +258,14 @@ int main(int argc, char *argv[])
                 int port = htons(voisins[nodeIndex].adresse.sin_port);
 
                 printf("[Serveur] %i) %s:%i\n", nodeIndex, adresse, port);
-                
+
+                res = sendTCP(dsClient, &incomingTab[nodeIndex], sizeof(int));
+                if(res == -1) {
+                    perror("[Serveur] : problème lors de l'envoi du nombre de connexions entrantes");
+                    exit(1);
+                }
+                printf("%s[Serveur] Nombre de connexions entrantes du noeuds %i envoyé avec succès%s\n", AC_GREEN, nodeIndex, AC_NORMAL);
+               
                 // voisins[nodeIndex].adresse = sockClient; 
                 voisins[nodeIndex].socket = dsClient;
                 printf("[Serveur] : Envoi du nombre de voisins du noeuds %i\n", nodeIndex);
@@ -269,13 +276,12 @@ int main(int argc, char *argv[])
                 }
                 printf("%s[Serveur] Nombre de voisins du noeuds %i envoyé avec succès%s\n", AC_GREEN, nodeIndex, AC_NORMAL);
 
-                res = sendTCP(dsClient, &incomingTab[nodeIndex], sizeof(int));
-                if(res == -1) {
-                    perror("[Serveur] : problème lors de l'envoi du nombre de connexions entrantes");
-                    exit(1);
-                }
-                printf("%s[Serveur] Nombre de connexions entrantes du noeuds %i envoyé avec succès%s\n", AC_GREEN, nodeIndex, AC_NORMAL);
+                
 
+                int nodeN = nodeIndex;
+                if (sendTCP(dsClient, &nodeN, sizeof(nodeN)) <= 0) {
+                    printf("[Serveur/Ordre] Problème lors de l'envoi du numéro de noeuds\n");
+                }
 
                 if(!FD_ISSET(df, &settmp)) FD_SET(dsClient, &set);
                 if(maxDesc < dsClient) maxDesc = dsClient;
@@ -319,10 +325,6 @@ int main(int argc, char *argv[])
                     }
                 } else {
                     printf("[Serveur/Envoi] Aucun ordre à envoyer pour le noeud%i\n", i);
-                }
-                int nodeN = i;
-                if (sendTCP(voisins[i].socket, &nodeN, sizeof(nodeN)) <= 0) {
-                    printf("[Serveur/Ordre] Problème lors de l'envoi du numéro de noeuds\n");
                 }
             }
         }

@@ -27,6 +27,12 @@ struct paquet {
     struct sockaddr_in adresse;
 };
 
+struct connexionsEntrantes {
+    int socket;
+    int color;
+    struct sockaddr_in adresse;
+};
+
 int sendTCP(int sock, void* msg, int sizeMsg) {
     int res;
     int sent = 0;
@@ -114,7 +120,6 @@ int main(int argc, char *argv[]) {
         perror("[Client] : problème lors de la mise en écoute de la socket");
         exit(1);
   }
-  //printf("[Client] : socket client sur écoute.\n");
 
   struct paquet msg;
   
@@ -123,8 +128,16 @@ int main(int argc, char *argv[]) {
       printf("%s[Client] Problème lors de l'envoi de l'adresse d'écoute%s\n", AC_RED, AC_WHITE);
   }
   printf("%s[Client] Envoi de l'adresse d'écoute réussi%s\n", AC_GREEN, AC_NORMAL);
+  
+  int incoming = 0; //nombres de Connexion en attente reçu du serveur
+  res = recvTCP(dsServ, &incoming, sizeof(int));
+  if (res == -1 || res == 0) {
+      printf("%s[Client] Erreur lors de la reception du nombre de connexions entrantes %s\n", AC_RED, AC_WHITE);
+      exit(0);
+  }
 
-  int number;
+  int number = 0; //numéro d'identification du client
+  srand(time(NULL));
   int color = 0;
   fd_set set;
   fd_set settmp;
@@ -133,6 +146,8 @@ int main(int argc, char *argv[]) {
   FD_SET(dsServ, &set); //ajout de la socket client au tableau de scrutation
   int maxDesc = (sock_list > dsServ ) ? sock_list : dsServ;
   //printf("[Client] : attente de connexion du serveur.\n");
+  int incomingConnexions = 0; //nombre de connexions entrantes
+  struct connexionsEntrantes incomingConnexionsInfos[incoming];
   while(1){
     settmp = set;
     if (select(maxDesc+1, &settmp, NULL, NULL, NULL) == -1) {
@@ -151,12 +166,16 @@ int main(int argc, char *argv[]) {
             exit(0);
         }
         printf("[Client] Nombre de voisins en attente : %i voisins\n", neighbors);
-        int incoming = 0;
-        res = recvTCP(dsServ, &incoming, sizeof(int));
-        if (res == -1 || res == 0) {
-            printf("%s[Client] Erreur lors de la reception du nombre de connexions entrantes %s\n", AC_RED, AC_WHITE);
-            exit(0);
+
+        //Reception du numéro de noeud
+        int nodenumberReception = recvTCP(dsServ, &number, sizeof(number));
+        printf("[Client] Numéro de noeud reçu, je suis le noeud numéro %i\n", number);
+        color = ((number%6)+1);
+        if(color == 1) {
+          color = 7;
         }
+        color = color + '0';
+
         printf("[Client] Nombre de connexions en attente : %i voisins\n", incoming);
         //étape 2 : boucle avec for et i<nombreNoeud reception un part un de chaque adresses de noeuds et stockage dans la struct + création socket
         struct paquet* voisinsAdr = (struct paquet*)malloc(neighbors * sizeof(struct paquet));
@@ -172,7 +191,7 @@ int main(int argc, char *argv[]) {
             voisinsAdr[i].adresse = adr.adresse;
             //printf("[Client] Une adresse voisine est %s:%i.\n", inet_ntoa(voisinsAdr[i].adresse.sin_addr), ntohs(voisinsAdr[i].adresse.sin_port));
           }
-          printf("%s[Client] Attente de l'ordre pour démarrer les connexions%s\n", AC_MAGENTA, AC_WHITE);
+          //printf("%s[Client] Attente de l'ordre pour démarrer les connexions%s\n", AC_MAGENTA, AC_WHITE);
           //Reception de l'ordre de démarrer les connexions
           int ordre;
           int ordreReception = recvTCP(dsServ, &ordre, sizeof(ordre));
@@ -181,13 +200,6 @@ int main(int argc, char *argv[]) {
             exit(0);
           }
 
-          //Reception du numéro de noeud
-          int nodenumberReception = recvTCP(dsServ, &number, sizeof(number));
-          color = ((number%6)+1);
-          if(color == 1) {
-            color = 7;
-          }
-          color = color + '0';
           //printf("Couleur : %i", color);
           if(nodenumberReception == -1 || nodenumberReception == 0){
             printf("%s[Client] Erreur lors de la reception du numéro d'identification%s\n", AC_RED, AC_WHITE);
@@ -196,12 +208,12 @@ int main(int argc, char *argv[]) {
 
           sleep(2);
 
-          printf("\x1B[3%cm[Client] %i) Ordre de connexion reçu, je démarre les connexions%s\n", color, number, AC_WHITE);
+          //printf("\x1B[3%cm[Client] %i) Ordre de connexion reçu, je démarre les connexions%s\n", color, number, AC_WHITE);
 
           //étape 3 : boucle de connexion
-          printf("\x1B[3%cm[Client/Connexions] Le noeuds %i démarre les connexions aux voisins%s\n",color, number, AC_WHITE);
+          //printf("\x1B[3%cm[Client/Connexions] Le noeuds %i démarre les connexions aux voisins%s\n",color, number, AC_WHITE);
           for(int j = 0; j < neighbors; j++){
-            printf("\x1B[3%cm[Client/Connexions] Tentative de connexion au noeud %i %s\n",color, j, AC_WHITE);
+            //printf("\x1B[3%cm[Client/Connexions] Tentative de connexion au noeud %i %s\n",color, j, AC_WHITE);
             struct sockaddr_in sock_voisin = voisinsAdr[j].adresse;
             
             socklen_t lgAdr = sizeof(struct sockaddr_in);
@@ -217,14 +229,21 @@ int main(int argc, char *argv[]) {
               exit(0);
             }
             voisinsAdr[j].socket = dsVoisins;
-            printf("\x1B[3%cm[Client/Connexion] Connexion au voisin %i (%s:%i) réussie%s\n", color, j, inet_ntoa(voisinsAdr[j].adresse.sin_addr), ntohs(voisinsAdr[j].adresse.sin_port), AC_WHITE);
+
+            struct paquet msg;
+  
+            msg.adresse = sock_clt;
+            if (sendTCP(dsVoisins, &msg, sizeof(struct paquet)) <= 0){
+                printf("%s[Client/Interconnexions] Problème lors de l'envoi de l'adresse d'écoute%s\n", AC_RED, AC_WHITE);
+            }
+            printf("%s[Client n°%i] Envoi de l'adresse d'écoute au voisin réussi%s\n", AC_GREEN, number, AC_NORMAL);
+            //printf("\x1B[3%cm[Client/Connexion] Connexion au voisin %i (%s:%i) réussie%s\n", color, j, inet_ntoa(voisinsAdr[j].adresse.sin_addr), ntohs(voisinsAdr[j].adresse.sin_port), AC_WHITE);
           }
           printf("\e[0;100m\x1B[3%cm[Client/Connexion] Noeud %i, toutes les connexions sont réussies\e[0m%s\n", color, number, AC_WHITE);
-          printf("JAI TOUT FINI\n");
           break;
         }
 
-/*         printf("Fermeture de la socket serveur\n");
+        /*         printf("Fermeture de la socket serveur\n");
         FD_CLR(dsServ, &set); */
         
       } else {
@@ -232,8 +251,31 @@ int main(int argc, char *argv[]) {
         //Acceptation de la connexion d'un autre client
         int dsC = accept(ds, (struct sockaddr *)&sock_clt, &size);
         setsockopt(dsC, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
+        if (recvTCP(ds, &incomingConnexionsInfos[incomingConnexions], sizeof(struct connexionsEntrantes)) <= 0) {
+          printf("[Client/Interconnexions] Problème lors de la réception de l'adresse d'un voisin\n");
+          exit(0);
+        }
+                
+        char adresse[INET_ADDRSTRLEN];
+        inet_ntop(AF_INET, &incomingConnexionsInfos[incomingConnexions].adresse.sin_addr, adresse, INET_ADDRSTRLEN);
+        int port = htons(incomingConnexionsInfos[incomingConnexions].adresse.sin_port);
+
+        printf("[Client/Interconnexions] %i) %s:%i\n", incomingConnexions, adresse, port);
+        
+        incomingConnexionsInfos[incomingConnexions].socket = dsC;
+        incomingConnexions++;
+        
         FD_SET(dsC, &set);
         if(maxDesc < dsC) maxDesc = dsC;
+      }
+
+      sleep(1);
+      if(incomingConnexions == incoming){
+        //printf("Début de la coloration ..\n");
+        srand(time(NULL));
+        int r = rand() % 2;
+        printf("Couleur choisie : %i\n", r);
+
       }
     }
   }
