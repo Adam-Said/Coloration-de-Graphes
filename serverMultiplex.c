@@ -158,11 +158,13 @@ int main(int argc, char *argv[])
         }
     }
     int totalConnexions = 0;
+    int totalIncoming = 0;
     for(int i = 0; i <= nodeNumber; i++){
         totalConnexions = totalConnexions + nodesTab[i];
+        totalIncoming = totalIncoming + incomingTab[i];
     }
     printf("[Serveur] Nombres de connexions (sockets) attendues : %i\n", totalConnexions);
-    
+    printf("[Serveur] Nombres de connexions (sockets) à faire : %i\n", totalIncoming);
     for(int i = 1; i <= nodeNumber; i++){
         if(nodesTab[i] != 0){
             edgesConnexionTab[i] = (int*)malloc(sizeof(int*) * nodesTab[i]);
@@ -258,8 +260,9 @@ int main(int argc, char *argv[])
                 int port = htons(voisins[nodeIndex].adresse.sin_port);
 
                 printf("[Serveur] %i) %s:%i\n", nodeIndex, adresse, port);
-
-                res = sendTCP(dsClient, &incomingTab[nodeIndex], sizeof(int));
+                int numVoisins = nodesTab[nodeIndex];
+                numVoisins += incomingTab[nodeIndex];
+                res = sendTCP(dsClient, &numVoisins, sizeof(int));
                 if(res == -1) {
                     perror("[Serveur] : problème lors de l'envoi du nombre de connexions entrantes");
                     exit(1);

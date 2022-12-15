@@ -129,10 +129,10 @@ int main(int argc, char *argv[]) {
   }
   printf("%s[Client] Envoi de l'adresse d'écoute réussi%s\n", AC_GREEN, AC_NORMAL);
   
-  int incoming = 0; //nombres de Connexion en attente reçu du serveur
-  res = recvTCP(dsServ, &incoming, sizeof(int));
+  int allNeighbors = 0; //nombres de Connexion en attente reçu du serveur
+  res = recvTCP(dsServ, &allNeighbors, sizeof(int));
   if (res == -1 || res == 0) {
-      printf("%s[Client] Erreur lors de la reception du nombre de connexions entrantes %s\n", AC_RED, AC_WHITE);
+      printf("%s[Client] Erreur lors de la reception du nombre de connexions totales %s\n", AC_RED, AC_WHITE);
       exit(0);
   }
 
@@ -146,8 +146,12 @@ int main(int argc, char *argv[]) {
   FD_SET(dsServ, &set); //ajout de la socket client au tableau de scrutation
   int maxDesc = (sock_list > dsServ ) ? sock_list : dsServ;
   //printf("[Client] : attente de connexion du serveur.\n");
-  int incomingConnexions = 0; //nombre de connexions entrantes
-  struct connexionsEntrantes incomingConnexionsInfos[incoming];
+  int incomingConnexions = 0; //nombre de connexions entrantes total
+  int incoming = 0; //nombre de connexions entrantes reçues
+
+  struct paquet* incomingConnexionsInfos = (struct paquet*)malloc(allNeighbors * sizeof(struct paquet));
+  struct paquet* voisinsAdr = (struct paquet*)malloc(allNeighbors * sizeof(struct paquet));
+
   while(1){
     settmp = set;
     if (select(maxDesc+1, &settmp, NULL, NULL, NULL) == -1) {
@@ -159,14 +163,15 @@ int main(int argc, char *argv[]) {
       if(df == dsServ){
         //étape 1 : réception du nombre de noeuds auxquels se connecter
         //printf("[Client/Reception] Réception du nombre de voisins\n");
-        int neighbors;
-        int res = recvTCP(dsServ, &neighbors, sizeof(int));
+        int toConnectNeighbors = 0;
+        int res = recvTCP(dsServ, &toConnectNeighbors, sizeof(int));
         if (res == -1 || res == 0) {
             printf("%s[Client] Erreur lors de la reception du nombre de noeuds voisins%s\n", AC_RED, AC_WHITE);
             exit(0);
         }
-        printf("[Client] Nombre de voisins en attente : %i voisins\n", neighbors);
-
+        printf("[Client] Nombre de voisins à connecter : %i voisins\n", toConnectNeighbors);
+        incoming = allNeighbors - toConnectNeighbors;
+        printf("[Client] Nombre de connexions en attente : %i voisins\n", incoming);
         //Reception du numéro de noeud
         int nodenumberReception = recvTCP(dsServ, &number, sizeof(number));
         printf("[Client] Numéro de noeud reçu, je suis le noeud numéro %i\n", number);
@@ -175,13 +180,10 @@ int main(int argc, char *argv[]) {
           color = 7;
         }
         color = color + '0';
-
-        printf("[Client] Nombre de connexions en attente : %i voisins\n", incoming);
         //étape 2 : boucle avec for et i<nombreNoeud reception un part un de chaque adresses de noeuds et stockage dans la struct + création socket
-        struct paquet* voisinsAdr = (struct paquet*)malloc(neighbors * sizeof(struct paquet));
-        if(neighbors != 0){
+        if(toConnectNeighbors != 0){
           //printf("[Client/Reception] Reception et stockage des adresses voisines\n");
-          for(int i = 0; i < neighbors; i++){
+          for(int i = 0; i < toConnectNeighbors; i++){
             struct paquet adr;
             int reception = recvTCP(dsServ, &adr, sizeof(adr));
             if(reception == -1 || reception == 0){
@@ -212,7 +214,7 @@ int main(int argc, char *argv[]) {
 
           //étape 3 : boucle de connexion
           //printf("\x1B[3%cm[Client/Connexions] Le noeuds %i démarre les connexions aux voisins%s\n",color, number, AC_WHITE);
-          for(int j = 0; j < neighbors; j++){
+          for(int j = 0; j < toConnectNeighbors; j++){
             //printf("\x1B[3%cm[Client/Connexions] Tentative de connexion au noeud %i %s\n",color, j, AC_WHITE);
             struct sockaddr_in sock_voisin = voisinsAdr[j].adresse;
             
@@ -240,7 +242,7 @@ int main(int argc, char *argv[]) {
             //printf("\x1B[3%cm[Client/Connexion] Connexion au voisin %i (%s:%i) réussie%s\n", color, j, inet_ntoa(voisinsAdr[j].adresse.sin_addr), ntohs(voisinsAdr[j].adresse.sin_port), AC_WHITE);
           }
           printf("\e[0;100m\x1B[3%cm[Client/Connexion] Noeud %i, toutes les connexions sont réussies\e[0m%s\n", color, number, AC_WHITE);
-          break;
+          //break;
         }
 
         /*         printf("Fermeture de la socket serveur\n");
@@ -249,17 +251,18 @@ int main(int argc, char *argv[]) {
       } else {
         // TODO Ajouter un compteur pour incrémenter le nombre de personne reçues et arrêter la boucle quand on a reçu tout le monde et commencer la coloration
         //Acceptation de la connexion d'un autre client
+        struct paquet newClient;
         int dsC = accept(ds, (struct sockaddr *)&sock_clt, &size);
         setsockopt(dsC, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
-        if (recvTCP(ds, &incomingConnexionsInfos[incomingConnexions], sizeof(struct connexionsEntrantes)) <= 0) {
+        if (recvTCP(dsC, &newClient, sizeof(struct paquet)) <= 0) {
           printf("[Client/Interconnexions] Problème lors de la réception de l'adresse d'un voisin\n");
           exit(0);
-        }
-                
+        }     
+        incomingConnexionsInfos[incomingConnexions] = newClient;
         char adresse[INET_ADDRSTRLEN];
         inet_ntop(AF_INET, &incomingConnexionsInfos[incomingConnexions].adresse.sin_addr, adresse, INET_ADDRSTRLEN);
         int port = htons(incomingConnexionsInfos[incomingConnexions].adresse.sin_port);
-
+      
         printf("[Client/Interconnexions] %i) %s:%i\n", incomingConnexions, adresse, port);
         
         incomingConnexionsInfos[incomingConnexions].socket = dsC;
@@ -271,11 +274,14 @@ int main(int argc, char *argv[]) {
 
       sleep(1);
       if(incomingConnexions == incoming){
-        //printf("Début de la coloration ..\n");
+        printf("Début de la coloration %i ..\n", number);
         srand(time(NULL));
         int r = rand() % 2;
-        printf("Couleur choisie : %i\n", r);
+        printf("[Client %i] Couleur choisie : %i\n", number, r);
 
+      }
+      else {
+        printf("[Client %i] il me reste %i connexions à recevoir]", number, incoming - incomingConnexions);
       }
     }
   }
