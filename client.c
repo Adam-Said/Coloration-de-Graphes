@@ -27,10 +27,11 @@ struct paquet {
     struct sockaddr_in adresse;
 };
 
-struct connexionsEntrantes {
-    int socket;
+struct infosColor {
     int color;
+    int socket;
     struct sockaddr_in adresse;
+    int state;
 };
 
 int sendTCP(int sock, void* msg, int sizeMsg) {
@@ -61,6 +62,34 @@ int recvTCP(int sock, void* msg, int sizeMsg) {
         }
     }
     return received;
+}
+
+void * recevoirCouleur (void * param){
+
+  struct infosColor * args = (struct infosColor *) param;
+  int color = 0;
+  struct sockaddr_in adresse = args->adresse;
+  int dsVois = args->socket;
+
+  int res = recvTCP(dsVois, &color, sizeof(int));
+  if (res == -1) {
+      printf("%s[Client] Erreur lors de la reception de la couleur %s\n", AC_RED, AC_WHITE);
+      exit(0);
+  }
+  args->color = color;
+  pthread_exit(NULL);
+}
+
+void * envoyerCouleur (void * param){ 
+
+  struct infosColor * args = (struct infosColor *) param;
+  int color = args->color;
+  int ds = args->socket;
+
+  if (sendTCP(ds, &color, sizeof(int)) <= 0){
+    printf("%s[Client/Interconnexions] Problème lors de l'envoi de a couleur%s\n", AC_RED, AC_WHITE);
+  }
+  pthread_exit(NULL);
 }
 
 int main(int argc, char *argv[]) {
@@ -148,9 +177,12 @@ int main(int argc, char *argv[]) {
   //printf("[Client] : attente de connexion du serveur.\n");
   int incomingConnexions = 0; //nombre de connexions entrantes total
   int incoming = 0; //nombre de connexions entrantes reçues
-
+  srand(time(NULL));
+  int myColor = rand() % 2;
   struct paquet* incomingConnexionsInfos = (struct paquet*)malloc(allNeighbors * sizeof(struct paquet));
   struct paquet* voisinsAdr = (struct paquet*)malloc(allNeighbors * sizeof(struct paquet));
+
+  struct infosColor* infos = (struct infosColor*)malloc(allNeighbors * sizeof(struct infosColor));
 
   while(1){
     settmp = set;
@@ -238,10 +270,10 @@ int main(int argc, char *argv[]) {
             if (sendTCP(dsVoisins, &msg, sizeof(struct paquet)) <= 0){
                 printf("%s[Client/Interconnexions] Problème lors de l'envoi de l'adresse d'écoute%s\n", AC_RED, AC_WHITE);
             }
-            printf("%s[Client n°%i] Envoi de l'adresse d'écoute au voisin réussi%s\n", AC_GREEN, number, AC_NORMAL);
+            //printf("%s[Client n°%i] Envoi de l'adresse d'écoute au voisin réussi%s\n", AC_GREEN, number, AC_NORMAL);
             //printf("\x1B[3%cm[Client/Connexion] Connexion au voisin %i (%s:%i) réussie%s\n", color, j, inet_ntoa(voisinsAdr[j].adresse.sin_addr), ntohs(voisinsAdr[j].adresse.sin_port), AC_WHITE);
           }
-          printf("\e[0;100m\x1B[3%cm[Client/Connexion] Noeud %i, toutes les connexions sont réussies\e[0m%s\n", color, number, AC_WHITE);
+          //printf("\e[0;100m\x1B[3%cm[Client/Connexion] Noeud %i, toutes les connexions sont réussies\e[0m%s\n", color, number, AC_WHITE);
           //break;
         }
 
@@ -263,7 +295,7 @@ int main(int argc, char *argv[]) {
         inet_ntop(AF_INET, &incomingConnexionsInfos[incomingConnexions].adresse.sin_addr, adresse, INET_ADDRSTRLEN);
         int port = htons(incomingConnexionsInfos[incomingConnexions].adresse.sin_port);
       
-        printf("[Client/Interconnexions] %i) %s:%i\n", incomingConnexions, adresse, port);
+        //printf("[Client/Interconnexions] %i) %s:%i\n", incomingConnexions, adresse, port);
         
         incomingConnexionsInfos[incomingConnexions].socket = dsC;
         incomingConnexions++;
@@ -273,15 +305,79 @@ int main(int argc, char *argv[]) {
       }
 
       sleep(1);
+     
       if(incomingConnexions == incoming){
-        printf("Début de la coloration %i ..\n", number);
-        srand(time(NULL));
-        int r = rand() % 2;
-        printf("[Client %i] Couleur choisie : %i\n", number, r);
+        for (size_t i = 0; i < allNeighbors - incoming; i++)
+        {
+          struct sockaddr_in sock_voisin = voisinsAdr[i].adresse;
+          int socket = voisinsAdr[i].socket;
+          int color = -1;
+          struct infosColor newInfos;
+          newInfos.adresse = sock_voisin;
+          newInfos.color = color;
+          newInfos.socket = socket;
+          newInfos.state = 1;
+          infos[i] = newInfos;
+        }
+        for (size_t i = allNeighbors - incoming - 1; i < allNeighbors; i++) {
+          struct sockaddr_in sock_voisin = incomingConnexionsInfos[i - allNeighbors - incoming - 1].adresse;
+          int socket = voisinsAdr[i - allNeighbors - incoming - 1].socket;
+          int color = -1;
+          struct infosColor newInfos;
+          newInfos.adresse = sock_voisin;
+          newInfos.color = color;
+          newInfos.socket = socket;
+          newInfos.state = 1;
+          infos[i] = newInfos;
+        }
+        pthread_t threads[2*allNeighbors];
 
-      }
-      else {
-        printf("[Client %i] il me reste %i connexions à recevoir]", number, incoming - incomingConnexions);
+        printf("Début de la coloration %i ..\n", number);
+        int check = 1;
+        while(check == 1) {  
+          srand(time(NULL));
+          int r = rand() % 2;
+          printf("[Client %i] Couleur choisie : %i\n", number, r);
+          myColor = myColor + r;
+
+          for (size_t i = 0; i < sizeof(infos)/sizeof(infos[0]); i++)
+          {
+            if(infos[i].state == 1){
+              infos[i].color = color;
+              pthread_create(&threads[i], NULL, envoyerCouleur, (void *)&infos[i]);
+            }
+          }
+          for (size_t i = 0; i < sizeof(infos)/sizeof(infos[0]); i++)
+          {
+            if(infos[i].state == 1){
+              pthread_create(&threads[i+ allNeighbors], NULL, recevoirCouleur, (void *)&infos[i]);
+            }
+          }
+
+          for (int i = 0; i < 2*allNeighbors; i++){
+            pthread_join(threads[i], NULL);
+          }
+
+          for (size_t i = 0; i < sizeof(infos)/sizeof(infos[0]); i++)
+          {
+            if(infos[i].color != color){
+              infos[i].state = 0;
+            }
+          }
+          int verif = 1;
+          for (size_t i = 0; i < sizeof(infos)/sizeof(infos[0]); i++)
+          {
+            if (infos[i].state == 1)
+            {
+              verif = 0;
+            }          
+          }
+          
+          if(verif == 1){
+            check = 0;
+          }
+        }
+        printf("[Client %i] Couleur finale : %i\n", number, color);
       }
     }
   }
