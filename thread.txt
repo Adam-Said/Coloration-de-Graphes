@@ -1,0 +1,1492 @@
+Script started on 2022-12-16 18:26:17+01:00 [TERM="xterm-256color" TTY="/dev/pts/3" COLUMNS="115" LINES="31"]
+[?2004h]0;gecko@gecko: ~/Desktop/HAI721-Projet[01;32mgecko@gecko[00m:[01;34m~/Desktop/HAI721-Projet[00m$ git config user.email "adam.said.1901@gmail.com"[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[30Ppython3 runner.py 
+[?2004lCompilation...
+gcc -Wall -Iinclude -c client.c -o obj/client.o
+gcc -lpthread -o bin/client obj/client.o 
+gcc -Wall -Iinclude -c serverMultiplex.c -o obj/serverMultiplex.o
+gcc -lpthread -o bin/serverMultiplex obj/serverMultiplex.o 
+Démarrage du programme
+Fichier à parser 
+
+^CTraceback (most recent call last):
+  File "/home/gecko/Desktop/HAI721-Projet/runner.py", line 16, in <module>
+    fileName = str(input())
+KeyboardInterrupt
+
+[?2004h]0;gecko@gecko: ~/Desktop/HAI721-Projet[01;32mgecko@gecko[00m:[01;34m~/Desktop/HAI721-Projet[00m$ python3 runner.py git config user.email "adam.said.1901@gmail.com"[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[30Ppython3 runner.py kill[C[C[C[C[C[Crunn[C[C[C[C[C[Ckill[C[C[C[C[C[Crunn[C[C[C[C[C[Ckill[C[C[C[C[C[Crunn[C[C[C[C[C[C< param10.txt 
+[?2004lCompilation...
+mkdir: cannot create directory ‘obj’: File exists
+mkdir: cannot create directory ‘bin’: File exists
+make: Nothing to be done for 'default'.
+Démarrage du programme
+Fichier à parser 
+
+Port serveur 
+
+Besoin de 10 clients
+[Runner] Démarrage du serveur sur 10000
+Fichier à parser fileTest10.txt 
+Tableau nodes indice : 2 nombre de noeuds connectés : 1
+2 attend 6 connexions
+Tableau nodes indice : 3 nombre de noeuds connectés : 1
+3 attend 4 connexions
+Tableau nodes indice : 5 nombre de noeuds connectés : 2
+5 attend 1 connexions
+Tableau nodes indice : 6 nombre de noeuds connectés : 2
+6 attend 2 connexions
+Tableau nodes indice : 7 nombre de noeuds connectés : 3
+7 attend 3 connexions
+Tableau nodes indice : 8 nombre de noeuds connectés : 5
+8 attend 0 connexions
+Tableau nodes indice : 9 nombre de noeuds connectés : 4
+9 attend 0 connexions
+Tableau nodes indice : 10 nombre de noeuds connectés : 5
+10 attend 0 connexions
+[Serveur] Nombres de connexions (sockets) attendues : 23
+[Serveur] Nombres de connexions (sockets) à faire : 23
+1 | Noeuds connectées : 
+2 | Noeuds connectées :  1 
+3 | Noeuds connectées :  2 
+4 | Noeuds connectées : 
+5 | Noeuds connectées :  2  4 
+6 | Noeuds connectées :  1  2 
+7 | Noeuds connectées :  1  3  4 
+8 | Noeuds connectées :  1  2  3  6  7 
+9 | Noeuds connectées :  2  3  5  7 
+10 | Noeuds connectées :  2  3  4  6  7 
+Fichier : Le nombre de noeuds nécessaires est 10 
+[Serveur] Création de la socket réussie 
+[Runner] Démarrage du client 0 sur 10.0.2.15:10001 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[Serveur] 1) 10.0.2.15:10001
+[32m[Serveur] Nombre de connexions entrantes du noeuds 1 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 1
+[32m[Serveur] Nombre de voisins du noeuds 1 envoyé avec succès[m
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[Client] Nombre de voisins à connecter : 0 voisins
+[Client] Nombre de connexions en attente : 4 voisins
+[Client] Numéro de noeud reçu, je suis le noeud numéro 1
+[Runner] Démarrage du client 1 sur 10.0.2.15:10002 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[Serveur] 2) 10.0.2.15:10002
+[32m[Serveur] Nombre de connexions entrantes du noeuds 2 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 2
+[32m[Serveur] Nombre de voisins du noeuds 2 envoyé avec succès[m
+[Client] Nombre de voisins à connecter : 1 voisins
+[Client] Nombre de connexions en attente : 6 voisins
+[Client] Numéro de noeud reçu, je suis le noeud numéro 2
+[Runner] Démarrage du client 2 sur 10.0.2.15:10003 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[Serveur] 3) 10.0.2.15:10003
+[32m[Serveur] Nombre de connexions entrantes du noeuds 3 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 3
+[32m[Serveur] Nombre de voisins du noeuds 3 envoyé avec succès[m
+[Client] Nombre de voisins à connecter : 1 voisins
+[Client] Nombre de connexions en attente : 4 voisins
+[Client] Numéro de noeud reçu, je suis le noeud numéro 3
+[Runner] Démarrage du client 3 sur 10.0.2.15:10004 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[Serveur] 4) 10.0.2.15:10004
+[32m[Serveur] Nombre de connexions entrantes du noeuds 4 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 4
+[32m[Serveur] Nombre de voisins du noeuds 4 envoyé avec succès[m
+[Client] Nombre de voisins à connecter : 0 voisins
+[Client] Nombre de connexions en attente : 3 voisins
+[Client] Numéro de noeud reçu, je suis le noeud numéro 4
+[Runner] Démarrage du client 4 sur 10.0.2.15:10005 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[Serveur] 5) 10.0.2.15:10005
+[32m[Serveur] Nombre de connexions entrantes du noeuds 5 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 5
+[32m[Serveur] Nombre de voisins du noeuds 5 envoyé avec succès[m
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[Client] Nombre de voisins à connecter : 2 voisins
+[Client] Nombre de connexions en attente : 1 voisins
+[Client] Numéro de noeud reçu, je suis le noeud numéro 5
+[Runner] Démarrage du client 5 sur 10.0.2.15:10006 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[Serveur] 6) 10.0.2.15:10006
+[32m[Serveur] Nombre de connexions entrantes du noeuds 6 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 6
+[32m[Serveur] Nombre de voisins du noeuds 6 envoyé avec succès[m
+[Client] Nombre de voisins à connecter : 2 voisins
+[Client] Nombre de connexions en attente : 2 voisins
+[Client] Numéro de noeud reçu, je suis le noeud numéro 6
+[Runner] Démarrage du client 6 sur 10.0.2.15:10007 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[Serveur] 7) 10.0.2.15:10007
+[32m[Serveur] Nombre de connexions entrantes du noeuds 7 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 7
+[Client] Nombre de voisins à connecter : 3 voisins
+[Client] Nombre de connexions en attente : 3 voisins
+[32m[Serveur] Nombre de voisins du noeuds 7 envoyé avec succès[m
+[Client] Numéro de noeud reçu, je suis le noeud numéro 7
+[Runner] Démarrage du client 7 sur 10.0.2.15:10008 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[Serveur] 8) 10.0.2.15:10008
+[32m[Serveur] Nombre de connexions entrantes du noeuds 8 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 8
+[32m[Serveur] Nombre de voisins du noeuds 8 envoyé avec succès[m
+[Client] Nombre de voisins à connecter : 5 voisins
+[Client] Nombre de connexions en attente : 0 voisins
+[Client] Numéro de noeud reçu, je suis le noeud numéro 8
+[Runner] Démarrage du client 8 sur 10.0.2.15:10009 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[Serveur] 9) 10.0.2.15:10009
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[32m[Serveur] Nombre de connexions entrantes du noeuds 9 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 9
+[32m[Serveur] Nombre de voisins du noeuds 9 envoyé avec succès[m
+[Client] Nombre de voisins à connecter : 4 voisins
+[Client] Nombre de connexions en attente : 0 voisins
+[Client] Numéro de noeud reçu, je suis le noeud numéro 9
+[Runner] Démarrage du client 9 sur 10.0.2.15:10010 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[Serveur] 10) 10.0.2.15:10010
+[32m[Serveur] Nombre de connexions entrantes du noeuds 10 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 10
+[32m[Serveur] Nombre de voisins du noeuds 10 envoyé avec succès[m
+[Serveur/Envoi] Aucun noeuds à envoyer au noeuds 1, je passe au prochain
+[Serveur/Envoi] Début de l'envoi des voisins du noeud 2
+[Serveur/Envoi] Toutes les adresses voisines du noeud 2 ont été envoyées
+[Serveur/Envoi] Début de l'envoi des voisins du noeud 3
+[Client] Nombre de voisins à connecter : 5 voisins
+[Serveur/Envoi] Toutes les adresses voisines du noeud 3 ont été envoyées
+[Serveur/Envoi] Aucun noeuds à envoyer au noeuds 4, je passe au prochain
+[Serveur/Envoi] Début de l'envoi des voisins du noeud 5
+[Client] Nombre de connexions en attente : 0 voisins
+[Client] Numéro de noeud reçu, je suis le noeud numéro 10
+[Serveur/Envoi] Toutes les adresses voisines du noeud 5 ont été envoyées
+[Serveur/Envoi] Début de l'envoi des voisins du noeud 6
+[Serveur/Envoi] Toutes les adresses voisines du noeud 6 ont été envoyées
+[Serveur/Envoi] Début de l'envoi des voisins du noeud 7
+[Serveur/Envoi] Toutes les adresses voisines du noeud 7 ont été envoyées
+[Serveur/Envoi] Début de l'envoi des voisins du noeud 8
+[Serveur/Envoi] Toutes les adresses voisines du noeud 8 ont été envoyées
+[Serveur/Envoi] Début de l'envoi des voisins du noeud 9
+[Serveur/Envoi] Toutes les adresses voisines du noeud 9 ont été envoyées
+[Serveur/Envoi] Début de l'envoi des voisins du noeud 10
+[Serveur/Envoi] Toutes les adresses voisines du noeud 10 ont été envoyées
+[Serveur/Ordre] Envoi des ordres de connexion1
+[Serveur/Envoi] Aucun ordre à envoyer pour le noeud1
+[Serveur/Envoi] Aucun ordre à envoyer pour le noeud4
+[?2004h]0;gecko@gecko: ~/Desktop/HAI721-Projet[01;32mgecko@gecko[00m:[01;34m~/Desktop/HAI721-Projet[00m$ Début de la coloration 8 ..
+Nouvelle chaîne : 0 
+[Client 8] Couleur choisie : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Couleur envoyée : 0
+Début de la coloration 9 ..
+Début de la coloration 10 ..
+Nouvelle chaîne : 0 
+[Client 10] Couleur choisie : 0
+Nouvelle chaîne : 0 
+[Client 9] Couleur choisie : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10007
+[Client/Interconnexions] Réception de 10.0.2.15:10006
+[Client/Interconnexions] Réception de 10.0.2.15:10004
+[Client/Interconnexions] Réception de 10.0.2.15:10002
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10003
+[Client/Interconnexions] Réception de 10.0.2.15:10002
+[Client/Interconnexions] Réception de 10.0.2.15:10003
+[Client/Interconnexions] Réception de 10.0.2.15:10002
+[Client/Interconnexions] Réception de 10.0.2.15:10001
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10007
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10003
+[Client/Interconnexions] Réception de 10.0.2.15:10005
+[Client/Interconnexions] Réception de 10.0.2.15:10006
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10007
+[Client/Interconnexions] Couleur envoyée : 0
+Début de la coloration 5 ..
+Nouvelle chaîne : 0 
+[Client 5] Couleur choisie : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10002
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10004
+[Client/Interconnexions] Réception de 10.0.2.15:10009
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+Début de la coloration 4 ..
+Nouvelle chaîne : 0 
+[Client 4] Couleur choisie : 0
+Début de la coloration 6 ..
+Nouvelle chaîne : 0 
+[Client 6] Couleur choisie : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10005
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10007
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10001
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10002
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10008
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10010
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10010
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Couleur envoyée : �
+[Client/Interconnexions] Couleur reçue : 0
+Début de la coloration 7 ..
+Nouvelle chaîne : 0 
+[Client 7] Couleur choisie : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+Début de la coloration 1 ..
+MYCOLOR : 0
+infos[0] : � : 0
+infos[1] : 0 : 1
+infos[2] : 0 : 1
+Nouvelle chaîne : 00 
+[Client 4] Couleur choisie : 00
+Nouvelle chaîne : 0 
+[Client 1] Couleur choisie : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10003
+[Client/Interconnexions] Réception de 10.0.2.15:10004
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10006
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10009
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10007
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10010
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10008
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10001
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10002
+[Client/Interconnexions] Réception de 10.0.2.15:10008
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+Début de la coloration 3 ..
+Nouvelle chaîne : 1 
+[Client 3] Couleur choisie : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur envoyée : 1
+[Client/Interconnexions] Couleur reçue : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10002
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 1
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 1
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10008
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Couleur envoyée : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10007
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10009
+[Client/Interconnexions] Réception de 10.0.2.15:10010
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+Début de la coloration 2 ..
+Nouvelle chaîne : 0 
+[Client 2] Couleur choisie : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur envoyée : 0
+MYCOLOR : 0
+infos[0] : 0 : 1
+infos[1] : 0 : 1
+infos[2] : 0 : 1
+infos[3] : 0 : 1
+Nouvelle chaîne : 00 
+[Client 1] Couleur choisie : 00
+[Client/Interconnexions] Taille couleur envoyée : 2
+[Client/Interconnexions] Couleur envoyée : 00
+[Client/Interconnexions] Taille couleur envoyée : 2
+[Client/Interconnexions] Couleur envoyée : 00
+[Client/Interconnexions] Taille couleur envoyée : 2
+[Client/Interconnexions] Couleur envoyée : 00
+MYCOLOR : 0
+infos[0] : 0 : 1
+infos[1] : 0 : 1
+infos[2] : 0 : 1
+Nouvelle chaîne : 00 
+[Client 5] Couleur choisie : 00
+[Client/Interconnexions] Réception de 10.0.2.15:10008
+[Client/Interconnexions] Réception de 10.0.2.15:10007
+Socket fermée
+: Success
+[Client/Interconnexions] Taille Couleur reçue : 0
+[31m[Client] Erreur lors de la reception de la couleur [37m
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Taille couleur envoyée : 2
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 2
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Couleur envoyée : 00
+MYCOLOR : 0
+infos[0] : 0 : 1
+infos[1] : 0 : 1
+infos[2] : 0 : 1
+infos[3] : 0 : 1
+Nouvelle chaîne : 00 
+[Client 6] Couleur choisie : 00
+[Client/Interconnexions] Couleur envoyée : 00
+[Client/Interconnexions] Taille couleur envoyée : 2
+Problème lors de l'envoi du message
+[Client/Interconnexions] Réception de 10.0.2.15:10001
+[Client/Interconnexions] Taille Couleur reçue : 2
+[Client/Interconnexions] Couleur reçue : 00
+[Client/Interconnexions] Réception de 10.0.2.15:10002
+[Client/Interconnexions] Réception de 10.0.2.15:10008
+[Client/Interconnexions] Taille couleur envoyée : 2
+: Broken pipe
+[31m[Client/Interconnexions] Problème lors de l'envoi de la couleur [37m
+[Client/Interconnexions] Couleur envoyée : 00
+[Client/Interconnexions] Taille couleur envoyée : 2
+[Client/Interconnexions] Couleur envoyée : 00
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10001
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10010
+[Client/Interconnexions] Réception de 10.0.2.15:10006
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Couleur envoyée : 0
+MYCOLOR : 0
+infos[0] : 0 : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10009
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10002
+[Client/Interconnexions] Réception de 10.0.2.15:10004
+[Client/Interconnexions] Réception de 10.0.2.15:10009
+Socket fermée
+: Success
+[Client/Interconnexions] Taille Couleur reçue : 0
+[31m[Client] Erreur lors de la reception de la couleur [37m
+infos[1] : 1 : 0
+infos[2] : 0 : 1
+infos[3] : 0 : 1
+Nouvelle chaîne : 00 
+[Client 9] Couleur choisie : 00
+[Client/Interconnexions] Taille couleur envoyée : 2
+[Client/Interconnexions] Couleur envoyée : 00
+[Client/Interconnexions] Taille couleur envoyée : 2
+Problème lors de l'envoi du message
+: Broken pipe
+[31m[Client/Interconnexions] Problème lors de l'envoi de la couleur [37m
+[Client/Interconnexions] Taille couleur envoyée : 2
+[Client/Interconnexions] Couleur envoyée : 00
+[Client/Interconnexions] Taille couleur envoyée : 2
+Problème lors de l'envoi du message
+[Client/Interconnexions] Réception de 10.0.2.15:10007
+[Client/Interconnexions] Réception de 10.0.2.15:10005
+[Client/Interconnexions] Taille Couleur reçue : 2
+[Client/Interconnexions] Couleur reçue : 00
+Socket fermée
+: Broken pipe
+: Success
+[Client/Interconnexions] Réception de 10.0.2.15:10002
+[31m[Client/Interconnexions] Problème lors de l'envoi de la couleur [37m
+[Client/Interconnexions] Réception de 10.0.2.15:10005
+[Client/Interconnexions] Réception de 10.0.2.15:10008
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille Couleur reçue : 0
+[31m[Client] Erreur lors de la reception de la couleur [37m
+[Client/Interconnexions] Réception de 10.0.2.15:10003
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10010
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+Problème lors de la réception du message
+: Connection reset by peer
+[31m[Client] Erreur lors de la reception de la taille couleur [37m
+^C[?2004l[?2004h[?2004l
+[?2004h]0;gecko@gecko: ~/Desktop/HAI721-Projet[01;32mgecko@gecko[00m:[01;34m~/Desktop/HAI721-Projet[00m$ python3 runner.py < param10.txt [Kgit config user.email "adam.said.1901@gmail.com"[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[30Ppython3 runner.py kill[C[C[C[C[C[C
+[?2004lDestruction des fichiers générés
+(rm -rf bin ; rm -rf obj)
+Destruction des processus
+Killed server.
+[?2004h]0;gecko@gecko: ~/Desktop/HAI721-Projet[01;32mgecko@gecko[00m:[01;34m~/Desktop/HAI721-Projet[00m$ python3 killer.py [14@runner.py < param10.txt[C
+[?2004lCompilation...
+gcc -Wall -Iinclude -c client.c -o obj/client.o
+gcc -lpthread -o bin/client obj/client.o 
+gcc -Wall -Iinclude -c serverMultiplex.c -o obj/serverMultiplex.o
+gcc -lpthread -o bin/serverMultiplex obj/serverMultiplex.o 
+Démarrage du programme
+Fichier à parser 
+
+Port serveur 
+
+Besoin de 10 clients
+[Runner] Démarrage du serveur sur 10000
+Fichier à parser fileTest10.txt 
+Tableau nodes indice : 2 nombre de noeuds connectés : 1
+2 attend 6 connexions
+Tableau nodes indice : 3 nombre de noeuds connectés : 1
+3 attend 4 connexions
+Tableau nodes indice : 5 nombre de noeuds connectés : 2
+5 attend 1 connexions
+Tableau nodes indice : 6 nombre de noeuds connectés : 2
+6 attend 2 connexions
+Tableau nodes indice : 7 nombre de noeuds connectés : 3
+7 attend 3 connexions
+Tableau nodes indice : 8 nombre de noeuds connectés : 5
+8 attend 0 connexions
+Tableau nodes indice : 9 nombre de noeuds connectés : 4
+9 attend 0 connexions
+Tableau nodes indice : 10 nombre de noeuds connectés : 5
+10 attend 0 connexions
+[Serveur] Nombres de connexions (sockets) attendues : 23
+[Serveur] Nombres de connexions (sockets) à faire : 23
+1 | Noeuds connectées : 
+2 | Noeuds connectées :  1 
+3 | Noeuds connectées :  2 
+4 | Noeuds connectées : 
+5 | Noeuds connectées :  2  4 
+6 | Noeuds connectées :  1  2 
+7 | Noeuds connectées :  1  3  4 
+8 | Noeuds connectées :  1  2  3  6  7 
+9 | Noeuds connectées :  2  3  5  7 
+10 | Noeuds connectées :  2  3  4  6  7 
+Fichier : Le nombre de noeuds nécessaires est 10 
+[Serveur] Création de la socket réussie 
+[Runner] Démarrage du client 0 sur 10.0.2.15:10001 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[Serveur] 1) 10.0.2.15:10001
+[32m[Serveur] Nombre de connexions entrantes du noeuds 1 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 1
+[32m[Serveur] Nombre de voisins du noeuds 1 envoyé avec succès[m
+[Client] Nombre de voisins à connecter : 0 voisins
+[Client] Nombre de connexions en attente : 4 voisins
+[Client] Numéro de noeud reçu, je suis le noeud numéro 1
+[Runner] Démarrage du client 1 sur 10.0.2.15:10002 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[Serveur] 2) 10.0.2.15:10002
+[32m[Serveur] Nombre de connexions entrantes du noeuds 2 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 2
+[32m[Serveur] Nombre de voisins du noeuds 2 envoyé avec succès[m
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[Client] Nombre de voisins à connecter : 1 voisins
+[Client] Nombre de connexions en attente : 6 voisins
+[Client] Numéro de noeud reçu, je suis le noeud numéro 2
+[Runner] Démarrage du client 2 sur 10.0.2.15:10003 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[Serveur] 3) 10.0.2.15:10003
+[32m[Serveur] Nombre de connexions entrantes du noeuds 3 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 3
+[32m[Serveur] Nombre de voisins du noeuds 3 envoyé avec succès[m
+[Client] Nombre de voisins à connecter : 1 voisins
+[Client] Nombre de connexions en attente : 4 voisins
+[Client] Numéro de noeud reçu, je suis le noeud numéro 3
+[Runner] Démarrage du client 3 sur 10.0.2.15:10004 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[Serveur] 4) 10.0.2.15:10004
+[32m[Serveur] Nombre de connexions entrantes du noeuds 4 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 4
+[32m[Serveur] Nombre de voisins du noeuds 4 envoyé avec succès[m
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[Client] Nombre de voisins à connecter : 0 voisins
+[Client] Nombre de connexions en attente : 3 voisins
+[Client] Numéro de noeud reçu, je suis le noeud numéro 4
+[Runner] Démarrage du client 4 sur 10.0.2.15:10005 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[Serveur] 5) 10.0.2.15:10005
+[32m[Serveur] Nombre de connexions entrantes du noeuds 5 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 5
+[32m[Serveur] Nombre de voisins du noeuds 5 envoyé avec succès[m
+[Client] Nombre de voisins à connecter : 2 voisins
+[Client] Nombre de connexions en attente : 1 voisins
+[Client] Numéro de noeud reçu, je suis le noeud numéro 5
+[Runner] Démarrage du client 5 sur 10.0.2.15:10006 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[Serveur] 6) 10.0.2.15:10006
+[32m[Serveur] Nombre de connexions entrantes du noeuds 6 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 6
+[32m[Serveur] Nombre de voisins du noeuds 6 envoyé avec succès[m
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[Client] Nombre de voisins à connecter : 2 voisins
+[Client] Nombre de connexions en attente : 2 voisins
+[Client] Numéro de noeud reçu, je suis le noeud numéro 6
+[Runner] Démarrage du client 6 sur 10.0.2.15:10007 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[Serveur] 7) 10.0.2.15:10007
+[32m[Serveur] Nombre de connexions entrantes du noeuds 7 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 7
+[32m[Serveur] Nombre de voisins du noeuds 7 envoyé avec succès[m
+[Client] Nombre de voisins à connecter : 3 voisins
+[Client] Nombre de connexions en attente : 3 voisins
+[Client] Numéro de noeud reçu, je suis le noeud numéro 7
+[Runner] Démarrage du client 7 sur 10.0.2.15:10008 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[Serveur] 8) 10.0.2.15:10008
+[32m[Serveur] Nombre de connexions entrantes du noeuds 8 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 8
+[32m[Serveur] Nombre de voisins du noeuds 8 envoyé avec succès[m
+[Client] Nombre de voisins à connecter : 5 voisins
+[Client] Nombre de connexions en attente : 0 voisins
+[Client] Numéro de noeud reçu, je suis le noeud numéro 8
+[Runner] Démarrage du client 8 sur 10.0.2.15:10009 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[Serveur] 9) 10.0.2.15:10009
+[32m[Serveur] Nombre de connexions entrantes du noeuds 9 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 9
+[32m[Serveur] Nombre de voisins du noeuds 9 envoyé avec succès[m
+[Client] Nombre de voisins à connecter : 4 voisins
+[Client] Nombre de connexions en attente : 0 voisins
+[Client] Numéro de noeud reçu, je suis le noeud numéro 9
+[Runner] Démarrage du client 9 sur 10.0.2.15:10010 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[Serveur] 10) 10.0.2.15:10010
+[32m[Serveur] Nombre de connexions entrantes du noeuds 10 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 10
+[32m[Serveur] Nombre de voisins du noeuds 10 envoyé avec succès[m
+[Serveur/Envoi] Aucun noeuds à envoyer au noeuds 1, je passe au prochain
+[Serveur/Envoi] Début de l'envoi des voisins du noeud 2
+[Serveur/Envoi] Toutes les adresses voisines du noeud 2 ont été envoyées
+[Serveur/Envoi] Début de l'envoi des voisins du noeud 3
+[Serveur/Envoi] Toutes les adresses voisines du noeud 3 ont été envoyées
+[Serveur/Envoi] Aucun noeuds à envoyer au noeuds 4, je passe au prochain
+[Serveur/Envoi] Début de l'envoi des voisins du noeud 5
+[Serveur/Envoi] Toutes les adresses voisines du noeud 5 ont été envoyées
+[Serveur/Envoi] Début de l'envoi des voisins du noeud 6
+[Serveur/Envoi] Toutes les adresses voisines du noeud 6 ont été envoyées
+[Serveur/Envoi] Début de l'envoi des voisins du noeud 7
+[Client] Nombre de voisins à connecter : 5 voisins
+[Client] Nombre de connexions en attente : 0 voisins
+[Client] Numéro de noeud reçu, je suis le noeud numéro 10
+[Serveur/Envoi] Toutes les adresses voisines du noeud 7 ont été envoyées
+[Serveur/Envoi] Début de l'envoi des voisins du noeud 8
+[Serveur/Envoi] Toutes les adresses voisines du noeud 8 ont été envoyées
+[Serveur/Envoi] Début de l'envoi des voisins du noeud 9
+[Serveur/Envoi] Toutes les adresses voisines du noeud 9 ont été envoyées
+[Serveur/Envoi] Début de l'envoi des voisins du noeud 10
+[Serveur/Envoi] Toutes les adresses voisines du noeud 10 ont été envoyées
+[Serveur/Ordre] Envoi des ordres de connexion1
+[Serveur/Envoi] Aucun ordre à envoyer pour le noeud1
+[Serveur/Envoi] Aucun ordre à envoyer pour le noeud4
+[?2004h]0;gecko@gecko: ~/Desktop/HAI721-Projet[01;32mgecko@gecko[00m:[01;34m~/Desktop/HAI721-Projet[00m$ Début de la coloration 9 ..
+Nouvelle chaîne : 0 
+[Client 9] Couleur choisie : 0
+Début de la coloration 10 ..
+Début de la coloration 8 ..
+Nouvelle chaîne : 0 
+Nouvelle chaîne : 0 
+[Client 10] Couleur choisie : 0
+[Client 8] Couleur choisie : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10007
+[Client/Interconnexions] Réception de 10.0.2.15:10006
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10004
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10003
+[Client/Interconnexions] Réception de 10.0.2.15:10002
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10006
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10002
+[Client/Interconnexions] Réception de 10.0.2.15:10003
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10007
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10001
+[Client/Interconnexions] Réception de 10.0.2.15:10003
+[Client/Interconnexions] Réception de 10.0.2.15:10005
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10002
+[Client/Interconnexions] Réception de 10.0.2.15:10007
+Début de la coloration 5 ..
+Nouvelle chaîne : 1 
+[Client 5] Couleur choisie : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10002
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 1
+[Client/Interconnexions] Couleur envoyée : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10004
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10009
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+Début de la coloration 6 ..
+Nouvelle chaîne : 1 
+[Client 6] Couleur choisie : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 1
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 1
+Début de la coloration 4 ..
+Nouvelle chaîne : 1 
+[Client 4] Couleur choisie : 1
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur reçue : 1
+[Client/Interconnexions] Couleur envoyée : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10007
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur reçue : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10005
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10001
+[Client/Interconnexions] Réception de 10.0.2.15:10002
+[Client/Interconnexions] Réception de 10.0.2.15:10008
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10010
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10010
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur reçue : 1
+[Client/Interconnexions] Couleur envoyée : 1
+Début de la coloration 7 ..
+Nouvelle chaîne : 1 
+[Client 7] Couleur choisie : 1
+Début de la coloration 1 ..
+Nouvelle chaîne : 1 
+[Client 1] Couleur choisie : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 1
+[Client/Interconnexions] Couleur reçue : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 1
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 1
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 1
+[Client/Interconnexions] Couleur envoyée : 1
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10006
+MYCOLOR : 1
+infos[0] : 1 : 1
+infos[1] : 0 : 0
+infos[2] : � : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Taille Couleur reçue : 1
+Nouvelle chaîne : 11 
+[Client 4] Couleur choisie : 11
+[Client/Interconnexions] Taille couleur envoyée : 2
+[Client/Interconnexions] Couleur envoyée : 11
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur envoyée : 1
+[Client/Interconnexions] Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10007
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10001
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10008
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10003
+[Client/Interconnexions] Réception de 10.0.2.15:10004
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10009
+[Client/Interconnexions] Réception de 10.0.2.15:10010
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 1
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10002
+[Client/Interconnexions] Réception de 10.0.2.15:10008
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Couleur reçue : 1
+Début de la coloration 3 ..
+Nouvelle chaîne : 0 
+[Client 3] Couleur choisie : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10008
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10007
+[Client/Interconnexions] Réception de 10.0.2.15:10002
+[Client/Interconnexions] Réception de 10.0.2.15:10010
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10009
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+Début de la coloration 2 ..
+Nouvelle chaîne : 0 
+[Client 2] Couleur choisie : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Couleur reçue : 0
+MYCOLOR : 1
+infos[0] : 0 : 0
+infos[1] : 1 : 1
+infos[2] : 0 : 0
+Nouvelle chaîne : 10 
+[Client 5] Couleur choisie : 10
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10001
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10005
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10010
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10003
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10006
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 1
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 1
+MYCOLOR : 1
+infos[0] : 1 : 1
+infos[1] : 1 : 1
+infos[2] : 1 : 1
+infos[3] : 0 : 0
+MYCOLOR : 0
+infos[0] : 0 : 1
+Nouvelle chaîne : 10 
+infos[1] : 0 : 1
+[Client 1] Couleur choisie : 10
+infos[2] : 1 : 0
+infos[3] : 1 : 0
+Nouvelle chaîne : 00 
+[Client 9] Couleur choisie : 00
+[Client/Interconnexions] Taille couleur envoyée : 2
+[Client/Interconnexions] Taille couleur envoyée : 2
+[Client/Interconnexions] Couleur envoyée : 00
+[Client/Interconnexions] Taille couleur envoyée : 2
+[Client/Interconnexions] Couleur envoyée : 00
+[Client/Interconnexions] Couleur envoyée : 10
+[Client/Interconnexions] Taille couleur envoyée : 2
+Problème lors de l'envoi du message
+: Broken pipe
+[31m[Client/Interconnexions] Problème lors de l'envoi de la couleur [37m
+[Client/Interconnexions] Réception de 10.0.2.15:10002
+[Client/Interconnexions] Réception de 10.0.2.15:10006
+[Client/Interconnexions] Réception de 10.0.2.15:10009
+[Client/Interconnexions] Réception de 10.0.2.15:10007
+Socket fermée
+: Success
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille Couleur reçue : 0
+[31m[Client] Erreur lors de la reception de la couleur [37m
+[Client/Interconnexions] Réception de 10.0.2.15:10008
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+MYCOLOR : 1
+infos[0] : 1 : 1
+infos[1] : 0 : 0
+infos[2] : 0 : 0
+infos[3] : 0 : 0
+Nouvelle chaîne : 10 
+[Client 6] Couleur choisie : 10
+[Client/Interconnexions] Réception de 10.0.2.15:10001
+[Client/Interconnexions] Taille Couleur reçue : 2
+[Client/Interconnexions] Couleur reçue : 10
+[Client/Interconnexions] Taille couleur envoyée : 2
+Problème lors de l'envoi du message
+: Broken pipe
+[31m[Client/Interconnexions] Problème lors de l'envoi de la couleur [37m
+^C[?2004l[?2004h[?2004l
+[?2004h]0;gecko@gecko: ~/Desktop/HAI721-Projet[01;32mgecko@gecko[00m:[01;34m~/Desktop/HAI721-Projet[00m$ python3 runner.py < param10.txt [14Pkiller.py[C
+[?2004lDestruction des fichiers générés
+(rm -rf bin ; rm -rf obj)
+Destruction des processus
+Killed server.
+[?2004h]0;gecko@gecko: ~/Desktop/HAI721-Projet[01;32mgecko@gecko[00m:[01;34m~/Desktop/HAI721-Projet[00m$ python3 killer.py [14@runner.py < param10.txt[C
+[?2004lCompilation...
+gcc -Wall -Iinclude -c client.c -o obj/client.o
+gcc -lpthread -o bin/client obj/client.o 
+gcc -Wall -Iinclude -c serverMultiplex.c -o obj/serverMultiplex.o
+gcc -lpthread -o bin/serverMultiplex obj/serverMultiplex.o 
+Démarrage du programme
+Fichier à parser 
+
+Port serveur 
+
+Besoin de 10 clients
+[Runner] Démarrage du serveur sur 10000
+Fichier à parser fileTest10.txt 
+Tableau nodes indice : 2 nombre de noeuds connectés : 1
+2 attend 6 connexions
+Tableau nodes indice : 3 nombre de noeuds connectés : 1
+3 attend 4 connexions
+Tableau nodes indice : 5 nombre de noeuds connectés : 2
+5 attend 1 connexions
+Tableau nodes indice : 6 nombre de noeuds connectés : 2
+6 attend 2 connexions
+Tableau nodes indice : 7 nombre de noeuds connectés : 3
+7 attend 3 connexions
+Tableau nodes indice : 8 nombre de noeuds connectés : 5
+8 attend 0 connexions
+Tableau nodes indice : 9 nombre de noeuds connectés : 4
+9 attend 0 connexions
+Tableau nodes indice : 10 nombre de noeuds connectés : 5
+10 attend 0 connexions
+[Serveur] Nombres de connexions (sockets) attendues : 23
+[Serveur] Nombres de connexions (sockets) à faire : 23
+1 | Noeuds connectées : 
+2 | Noeuds connectées :  1 
+3 | Noeuds connectées :  2 
+4 | Noeuds connectées : 
+5 | Noeuds connectées :  2  4 
+6 | Noeuds connectées :  1  2 
+7 | Noeuds connectées :  1  3  4 
+8 | Noeuds connectées :  1  2  3  6  7 
+9 | Noeuds connectées :  2  3  5  7 
+10 | Noeuds connectées :  2  3  4  6  7 
+Fichier : Le nombre de noeuds nécessaires est 10 
+[Serveur] Création de la socket réussie 
+[Runner] Démarrage du client 0 sur 10.0.2.15:10001 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[Serveur] 1) 10.0.2.15:10001
+[32m[Serveur] Nombre de connexions entrantes du noeuds 1 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 1
+[32m[Serveur] Nombre de voisins du noeuds 1 envoyé avec succès[m
+[Client] Nombre de voisins à connecter : 0 voisins
+[Client] Nombre de connexions en attente : 4 voisins
+[Client] Numéro de noeud reçu, je suis le noeud numéro 1
+[Runner] Démarrage du client 1 sur 10.0.2.15:10002 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[Serveur] 2) 10.0.2.15:10002
+[32m[Serveur] Nombre de connexions entrantes du noeuds 2 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 2
+[32m[Serveur] Nombre de voisins du noeuds 2 envoyé avec succès[m
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[Client] Nombre de voisins à connecter : 1 voisins
+[Client] Nombre de connexions en attente : 6 voisins
+[Client] Numéro de noeud reçu, je suis le noeud numéro 2
+[Runner] Démarrage du client 2 sur 10.0.2.15:10003 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[Serveur] 3) 10.0.2.15:10003
+[32m[Serveur] Nombre de connexions entrantes du noeuds 3 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 3
+[32m[Serveur] Nombre de voisins du noeuds 3 envoyé avec succès[m
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[Client] Nombre de voisins à connecter : 1 voisins
+[Client] Nombre de connexions en attente : 4 voisins
+[Client] Numéro de noeud reçu, je suis le noeud numéro 3
+[Runner] Démarrage du client 3 sur 10.0.2.15:10004 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[Serveur] 4) 10.0.2.15:10004
+[32m[Serveur] Nombre de connexions entrantes du noeuds 4 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 4
+[Client] Nombre de voisins à connecter : 0 voisins
+[32m[Serveur] Nombre de voisins du noeuds 4 envoyé avec succès[m
+[Client] Nombre de connexions en attente : 3 voisins
+[Client] Numéro de noeud reçu, je suis le noeud numéro 4
+[Runner] Démarrage du client 4 sur 10.0.2.15:10005 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[Serveur] 5) 10.0.2.15:10005
+[32m[Serveur] Nombre de connexions entrantes du noeuds 5 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 5
+[32m[Serveur] Nombre de voisins du noeuds 5 envoyé avec succès[m
+[Client] Nombre de voisins à connecter : 2 voisins
+[Client] Nombre de connexions en attente : 1 voisins
+[Client] Numéro de noeud reçu, je suis le noeud numéro 5
+[Runner] Démarrage du client 5 sur 10.0.2.15:10006 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[Serveur] 6) 10.0.2.15:10006
+[32m[Serveur] Nombre de connexions entrantes du noeuds 6 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 6
+[32m[Serveur] Nombre de voisins du noeuds 6 envoyé avec succès[m
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[Client] Nombre de voisins à connecter : 2 voisins
+[Client] Nombre de connexions en attente : 2 voisins
+[Client] Numéro de noeud reçu, je suis le noeud numéro 6
+[Runner] Démarrage du client 6 sur 10.0.2.15:10007 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[Serveur] 7) 10.0.2.15:10007
+[32m[Serveur] Nombre de connexions entrantes du noeuds 7 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 7
+[Client] Nombre de voisins à connecter : 3 voisins
+[32m[Serveur] Nombre de voisins du noeuds 7 envoyé avec succès[m
+[Client] Nombre de connexions en attente : 3 voisins
+[Client] Numéro de noeud reçu, je suis le noeud numéro 7
+[Runner] Démarrage du client 7 sur 10.0.2.15:10008 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[Serveur] 8) 10.0.2.15:10008
+[32m[Serveur] Nombre de connexions entrantes du noeuds 8 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 8
+[Client] Nombre de voisins à connecter : 5 voisins
+[32m[Serveur] Nombre de voisins du noeuds 8 envoyé avec succès[m
+[Client] Nombre de connexions en attente : 0 voisins
+[Client] Numéro de noeud reçu, je suis le noeud numéro 8
+[Runner] Démarrage du client 8 sur 10.0.2.15:10009 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[Serveur] 9) 10.0.2.15:10009
+[32m[Serveur] Nombre de connexions entrantes du noeuds 9 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 9
+[32m[Serveur] Nombre de voisins du noeuds 9 envoyé avec succès[m
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[Client] Nombre de voisins à connecter : 4 voisins
+[Client] Nombre de connexions en attente : 0 voisins
+[Client] Numéro de noeud reçu, je suis le noeud numéro 9
+[Runner] Démarrage du client 9 sur 10.0.2.15:10010 au serveur
+[32m[Client] Première connexion au serveur réussie[m
+[32m[Client] Envoi de l'adresse d'écoute réussi[m
+[Serveur] 10) 10.0.2.15:10010
+[32m[Serveur] Nombre de connexions entrantes du noeuds 10 envoyé avec succès[m
+[Serveur] : Envoi du nombre de voisins du noeuds 10
+[32m[Serveur] Nombre de voisins du noeuds 10 envoyé avec succès[m
+[Serveur/Envoi] Aucun noeuds à envoyer au noeuds 1, je passe au prochain
+[Serveur/Envoi] Début de l'envoi des voisins du noeud 2
+[Serveur/Envoi] Toutes les adresses voisines du noeud 2 ont été envoyées
+[Serveur/Envoi] Début de l'envoi des voisins du noeud 3
+[Serveur/Envoi] Toutes les adresses voisines du noeud 3 ont été envoyées
+[Serveur/Envoi] Aucun noeuds à envoyer au noeuds 4, je passe au prochain
+[Serveur/Envoi] Début de l'envoi des voisins du noeud 5
+[Serveur/Envoi] Toutes les adresses voisines du noeud 5 ont été envoyées
+[Serveur/Envoi] Début de l'envoi des voisins du noeud 6
+[Serveur/Envoi] Toutes les adresses voisines du noeud 6 ont été envoyées
+[Serveur/Envoi] Début de l'envoi des voisins du noeud 7
+[Serveur/Envoi] Toutes les adresses voisines du noeud 7 ont été envoyées
+[Serveur/Envoi] Début de l'envoi des voisins du noeud 8
+[Serveur/Envoi] Toutes les adresses voisines du noeud 8 ont été envoyées
+[Serveur/Envoi] Début de l'envoi des voisins du noeud 9
+[Serveur/Envoi] Toutes les adresses voisines du noeud 9 ont été envoyées
+[Serveur/Envoi] Début de l'envoi des voisins du noeud 10
+[Serveur/Envoi] Toutes les adresses voisines du noeud 10 ont été envoyées
+[Serveur/Ordre] Envoi des ordres de connexion1
+[Serveur/Envoi] Aucun ordre à envoyer pour le noeud1
+[Serveur/Envoi] Aucun ordre à envoyer pour le noeud4
+[Client] Nombre de voisins à connecter : 5 voisins
+[Client] Nombre de connexions en attente : 0 voisins
+[Client] Numéro de noeud reçu, je suis le noeud numéro 10
+[?2004h]0;gecko@gecko: ~/Desktop/HAI721-Projet[01;32mgecko@gecko[00m:[01;34m~/Desktop/HAI721-Projet[00m$ Début de la coloration 8 ..
+Nouvelle chaîne : 0 
+[Client 8] Couleur choisie : 0
+Début de la coloration 9 ..
+Nouvelle chaîne : 0 
+[Client 9] Couleur choisie : 0
+Début de la coloration 10 ..
+Nouvelle chaîne : 0 
+[Client 10] Couleur choisie : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10004
+[Client/Interconnexions] Réception de 10.0.2.15:10007
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10002
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10007
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10002
+[Client/Interconnexions] Réception de 10.0.2.15:10003
+[Client/Interconnexions] Réception de 10.0.2.15:10003
+[Client/Interconnexions] Réception de 10.0.2.15:10005
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10006
+[Client/Interconnexions] Réception de 10.0.2.15:10006
+[Client/Interconnexions] Réception de 10.0.2.15:10001
+[Client/Interconnexions] Réception de 10.0.2.15:10002
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10007
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10003
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+Début de la coloration 5 ..
+Nouvelle chaîne : 0 
+[Client 5] Couleur choisie : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10004
+[Client/Interconnexions] Réception de 10.0.2.15:10002
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10009
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+Début de la coloration 6 ..
+Nouvelle chaîne : 0 
+[Client 6] Couleur choisie : 0
+Début de la coloration 4 ..
+Nouvelle chaîne : 0 
+[Client 4] Couleur choisie : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10007
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10010
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10005
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10001
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10002
+[Client/Interconnexions] Réception de 10.0.2.15:10010
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10008
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+Début de la coloration 1 ..
+Nouvelle chaîne : 0 
+[Client 1] Couleur choisie : 0
+Début de la coloration 7 ..
+Nouvelle chaîne : 0 
+[Client 7] Couleur choisie : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10008
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10007
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10009
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur reçue : 0
+MYCOLOR : 0
+infos[0] : 0 : 1
+infos[1] : 0 : 1
+infos[2] : 0 : 1
+Nouvelle chaîne : 00 
+[Client 4] Couleur choisie : 00
+[Client/Interconnexions] Taille couleur envoyée : 2
+[Client/Interconnexions] Taille Couleur reçue : 2
+[Client/Interconnexions] Couleur envoyée : �
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Couleur reçue : �
+[Client/Interconnexions] Réception de 10.0.2.15:10008
+[Client/Interconnexions] Taille couleur envoyée : 2
+[Client/Interconnexions] Couleur envoyée : 00
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille couleur envoyée : 2
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10001
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10010
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10002
+[Client/Interconnexions] Couleur envoyée : 00
+[Client/Interconnexions] Réception de 10.0.2.15:10006
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10010
+[Client/Interconnexions] Réception de 10.0.2.15:10004
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10007
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10005
+[Client/Interconnexions] Taille couleur envoyée : 2
+[Client/Interconnexions] Couleur envoyée : 00
+[Client/Interconnexions] Réception de 10.0.2.15:10003
+Début de la coloration 3 ..
+Nouvelle chaîne : 0 
+[Client 3] Couleur choisie : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10007
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10002
+[Client/Interconnexions] Réception de 10.0.2.15:10009
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10008
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10010
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+Problème lors de la réception du message
+: Connection reset by peer
+[31m[Client] Erreur lors de la reception de la taille couleur [37m
+Début de la coloration 2 ..
+Nouvelle chaîne : 1 
+[Client 2] Couleur choisie : 1
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 1
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10003
+[Client/Interconnexions] Réception de 10.0.2.15:10005
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10006
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Réception de 10.0.2.15:10001
+[Client/Interconnexions] Taille Couleur reçue : 1
+MYCOLOR : 0
+infos[0] : 1 : 0
+infos[1] : 0 : 1
+infos[2] : 0 : 1
+infos[3] : 0 : 1
+Nouvelle chaîne : 01 
+[Client 9] Couleur choisie : 01
+[Client/Interconnexions] Taille couleur envoyée : 2
+[Client/Interconnexions] Couleur envoyée : 01
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+MYCOLOR : 0
+infos[0] : 0 : 1
+infos[1] : 0 : 1
+infos[2] : 0 : 1
+Nouvelle chaîne : 01 
+[Client 5] Couleur choisie : 01
+[Client/Interconnexions] Couleur reçue : 1
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Taille couleur envoyée : 2
+[Client/Interconnexions] Couleur envoyée : 01
+[Client/Interconnexions] Couleur reçue : 1
+[Client/Interconnexions] Couleur envoyée : 1
+[Client/Interconnexions] Réception de 10.0.2.15:10004
+[Client/Interconnexions] Taille Couleur reçue : 2
+[Client/Interconnexions] Couleur reçue : 00
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille couleur envoyée : 2
+Problème lors de l'envoi du message
+: Broken pipe
+[31m[Client/Interconnexions] Problème lors de l'envoi de la couleur [37m
+[Client/Interconnexions] Réception de 10.0.2.15:10002
+[Client/Interconnexions] Réception de 10.0.2.15:10003
+[Client/Interconnexions] Taille couleur envoyée : 2
+[Client/Interconnexions] Couleur envoyée : 01
+[Client/Interconnexions] Taille couleur envoyée : 2
+Problème lors de l'envoi du message
+[Client/Interconnexions] Couleur reçue : 0
+[Client/Interconnexions] Taille couleur envoyée : 1
+[Client/Interconnexions] Couleur envoyée : 0
+: Broken pipe
+[31m[Client/Interconnexions] Problème lors de l'envoi de la couleur [37m
+[Client/Interconnexions] Réception de 10.0.2.15:10009
+[Client/Interconnexions] Réception de 10.0.2.15:10009
+[Client/Interconnexions] Taille Couleur reçue : 2
+[Client/Interconnexions] Couleur reçue : 01
+[Client/Interconnexions] Taille Couleur reçue : 1
+[Clien
