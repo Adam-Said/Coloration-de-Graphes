@@ -23,17 +23,40 @@
 #define AC_WHITE "\x1b[37m"
 #define AC_NORMAL "\x1b[m"
 
+#define MAX_LENGTH 100
+
 struct paquet {
     int socket;
     struct sockaddr_in adresse;
 };
 
 struct infosColor {
-    int color;
+    char * color;
     int socket;
     struct sockaddr_in adresse;
     int state;
 };
+
+char* int_to_string(int n) {
+  // Allouer de l'espace pour la chaîne de caractères
+  char* str = malloc(sizeof(char) * 12); // 12 est la taille maximale d'un entier en C
+  // Convertir l'entier en chaîne de caractères
+  sprintf(str, "%d", n);
+  // Retourner la chaîne de caractères
+  return str;
+}
+
+char* nextBinary(char* str) {
+  // Générer un nombre aléatoire compris entre 0 et 1
+  srand(time(NULL));
+  int rand_num = rand() %2;
+  char * num = int_to_string(rand_num);// Allouer de l'espace pour la nouvelle chaîne de caractères
+  char* new_str = malloc(MAX_LENGTH * sizeof(char)); // Copier la chaîne de caractères d'origine dans la nouvelle chaîne
+  strcat(new_str, str);  // Ajouter le nombre aléatoire à la fin de la nouvelle chaîne
+  strcat(new_str, num);
+  // Retourner la nouvelle chaîne de caractères
+  return new_str;
+}
 
 int sendTCP(int sock, void* msg, int sizeMsg) {
     int res;
@@ -68,25 +91,35 @@ int recvTCP(int sock, void* msg, int sizeMsg) {
 void * recevoirCouleur (void * param){
 	
   struct infosColor * args = (struct infosColor *) param;
-  int color = 0;
+  char * color = "";
   int dsVois = args->socket;
 
 	struct sockaddr_in adresse = args->adresse;
 
 	char castAdresse[INET_ADDRSTRLEN];
 	inet_ntop(AF_INET, &adresse.sin_addr, castAdresse, INET_ADDRSTRLEN);
-	int port = htons(args->adresse.sin_port);
+	//int port = htons(args->adresse.sin_port);
 
-	printf("[Client/Interconnexions] Réception de %s:%i\n", castAdresse, port);
-
-  int res = recvTCP(dsVois, &color, sizeof(int));
+	//printf("[Client/Interconnexions] Réception de %s:%i\n", castAdresse, port);
+	size_t colorSize = 0;
+  int res = recvTCP(dsVois, &colorSize, sizeof(size_t));
+  if (res == -1) {
+      printf("%s[Client] Erreur lors de la reception de la taille couleur %s\n", AC_RED, AC_WHITE);
+      exit(0);
+  }
+	else
+	{
+		printf("[Client/Interconnexions] Taille Couleur reçue : %s\n", color);
+	}
+	
+  res = recvTCP(dsVois, &color, sizeof(colorSize));
   if (res == -1) {
       printf("%s[Client] Erreur lors de la reception de la couleur %s\n", AC_RED, AC_WHITE);
       exit(0);
   }
 	else
 	{
-		printf("[Client/Interconnexions] Couleur reçue : %i\n", color);
+		printf("[Client/Interconnexions] Couleur reçue : %s\n", color);
 	}
 	
   args->color = color;
@@ -95,22 +128,30 @@ void * recevoirCouleur (void * param){
 
 void * envoyerCouleur (void * param){ 
   struct infosColor * args = (struct infosColor *) param;
-  int color = args->color;
+  char * color = args->color;
   int ds = args->socket;
 	struct sockaddr_in adresse = args->adresse;
 
 	char castAdresse[INET_ADDRSTRLEN];
 	inet_ntop(AF_INET, &adresse.sin_addr, castAdresse, INET_ADDRSTRLEN);
-	int port = htons(args->adresse.sin_port);
+	//int port = htons(args->adresse.sin_port);
 
-	printf("[Client/Interconnexions] Envoi à %s:%i\n", castAdresse, port);
-
-  if (sendTCP(ds, &color, sizeof(int)) <= 0){
-    printf("%s[Client/Interconnexions] Problème lors de l'envoi de a couleur%s\n", AC_RED, AC_WHITE);
+	//printf("[Client/Interconnexions] Envoi à %s:%i\n", castAdresse, port);
+	size_t colorSize = strlen(color);
+	if (sendTCP(ds, &colorSize, sizeof(size_t)) == -1) {
+    printf("%s[Client/Interconnexions] Problème lors de l'envoi de la taille de la couleur %s\n", AC_RED, AC_WHITE);
   }
 	else
 	{
-		printf("[Client/Interconnexions] Couleur envoyée : %i\n", color);
+		printf("[Client/Interconnexions] Taille couleur envoyée : %s\n", color);
+	}
+
+  if (sendTCP(ds, &color, colorSize) == -1) {
+    printf("%s[Client/Interconnexions] Problème lors de l'envoi de la couleur %s\n", AC_RED, AC_WHITE);
+  }
+	else
+	{
+		printf("[Client/Interconnexions] Couleur envoyée : %s\n", color);
 	}
   pthread_exit(NULL);
 }
@@ -200,8 +241,7 @@ int main(int argc, char *argv[]) {
   //printf("[Client] : attente de connexion du serveur.\n");
   int incomingConnexions = 0; //nombre de connexions entrantes total
   int incoming = 0; //nombre de connexions entrantes reçues
-  srand(time(NULL));
-  int myColor = rand() % 2;
+  char * myColor = "";
   struct paquet* incomingConnexionsInfos = (struct paquet*)malloc(allNeighbors * sizeof(struct paquet));
   struct paquet* voisinsAdr = (struct paquet*)malloc(allNeighbors * sizeof(struct paquet));
 
@@ -335,7 +375,7 @@ int main(int argc, char *argv[]) {
 					if(&voisinsAdr[i] != NULL) {
 						struct sockaddr_in sock_voisin = voisinsAdr[i].adresse;
 						int socket = voisinsAdr[i].socket;
-						int color = -1;
+						char * color = "";
 						struct infosColor newInfos;
 						newInfos.adresse = sock_voisin;
 						newInfos.color = color;
@@ -351,7 +391,7 @@ int main(int argc, char *argv[]) {
         for (size_t i = 0; i < incoming; i++) {
           struct sockaddr_in sock_voisin = incomingConnexionsInfos[i].adresse;
           int socket = voisinsAdr[i].socket;
-          int color = -1;
+          char * color = "";
           struct infosColor newInfos;
           newInfos.adresse = sock_voisin;
           newInfos.color = color;
@@ -365,10 +405,8 @@ int main(int argc, char *argv[]) {
         printf("Début de la coloration %i ..\n", number);
         int check = 1;
         while(check == 1) {  
-          srand(time(NULL));
-          int r = rand() % 2;
-          printf("[Client %i] Couleur choisie : %i\n", number, r);
-          myColor = myColor + r;
+          myColor = nextBinary(myColor);
+          printf("[Client %i] Couleur choisie : %s\n", number, myColor);
 
           for (size_t i = 0; i < toConnectNeighbors + incoming; i++)
           {
@@ -390,7 +428,7 @@ int main(int argc, char *argv[]) {
 
           for (size_t i = 0; i < toConnectNeighbors + incoming; i++)
           {
-            if(infos[i].color != color){
+            if(*infos[i].color != color){
               infos[i].state = 0;
             }
           }
