@@ -19,10 +19,10 @@ obj/%.o: %.c
 	gcc -Wall -Iinclude -c $< -o $@
 
 bin/client: $(SRCS0:%.c=obj/%.o)
-	gcc -o $@ $+ -lpthread
+	gcc -lpthread -o $@ $+ 
 
 bin/serverMultiplex: $(SRCS1:%.c=obj/%.o)
-	gcc -o $@ $+ -lpthread
+	gcc -lpthread -o $@ $+ 
 
 
 clean:

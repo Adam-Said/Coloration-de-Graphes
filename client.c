@@ -1,4 +1,5 @@
 #include <asm-generic/socket.h>
+#include <pthread.h>
 #include <netinet/in.h>
 #include <stdio.h> 
 #include <unistd.h>
@@ -65,30 +66,52 @@ int recvTCP(int sock, void* msg, int sizeMsg) {
 }
 
 void * recevoirCouleur (void * param){
-
+	
   struct infosColor * args = (struct infosColor *) param;
   int color = 0;
-  struct sockaddr_in adresse = args->adresse;
   int dsVois = args->socket;
+
+	struct sockaddr_in adresse = args->adresse;
+
+	char castAdresse[INET_ADDRSTRLEN];
+	inet_ntop(AF_INET, &adresse.sin_addr, castAdresse, INET_ADDRSTRLEN);
+	int port = htons(args->adresse.sin_port);
+
+	printf("[Client/Interconnexions] Réception de %s:%i\n", castAdresse, port);
 
   int res = recvTCP(dsVois, &color, sizeof(int));
   if (res == -1) {
       printf("%s[Client] Erreur lors de la reception de la couleur %s\n", AC_RED, AC_WHITE);
       exit(0);
   }
+	else
+	{
+		printf("[Client/Interconnexions] Couleur reçue : %i\n", color);
+	}
+	
   args->color = color;
   pthread_exit(NULL);
 }
 
 void * envoyerCouleur (void * param){ 
-
   struct infosColor * args = (struct infosColor *) param;
   int color = args->color;
   int ds = args->socket;
+	struct sockaddr_in adresse = args->adresse;
+
+	char castAdresse[INET_ADDRSTRLEN];
+	inet_ntop(AF_INET, &adresse.sin_addr, castAdresse, INET_ADDRSTRLEN);
+	int port = htons(args->adresse.sin_port);
+
+	printf("[Client/Interconnexions] Envoi à %s:%i\n", castAdresse, port);
 
   if (sendTCP(ds, &color, sizeof(int)) <= 0){
     printf("%s[Client/Interconnexions] Problème lors de l'envoi de a couleur%s\n", AC_RED, AC_WHITE);
   }
+	else
+	{
+		printf("[Client/Interconnexions] Couleur envoyée : %i\n", color);
+	}
   pthread_exit(NULL);
 }
 
@@ -184,6 +207,7 @@ int main(int argc, char *argv[]) {
 
   struct infosColor* infos = (struct infosColor*)malloc(allNeighbors * sizeof(struct infosColor));
 
+	int toConnectNeighbors = 0;
   while(1){
     settmp = set;
     if (select(maxDesc+1, &settmp, NULL, NULL, NULL) == -1) {
@@ -195,7 +219,6 @@ int main(int argc, char *argv[]) {
       if(df == dsServ){
         //étape 1 : réception du nombre de noeuds auxquels se connecter
         //printf("[Client/Reception] Réception du nombre de voisins\n");
-        int toConnectNeighbors = 0;
         int res = recvTCP(dsServ, &toConnectNeighbors, sizeof(int));
         if (res == -1 || res == 0) {
             printf("%s[Client] Erreur lors de la reception du nombre de noeuds voisins%s\n", AC_RED, AC_WHITE);
@@ -291,9 +314,9 @@ int main(int argc, char *argv[]) {
           exit(0);
         }     
         incomingConnexionsInfos[incomingConnexions] = newClient;
-        char adresse[INET_ADDRSTRLEN];
-        inet_ntop(AF_INET, &incomingConnexionsInfos[incomingConnexions].adresse.sin_addr, adresse, INET_ADDRSTRLEN);
-        int port = htons(incomingConnexionsInfos[incomingConnexions].adresse.sin_port);
+        //char adresse[INET_ADDRSTRLEN];
+        //inet_ntop(AF_INET, &incomingConnexionsInfos[incomingConnexions].adresse.sin_addr, adresse, INET_ADDRSTRLEN);
+        //int port = htons(incomingConnexionsInfos[incomingConnexions].adresse.sin_port);
       
         //printf("[Client/Interconnexions] %i) %s:%i\n", incomingConnexions, adresse, port);
         
@@ -305,11 +328,28 @@ int main(int argc, char *argv[]) {
       }
 
       sleep(1);
-     
+			int cpt = 0;
       if(incomingConnexions == incoming){
-        for (size_t i = 0; i < allNeighbors - incoming; i++)
+        for (size_t i = 0; i < toConnectNeighbors ; i++)
         {
-          struct sockaddr_in sock_voisin = voisinsAdr[i].adresse;
+					if(&voisinsAdr[i] != NULL) {
+						struct sockaddr_in sock_voisin = voisinsAdr[i].adresse;
+						int socket = voisinsAdr[i].socket;
+						int color = -1;
+						struct infosColor newInfos;
+						newInfos.adresse = sock_voisin;
+						newInfos.color = color;
+						newInfos.socket = socket;
+						newInfos.state = 1;
+						infos[cpt] = newInfos;
+						cpt++;
+					}
+					else {
+						break;
+					}
+        }
+        for (size_t i = 0; i < incoming; i++) {
+          struct sockaddr_in sock_voisin = incomingConnexionsInfos[i].adresse;
           int socket = voisinsAdr[i].socket;
           int color = -1;
           struct infosColor newInfos;
@@ -317,20 +357,10 @@ int main(int argc, char *argv[]) {
           newInfos.color = color;
           newInfos.socket = socket;
           newInfos.state = 1;
-          infos[i] = newInfos;
+          infos[cpt] = newInfos;
+					cpt++;
         }
-        for (size_t i = allNeighbors - incoming - 1; i < allNeighbors; i++) {
-          struct sockaddr_in sock_voisin = incomingConnexionsInfos[i - allNeighbors - incoming - 1].adresse;
-          int socket = voisinsAdr[i - allNeighbors - incoming - 1].socket;
-          int color = -1;
-          struct infosColor newInfos;
-          newInfos.adresse = sock_voisin;
-          newInfos.color = color;
-          newInfos.socket = socket;
-          newInfos.state = 1;
-          infos[i] = newInfos;
-        }
-        pthread_t threads[2*allNeighbors];
+        pthread_t threads[2*(toConnectNeighbors + incoming)];
 
         printf("Début de la coloration %i ..\n", number);
         int check = 1;
@@ -340,32 +370,32 @@ int main(int argc, char *argv[]) {
           printf("[Client %i] Couleur choisie : %i\n", number, r);
           myColor = myColor + r;
 
-          for (size_t i = 0; i < sizeof(infos)/sizeof(infos[0]); i++)
+          for (size_t i = 0; i < toConnectNeighbors + incoming; i++)
           {
             if(infos[i].state == 1){
-              infos[i].color = color;
+              infos[i].color = myColor;
               pthread_create(&threads[i], NULL, envoyerCouleur, (void *)&infos[i]);
             }
           }
-          for (size_t i = 0; i < sizeof(infos)/sizeof(infos[0]); i++)
+          for (size_t i = 0; i < toConnectNeighbors + incoming; i++)
           {
             if(infos[i].state == 1){
-              pthread_create(&threads[i+ allNeighbors], NULL, recevoirCouleur, (void *)&infos[i]);
+              pthread_create(&threads[i+ toConnectNeighbors + incoming], NULL, recevoirCouleur, (void *)&infos[i]);
             }
           }
 
-          for (int i = 0; i < 2*allNeighbors; i++){
+          for (int i = 0; i < 2*(toConnectNeighbors + incoming); i++){
             pthread_join(threads[i], NULL);
           }
 
-          for (size_t i = 0; i < sizeof(infos)/sizeof(infos[0]); i++)
+          for (size_t i = 0; i < toConnectNeighbors + incoming; i++)
           {
             if(infos[i].color != color){
               infos[i].state = 0;
             }
           }
           int verif = 1;
-          for (size_t i = 0; i < sizeof(infos)/sizeof(infos[0]); i++)
+          for (size_t i = 0; i < toConnectNeighbors + incoming; i++)
           {
             if (infos[i].state == 1)
             {
