@@ -54,7 +54,7 @@ char* nextBinary(char* str) {
   char* new_str = malloc(MAX_LENGTH * sizeof(char)); // Copier la chaîne de caractères d'origine dans la nouvelle chaîne
   strcat(new_str, str);  // Ajouter le nombre aléatoire à la fin de la nouvelle chaîne
   strcat(new_str, num);
-  // Retourner la nouvelle chaîne de caractères
+  // Retourner la nouvelle chaîne de caractères 
   return new_str;
 }
 
