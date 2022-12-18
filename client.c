@@ -31,7 +31,8 @@ struct paquet {
 };
 
 struct infosColor {
-    char * color;
+    char * sendColor;
+		char * receiveColor;
     int socket;
     struct sockaddr_in adresse;
     int state;
@@ -53,9 +54,10 @@ char* nextBinary(char* str) {
   int rand_num = rand() %2;
   char * num = int_to_string(rand_num);// Allouer de l'espace pour la nouvelle chaîne de caractères
   int len = strlen(str);
+	printf("Taille de la chaîne d'origine : %i \n", len);
   char *new_str = (char*)malloc((len+2)*sizeof(char));
   //char* new_str = malloc(MAX_LENGTH * sizeof(char)); // Copier la chaîne de caractères d'origine dans la nouvelle chaîne
-  strcat(new_str, str);  // Ajouter le nombre aléatoire à la fin de la nouvelle chaîne
+  strcpy(new_str, str);  // Ajouter le nombre aléatoire à la fin de la nouvelle chaîne
   strcat(new_str, num);
 	printf("Nouvelle chaîne : %s \n", new_str);
   // Retourner la nouvelle chaîne de caractères 
@@ -131,14 +133,15 @@ void * recevoirCouleur (void * param){
 	{
 		printf("[Client/Thread] Couleur reçue : %s\n", newColor);
 	}
-	
-  args->color = newColor;
+  newColor[colorSize] = '\0';
+	sprintf(args->receiveColor, "%s", newColor);
+  //args->color = newColor;
   pthread_exit(NULL);
 }
 
 void * envoyerCouleur (void * param){ 
   struct infosColor * args = (struct infosColor *) param;
-  char * newColor = args->color;
+  char * newColor = args->sendColor;
   int ds = args->socket;
 	struct sockaddr_in adresse = args->adresse;
 
@@ -251,7 +254,7 @@ int main(int argc, char *argv[]) {
   //printf("[Client] : attente de connexion du serveur.\n");
   int incomingConnexions = 0; //nombre de connexions entrantes total
   int incoming = 0; //nombre de connexions entrantes reçues
-  char * myColor = "";
+  char * myColor = (char*)malloc(MAX_LENGTH*sizeof(char));
   struct paquet* incomingConnexionsInfos = (struct paquet*)malloc(allNeighbors * sizeof(struct paquet));
   struct paquet* voisinsAdr = (struct paquet*)malloc(allNeighbors * sizeof(struct paquet));
 
@@ -389,10 +392,10 @@ int main(int argc, char *argv[]) {
 		if(&voisinsAdr[i] != NULL) {
 			struct sockaddr_in sock_voisin = voisinsAdr[i].adresse;
 			int socket = voisinsAdr[i].socket;
-			char * color = "";
 			struct infosColor newInfos;
 			newInfos.adresse = sock_voisin;
-			newInfos.color = color;
+			newInfos.sendColor = (char*)malloc(MAX_LENGTH*sizeof(char));
+			newInfos.receiveColor = (char*)malloc(MAX_LENGTH*sizeof(char));
 			newInfos.socket = socket;
 			newInfos.state = 1;
 			infos[cpt] = newInfos;
@@ -405,10 +408,10 @@ int main(int argc, char *argv[]) {
 	for (size_t i = 0; i < incoming; i++) {
 		struct sockaddr_in sock_voisin = incomingConnexionsInfos[i].adresse;
 		int socket = incomingConnexionsInfos[i].socket;
-		char * color = "";
 		struct infosColor newInfos;
 		newInfos.adresse = sock_voisin;
-		newInfos.color = color;
+		newInfos.sendColor = (char*)malloc(MAX_LENGTH*sizeof(char));
+		newInfos.receiveColor = (char*)malloc(MAX_LENGTH*sizeof(char));
 		newInfos.socket = socket;
 		newInfos.state = 1;
 		infos[cpt] = newInfos;
@@ -426,7 +429,9 @@ int main(int argc, char *argv[]) {
 		{
 			if(infos[i].state == 1){
         printf("%sNODE %i Boucle d'envoi, thread n°%li %s\n", AC_MAGENTA, number, i, AC_NORMAL);
-				infos[i].color = myColor;
+				//sprintf(infos[i].color, "%s", myColor);
+				strcpy(infos[i].sendColor, myColor);
+        //infos[i].color = myColor;
 				if(pthread_create(&threads[i], NULL, envoyerCouleur, &infos[i]) != 0) {
           printf("Erreur lors de la création du thread %li", i);
         }
@@ -451,7 +456,7 @@ int main(int argc, char *argv[]) {
 		int verif = 1;
 		for (size_t i = 0; i < allNeighbors; i++)
 		{
-			if(strcmp(infos[i].color, myColor) != 0){
+			if(strcmp(infos[i].receiveColor, myColor) != 0){
 				infos[i].state = 0;
 			}
       else {
@@ -459,18 +464,18 @@ int main(int argc, char *argv[]) {
       }
 		}
 		
-		// if(verif == 1){
-		// 	check = 0;
-		// }
+		if(verif == 1){
+			check = 0;
+		}
 
 		// print infos array and its content
 		printf("NODE %i MYCOLOR : %s\n", number,myColor);
 		for (size_t i = 0; i < toConnectNeighbors + incoming; i++)
 		{
-			printf("infos[%li] : %s : %i\n", i, infos[i].color, infos[i].state);
+			printf("infos[%li] : %s : %i\n", i, infos[i].receiveColor, infos[i].state);
 		} 
 	}
-	printf("[Client %i] Couleur finale : %s\n", number, myColor);
+	printf("%s[Client %i] Couleur finale : %s %s\n", AC_RED, number, myColor, AC_NORMAL);
 
   //printf("[Travail] terminé le client s'arrête\n");
  
