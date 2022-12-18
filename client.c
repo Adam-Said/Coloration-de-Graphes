@@ -12,6 +12,7 @@
 #include<string.h>
 #include <sys/stat.h>
 #include <math.h>
+#include <time.h>
 
 #define AC_BLACK "\x1b[30m"
 #define AC_RED "\x1b[31m"
@@ -23,7 +24,7 @@
 #define AC_WHITE "\x1b[37m"
 #define AC_NORMAL "\x1b[m"
 
-#define MAX_LENGTH 100
+#define MAX_LENGTH 10000
 
 struct paquet {
     int socket;
@@ -50,8 +51,9 @@ char* int_to_string(int n) {
 char* nextBinary(char* str) {
   // Générer un nombre aléatoire compris entre 0 et 1
   printf("%sChaîne d'origine : %s %s\n", AC_CYAN, str, AC_NORMAL);
-  srand(time(NULL));
-  int rand_num = rand() %2;
+	struct timespec finish;
+  srand(clock_gettime(CLOCK_REALTIME, &finish));
+  int rand_num = finish.tv_nsec % 2;
   char * num = int_to_string(rand_num);// Allouer de l'espace pour la nouvelle chaîne de caractères
   int len = strlen(str);
 	//printf("Taille de la chaîne d'origine : %i \n", len);
@@ -381,10 +383,10 @@ int main(int argc, char *argv[]) {
       }
 
     }
-      sleep(1);
-      if(incomingConnexions == incoming){
-				break;
-      }
+		sleep(1);
+		if(incomingConnexions == incoming){
+			break;
+		}
   }
 	int cpt = 0;
 	for (size_t i = 0; i < toConnectNeighbors ; i++)
@@ -488,11 +490,11 @@ int main(int argc, char *argv[]) {
 
   printf("[Travail] terminé le client s'arrête\n");
  
-  if(close(ds) == -1) {
-    printf("[Client] : Problème lors de la fermeture socket\n");
-    exit(1);
-  }
-  printf("[Client] : Socket fermée !\n");
+  // if(close(ds) == -1) {
+  //   printf("[Client] : Problème lors de la fermeture socket\n");
+  //   exit(1);
+  // }
+  // printf("[Client] : Socket fermée !\n");
 
   return 0;
 }
