@@ -54,7 +54,7 @@ char* nextBinary(char* str) {
   int rand_num = rand() %2;
   char * num = int_to_string(rand_num);// Allouer de l'espace pour la nouvelle chaîne de caractères
   int len = strlen(str);
-	printf("Taille de la chaîne d'origine : %i \n", len);
+	//printf("Taille de la chaîne d'origine : %i \n", len);
   char *new_str = (char*)malloc((len+2)*sizeof(char));
   //char* new_str = malloc(MAX_LENGTH * sizeof(char)); // Copier la chaîne de caractères d'origine dans la nouvelle chaîne
   strcpy(new_str, str);  // Ajouter le nombre aléatoire à la fin de la nouvelle chaîne
@@ -428,7 +428,7 @@ int main(int argc, char *argv[]) {
 		for (size_t i = 0; i < allNeighbors; i++)
 		{
 			if(infos[i].state == 1){
-        printf("%sNODE %i Boucle d'envoi, thread n°%li %s\n", AC_MAGENTA, number, i, AC_NORMAL);
+        //printf("%sNODE %i Boucle d'envoi, thread n°%li %s\n", AC_MAGENTA, number, i, AC_NORMAL);
 				//sprintf(infos[i].color, "%s", myColor);
 				strcpy(infos[i].sendColor, myColor);
         //infos[i].color = myColor;
@@ -441,7 +441,7 @@ int main(int argc, char *argv[]) {
 		{
 			if(infos[i].state == 1){
         //struct infosColor newInfo = infos[i];
-        printf("%sNODE %i Boucle de réception, thread n°%li %s\n", AC_YELLOW,number, i, AC_NORMAL);
+        //printf("%sNODE %i Boucle de réception, thread n°%li %s\n", AC_YELLOW,number, i, AC_NORMAL);
 				if(pthread_create(&threads[i+ allNeighbors], NULL, recevoirCouleur, &infos[i]) != 0) {
           printf("Erreur lors de la création du thread %li", i);
         }
@@ -450,7 +450,16 @@ int main(int argc, char *argv[]) {
 		}
 
 		for (int i = 0; i < 2*allNeighbors; i++){
-			pthread_join(threads[i], NULL);
+			if(i < allNeighbors){
+				if(infos[i].state == 1) {
+					pthread_join(threads[i], NULL);
+				}
+			}
+			else {
+				if(infos[i-allNeighbors].state == 1) {
+					pthread_join(threads[i], NULL);
+				}
+			}
 		}
 
 		int verif = 1;
@@ -477,14 +486,13 @@ int main(int argc, char *argv[]) {
 	}
 	printf("%s[Client %i] Couleur finale : %s %s\n", AC_RED, number, myColor, AC_NORMAL);
 
-  //printf("[Travail] terminé le client s'arrête\n");
+  printf("[Travail] terminé le client s'arrête\n");
  
-  // fermeture socket
-  // if(close(ds) == -1) {
-  //   printf("[Client] : Problème lors de la fermeture socket\n");
-  //   exit(1);
-  // }
-  //printf("[Client] : Socket fermée !\n");
+  if(close(ds) == -1) {
+    printf("[Client] : Problème lors de la fermeture socket\n");
+    exit(1);
+  }
+  printf("[Client] : Socket fermée !\n");
 
   return 0;
 }
