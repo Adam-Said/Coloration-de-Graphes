@@ -25,6 +25,7 @@
 #define AC_NORMAL "\x1b[m"
 
 #define MAX_LENGTH 10000
+#define BINARY_LENGTH 30
 
 struct paquet {
     int socket;
@@ -39,6 +40,38 @@ struct infosColor {
     int state;
 };
 
+int myPow(int x, int y) {
+    int result = 1;
+    for (int i = 0; i < y; i++) {
+        result *= x;
+    }
+    return result;
+}
+
+int* generatePowerOfTwo(int* tab, int length){
+    //generation des puissances de 2
+    for(int i = 0; i < length; i++){
+        tab[i] = myPow(2,i);
+    }
+    return tab;
+}
+
+int getBinaryNumber(char* str){
+    int binaryNumber = 0;
+    int* binaryColor = (int*)malloc(BINARY_LENGTH*sizeof(int));
+    for (int i = 0; i < BINARY_LENGTH; i++){
+      binaryColor[i] = 0;
+    }
+    binaryColor = generatePowerOfTwo(binaryColor, BINARY_LENGTH);
+    
+    for(int i = 0; i < strlen(str); i++){
+        if(str[i] == '1'){
+            binaryNumber += binaryColor[i];
+        }
+    }
+    return binaryNumber;
+}
+
 char* int_to_string(int n) {
   // Allouer de l'espace pour la chaîne de caractères
   char* str = malloc(sizeof(char) * 12); // 12 est la taille maximale d'un entier en C
@@ -50,7 +83,7 @@ char* int_to_string(int n) {
 
 char* nextBinary(char* str) {
   // Générer un nombre aléatoire compris entre 0 et 1
-  printf("%sChaîne d'origine : %s %s\n", AC_CYAN, str, AC_NORMAL);
+  //printf("%sChaîne d'origine : %s %s\n", AC_CYAN, str, AC_NORMAL);
 	struct timespec finish;
   srand(clock_gettime(CLOCK_REALTIME, &finish));
   int rand_num = finish.tv_nsec % 2;
@@ -61,8 +94,16 @@ char* nextBinary(char* str) {
   //char* new_str = malloc(MAX_LENGTH * sizeof(char)); // Copier la chaîne de caractères d'origine dans la nouvelle chaîne
   strcpy(new_str, str);  // Ajouter le nombre aléatoire à la fin de la nouvelle chaîne
   strcat(new_str, num);
-	printf("Nouvelle chaîne : %s \n", new_str);
+	//printf("Nouvelle chaîne : %s \n", new_str);
   // Retourner la nouvelle chaîne de caractères 
+  return new_str;
+}
+
+char* makeValid(char* str) {
+  int len = strlen(str);
+  char *new_str = (char*)malloc((len+2)*sizeof(char));
+  strcpy(new_str, str);  // Ajouter le nombre aléatoire à la fin de la nouvelle chaîne
+  strcat(new_str, "1");
   return new_str;
 }
 
@@ -121,20 +162,20 @@ void * recevoirCouleur (void * param){
       perror("[Client/Thread] Erreur lors de la reception de la taille couleur\n");
       exit(0);
   }
-	else
+	/*else
 	{
 		printf("[Client/Thread] Taille Couleur reçue : %zu\n", colorSize);
-	}
+	}*/
 	
   res = recvTCP(dsVois, &newColor, colorSize*sizeof(char));
   if (res == -1 || res == 0) {
       perror("[Client/Thread] Erreur lors de la reception de la couleur\n");
       exit(0);
   }
-	else
+	/*else
 	{
 		printf("[Client/Thread] Couleur reçue : %s\n", newColor);
-	}
+	}*/
   newColor[colorSize] = '\0';
 	sprintf(args->receiveColor, "%s", newColor);
   //args->color = newColor;
@@ -156,18 +197,18 @@ void * envoyerCouleur (void * param){
 	if (sendTCP(ds, &colorSize, sizeof(size_t)) == -1) {
     perror("[Client/Thread] Problème lors de l'envoi de la taille de la couleur \n");
   }
-	else
+	/*else
 	{
 		printf("[Client/Thread] Taille couleur envoyée : %zu\n", colorSize);
-	}
+	}*/
 
   if (sendTCP(ds, newColor, colorSize*sizeof(char)) == -1) {
     perror("[Client/Thread] Problème lors de l'envoi de la couleur\n");
   }
-	else
+	/*else
 	{
 		printf("[Client/Thread] Couleur envoyée : %s\n", newColor);
-	}
+	}*/
   pthread_exit(NULL);
 }
 
@@ -425,7 +466,7 @@ int main(int argc, char *argv[]) {
 	int check = 1;
 	while(check == 1) {  
 		myColor = nextBinary(myColor);
-		printf("[Client %i] Couleur choisie : %s\n", number, myColor);
+		//printf("[Client %i] Couleur choisie : %s\n", number, myColor);
 
 		for (size_t i = 0; i < allNeighbors; i++)
 		{
@@ -480,15 +521,28 @@ int main(int argc, char *argv[]) {
 		}
 
 		// print infos array and its content
-		printf("NODE %i MYCOLOR : %s\n", number,myColor);
+		/*printf("NODE %i MYCOLOR : %s\n", number,myColor);
 		for (size_t i = 0; i < toConnectNeighbors + incoming; i++)
 		{
 			printf("infos[%li] : %s : %i\n", i, infos[i].receiveColor, infos[i].state);
-		} 
+		}*/ 
 	}
+  printf("Formatage de la couleur pour éviter les conflits\n");
+  myColor = makeValid(myColor);
 	printf("%s[Client %i] Couleur finale : %s %s\n", AC_RED, number, myColor, AC_NORMAL);
 
-  printf("[Travail] terminé le client s'arrête\n");
+  int decimalColor = getBinaryNumber(myColor);
+  printf("Couleur décimale de %s : %i\n", myColor, decimalColor);
+  
+  printf("%sNoeud numéro %i) Envoi de la couleur au serveur...\n%s", AC_YELLOW, number, AC_NORMAL);
+  if (sendTCP(dsServ, &decimalColor, sizeof(decimalColor)) == -1) {
+    perror("[Client/Thread] Problème lors de l'envoi de la couleur finale\n");
+  }
+  else{
+    printf("[Client/Thread] Couleur finale envoyée : %i\n", decimalColor);
+  }
+  
+  printf("[Travail] Terminé le client s'arrête\n");
  
   // if(close(ds) == -1) {
   //   printf("[Client] : Problème lors de la fermeture socket\n");

@@ -28,6 +28,38 @@ struct paquet {
     struct sockaddr_in adresse;
 };
 
+struct infosColor {
+	char * receiveColor;
+    int socket;
+    struct sockaddr_in adresse;
+    int state;
+};
+
+int isInArray(int * array, int size, int value) {
+    int i;
+    for (i = 0; i < size; i++) {
+        if (array[i] == value) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int compteUnique(int* T, int taille){
+    int compteur = 0;
+    int i, j;
+    for(i = 0; i < taille; i++){
+        int unique = 1;
+        for(j = 0; j < taille; j++){
+            if(T[i] == T[j] && j != i)
+                unique = 0;
+        }
+        if(unique == 1)
+            compteur++;
+    }
+    return compteur;
+}
+
 int sendTCP(int sock, void* msg, int sizeMsg) {
     int res;
     int sent = 0;
@@ -98,6 +130,7 @@ int nextPlace(int * tab, int size){
     }
     return i;
 }
+
 
 int main(int argc, char *argv[])
 {
@@ -238,6 +271,8 @@ int main(int argc, char *argv[])
     //struct paquet* voisinsAdr = (struct paquet*)malloc(nodeNumber * sizeof(struct paquet));
     struct paquet voisins[nodeNumber];
     int nodeIndex = 1;
+    int* finalColors = (int*)malloc(nodeNumber * sizeof(int));
+    int allSend = 0;
     while(1){
         settmp = set;
         if (select(maxDesc+1, &settmp, NULL, NULL, NULL) == -1) {
@@ -279,19 +314,17 @@ int main(int argc, char *argv[])
                 }
                 printf("%s[Serveur] Nombre de voisins du noeuds %i envoyé avec succès%s\n", AC_GREEN, nodeIndex, AC_NORMAL);
 
-                
-
                 int nodeN = nodeIndex;
                 if (sendTCP(dsClient, &nodeN, sizeof(nodeN)) <= 0) {
                     printf("[Serveur/Ordre] Problème lors de l'envoi du numéro de noeuds\n");
-                }
+                }                 
 
                 if(!FD_ISSET(df, &settmp)) FD_SET(dsClient, &set);
                 if(maxDesc < dsClient) maxDesc = dsClient;
                 nodeIndex++;
                 continue;
-            }
-        }
+            } 
+        } 
 
         if (nodeIndex == nodeNumber+1) {
             //printf("[Serveur] Tous les anneaux sont connectés, envoi des adresses\n");
@@ -330,8 +363,36 @@ int main(int argc, char *argv[])
                     printf("[Serveur/Envoi] Aucun ordre à envoyer pour le noeud%i\n", i);
                 }
             }
+            allSend  = 1;
         }
+        if(allSend == 1) break;
     } 
+
+    printf("%sFin du multiplexage\n%s", AC_MAGENTA, AC_NORMAL);
+
+    //attente des couleurs des clients
+    printf("Attente des noeuds...\n");
+    for(int i = 1; i <= nodeNumber; i++){
+        int receivedColor = 0;
+        res = recvTCP(voisins[i].socket, &receivedColor, sizeof(receivedColor));
+        if (res == -1 || res == 0) {
+            perror("[Serveur/Thread] Erreur lors de la reception de la couleur finale\n");
+            exit(0);
+        } else {
+            finalColors[i-1] = receivedColor;
+            printf("%s[Serveur/Thread] Couleur finale reçue : %i\n%s", AC_GREEN, finalColors[i-1], AC_NORMAL);
+        } 
+    } 
+
+    printf("----------------------------------------------------\n");
+
+    printf("%sCalcul du nombre de couleurs ...\n%s", AC_MAGENTA, AC_NORMAL);
+    for(int i = 0; i < nodeNumber; i++){
+        printf("Couleur n°%i : %i\n", i+1, finalColors[i]);
+    }
+    int nbColors = compteUnique(finalColors, nodeNumber); 
+    printf("%sNombre de couleurs : %i\n%s", AC_BLUE, nbColors, AC_NORMAL);
+
 
     /*FD_CLR(srv, &set);
         if(close(srv) == -1) {
@@ -343,8 +404,12 @@ int main(int argc, char *argv[])
     for(int i = 0; i <= nodeNumber; i++){
         free(edgesConnexionTab[i]);
         free(&nodesTab[i]);
+        free(&incomingTab[i]);
+        free(&voisins[i]);
+        free(&finalColors[i]);
     }
     //version fonctionnelle mac
 }
+
 
 
