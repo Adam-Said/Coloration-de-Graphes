@@ -25,6 +25,7 @@
 #define AC_NORMAL "\x1b[m"
 
 #define MAX_LENGTH 10000
+#define BINARY_LENGTH 30
 
 struct paquet {
     int socket;
@@ -38,6 +39,46 @@ struct infosColor {
     struct sockaddr_in adresse;
     int state;
 };
+
+int myPow(int x, int y) {
+    int result = 1;
+    for (int i = 0; i < y; i++) {
+        result *= x;
+    }
+    return result;
+}
+
+int* generatePowerOfTwo(int* tab, int length){
+    //generation des puissances de 2
+    for(int i = 0; i < length; i++){
+        tab[i] = myPow(2,i);
+    }
+    return tab;
+}
+
+int getBinaryNumber(char* str){
+    int binaryNumber = 0;
+    int* binaryColor = (int*)malloc(BINARY_LENGTH*sizeof(int));
+    for (int i = 0; i < BINARY_LENGTH; i++){
+      binaryColor[i] = 0;
+    }
+    binaryColor = generatePowerOfTwo(binaryColor, BINARY_LENGTH);
+
+    for(int i = 0; i < strlen(str); i++){
+        if(str[i] == '1'){
+            binaryNumber += binaryColor[i];
+        }
+    }
+    return binaryNumber;
+}
+
+char* makeValid(char* str) {
+  int len = strlen(str);
+  char *new_str = (char*)malloc((len+2)*sizeof(char));
+  strcpy(new_str, str);  // Ajouter le nombre aléatoire à la fin de la nouvelle chaîne
+  strcat(new_str, "1");
+  return new_str;
+}
 
 char* int_to_string(int n) {
   // Allouer de l'espace pour la chaîne de caractères
@@ -486,7 +527,20 @@ int main(int argc, char *argv[]) {
 			printf("infos[%li] : %s : %i\n", i, infos[i].receiveColor, infos[i].state);
 		} 
 	}
+  printf("Formatage de la couleur pour éviter les conflits\n");
+  myColor = makeValid(myColor);
 	printf("%s[Client %i] Couleur finale : %s %s\n", AC_RED, number, myColor, AC_NORMAL);
+
+  int decimalColor = getBinaryNumber(myColor);
+  printf("Couleur décimale de %s : %i\n", myColor, decimalColor);
+
+  printf("%sNoeud numéro %i) Envoi de la couleur au serveur...\n%s", AC_YELLOW, number, AC_NORMAL);
+  if (sendTCP(dsServ, &decimalColor, sizeof(decimalColor)) == -1) {
+    perror("[Client/Thread] Problème lors de l'envoi de la couleur finale\n");
+  }
+  else{
+    printf("[Client/Thread] Couleur finale envoyée : %i\n", decimalColor);
+  }
 
   printf("[Travail] terminé le client s'arrête\n");
  
