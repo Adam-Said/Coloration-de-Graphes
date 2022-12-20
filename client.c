@@ -27,17 +27,26 @@
 #define MAX_LENGTH 10000
 #define BINARY_LENGTH 30
 
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
 struct paquet {
     int socket;
     struct sockaddr_in adresse;
 };
 
 struct infosColor {
-    char * sendColor;
 		char * receiveColor;
     int socket;
     struct sockaddr_in adresse;
     int state;
+};
+
+struct threadArgs {
+		char * sendColor;
+		int socket;
+		struct sockaddr_in adresse;
+		struct infosColor * infosColor;
+		int allNeighbors;
 };
 
 int myPow(int x, int y) {
@@ -145,70 +154,85 @@ int recvTCP(int sock, void* msg, int sizeMsg) {
 
 void * recevoirCouleur (void * param){
 	
-  struct infosColor * args = (struct infosColor *) param;
+  struct threadArgs * args = (struct threadArgs *) param;
+	struct infosColor * infos = args->infosColor;
+	int allNeighbors = args->allNeighbors;
+
   char newColor[MAX_LENGTH];
-  int dsVois = args->socket;
 
-	struct sockaddr_in adresse = args->adresse;
-
-	char castAdresse[INET_ADDRSTRLEN];
-	inet_ntop(AF_INET, &adresse.sin_addr, castAdresse, INET_ADDRSTRLEN);
+	// struct sockaddr_in adresse = args->adresse;
+	// char castAdresse[INET_ADDRSTRLEN];
+	// inet_ntop(AF_INET, &adresse.sin_addr, castAdresse, INET_ADDRSTRLEN);
 	//int port = htons(args->adresse.sin_port);
-
 	//printf("[Client/Thread] Réception de %s:%i\n", castAdresse, port);
-	size_t colorSize = 0;
-  int res = recvTCP(dsVois, &colorSize, sizeof(size_t));
-  if (res == -1) {
-      perror("[Client/Thread] Erreur lors de la reception de la taille couleur\n");
-      exit(0);
-  }
-	else
-	{
-		printf("[Client/Thread] Taille Couleur reçue : %zu\n", colorSize);
+	for (size_t i = 0; i < allNeighbors; i++)
+  {
+			if(infos[i].state == 1){
+  			int dsVois = infos[i].socket;
+				size_t colorSize = 0;
+				int res = recvTCP(dsVois, &colorSize, sizeof(size_t));
+				if (res == -1) {
+						perror("[Client/Thread] Erreur lors de la reception de la taille couleur\n");
+						exit(0);
+				}
+				else
+				{
+					printf("[Client/Thread] Taille Couleur reçue : %zu\n", colorSize);
+				}
+				
+				res = recvTCP(dsVois, &newColor, colorSize*sizeof(char));
+				if (res == -1 || res == 0) {
+						perror("[Client/Thread] Erreur lors de la reception de la couleur\n");
+						exit(0);
+				}
+				else
+				{
+					printf("[Client/Thread] Couleur reçue : %s\n", newColor);
+				}
+				newColor[colorSize] = '\0';
+				pthread_mutex_lock(&mutex);
+				sprintf(infos[i].receiveColor, "%s", newColor);
+				pthread_mutex_unlock(&mutex);
+			}
 	}
-	
-  res = recvTCP(dsVois, &newColor, colorSize*sizeof(char));
-  if (res == -1 || res == 0) {
-      perror("[Client/Thread] Erreur lors de la reception de la couleur\n");
-      exit(0);
-  }
-	else
-	{
-		printf("[Client/Thread] Couleur reçue : %s\n", newColor);
-	}
-  newColor[colorSize] = '\0';
-	sprintf(args->receiveColor, "%s", newColor);
   //args->color = newColor;
   pthread_exit(NULL);
 }
 
 void * envoyerCouleur (void * param){ 
-  struct infosColor * args = (struct infosColor *) param;
+  struct threadArgs * args = (struct threadArgs *) param;
+	int allNeighbors = args->allNeighbors;
+	struct infosColor * infos = args->infosColor;
   char * newColor = args->sendColor;
-  int ds = args->socket;
-	struct sockaddr_in adresse = args->adresse;
-
-	char castAdresse[INET_ADDRSTRLEN];
-	inet_ntop(AF_INET, &adresse.sin_addr, castAdresse, INET_ADDRSTRLEN);
-	//int port = htons(args->adresse.sin_port);
-
-	//printf("[Client/Interconnexions] Envoi à %s:%i\n", castAdresse, port);
 	size_t colorSize = strlen(newColor);
-	if (sendTCP(ds, &colorSize, sizeof(size_t)) == -1) {
-    perror("[Client/Thread] Problème lors de l'envoi de la taille de la couleur \n");
-  }
-	else
-	{
-		printf("[Client/Thread] Taille couleur envoyée : %zu\n", colorSize);
-	}
 
-  if (sendTCP(ds, newColor, colorSize*sizeof(char)) == -1) {
-    perror("[Client/Thread] Problème lors de l'envoi de la couleur\n");
+	//struct sockaddr_in adresse = args->adresse;
+	// char castAdresse[INET_ADDRSTRLEN];
+	// inet_ntop(AF_INET, &adresse.sin_addr, castAdresse, INET_ADDRSTRLEN);
+	//int port = htons(args->adresse.sin_port);
+	//printf("[Client/Interconnexions] Envoi à %s:%i\n", castAdresse, port);
+
+  for (size_t i = 0; i < allNeighbors; i++)
+  {
+			if(infos[i].state == 1){
+  			int ds = infos[i].socket;
+				if (sendTCP(ds, &colorSize, sizeof(size_t)) == -1) {
+					perror("[Client/Thread] Problème lors de l'envoi de la taille de la couleur \n");
+				}
+				else
+				{
+					printf("[Client/Thread] Taille couleur envoyée : %zu\n", colorSize);
+				}
+
+				if (sendTCP(ds, newColor, colorSize*sizeof(char)) == -1) {
+					perror("[Client/Thread] Problème lors de l'envoi de la couleur\n");
+				}
+				else
+				{
+					printf("[Client/Thread] Couleur envoyée : %s\n", newColor);
+				}
+      }
   }
-	else
-	{
-		printf("[Client/Thread] Couleur envoyée : %s\n", newColor);
-	}
   pthread_exit(NULL);
 }
 
@@ -437,7 +461,6 @@ int main(int argc, char *argv[]) {
 			int socket = voisinsAdr[i].socket;
 			struct infosColor newInfos;
 			newInfos.adresse = sock_voisin;
-			newInfos.sendColor = (char*)malloc(MAX_LENGTH*sizeof(char));
 			newInfos.receiveColor = (char*)malloc(MAX_LENGTH*sizeof(char));
 			newInfos.socket = socket;
 			newInfos.state = 1;
@@ -453,14 +476,13 @@ int main(int argc, char *argv[]) {
 		int socket = incomingConnexionsInfos[i].socket;
 		struct infosColor newInfos;
 		newInfos.adresse = sock_voisin;
-		newInfos.sendColor = (char*)malloc(MAX_LENGTH*sizeof(char));
 		newInfos.receiveColor = (char*)malloc(MAX_LENGTH*sizeof(char));
 		newInfos.socket = socket;
 		newInfos.state = 1;
 		infos[cpt] = newInfos;
 		cpt++;
 	}
-	pthread_t threads[2*(toConnectNeighbors + incoming)];
+	pthread_t threads[2];
 
 	printf("Début de la coloration %i ..\n", number);
 	int check = 1;
@@ -468,31 +490,21 @@ int main(int argc, char *argv[]) {
 		myColor = nextBinary(myColor);
 		printf("[Client %i] Couleur choisie : %s\n", number, myColor);
 
-		for (size_t i = 0; i < allNeighbors; i++)
-		{
-			if(infos[i].state == 1){
-        //printf("%sNODE %i Boucle d'envoi, thread n°%li %s\n", AC_MAGENTA, number, i, AC_NORMAL);
-				//sprintf(infos[i].color, "%s", myColor);
-				strcpy(infos[i].sendColor, myColor);
-        //infos[i].color = myColor;
-				if(pthread_create(&threads[i], NULL, envoyerCouleur, &infos[i]) != 0) {
-          printf("Erreur lors de la création du thread %li", i);
-        }
-			}
-		}
-		for (size_t i = 0; i < allNeighbors; i++)
-		{
-			if(infos[i].state == 1){
-        //struct infosColor newInfo = infos[i];
-        //printf("%sNODE %i Boucle de réception, thread n°%li %s\n", AC_YELLOW,number, i, AC_NORMAL);
-				if(pthread_create(&threads[i+ allNeighbors], NULL, recevoirCouleur, &infos[i]) != 0) {
-          printf("Erreur lors de la création du thread %li", i);
-        }
-        //infos[i] = newInfo;
-			}
+		struct threadArgs args;
+		args.sendColor = myColor;
+		args.infosColor = infos;
+		args.allNeighbors = allNeighbors;
+
+		if(pthread_create(&threads[0], NULL, envoyerCouleur, &args) != 0) {
+			printf("Erreur lors de la création du thread d'envoi");
 		}
 
-		for (int i = 0; i < 2*allNeighbors; i++){
+		if(pthread_create(&threads[1], NULL, recevoirCouleur, &args) != 0) {
+			printf("Erreur lors de la création du thread de réception");
+		}
+
+
+		for (int i = 0; i < 2; i++){
 			if(i < allNeighbors){
 				if(infos[i].state == 1) {
 					pthread_join(threads[i], NULL);
@@ -506,6 +518,7 @@ int main(int argc, char *argv[]) {
 		}
 
 		int verif = 1;
+		pthread_mutex_lock(&mutex);
 		for (size_t i = 0; i < allNeighbors; i++)
 		{
 			if(strcmp(infos[i].receiveColor, myColor) != 0){
@@ -515,6 +528,7 @@ int main(int argc, char *argv[]) {
         verif = 0;
       }
 		}
+		pthread_mutex_unlock(&mutex);
 		
 		if(verif == 1){
 			check = 0;
@@ -543,7 +557,7 @@ int main(int argc, char *argv[]) {
   }
 
   printf("[Travail] terminé le client s'arrête\n");
- 
+	pthread_mutex_destroy(&mutex);
   // if(close(ds) == -1) {
   //   printf("[Client] : Problème lors de la fermeture socket\n");
   //   exit(1);
