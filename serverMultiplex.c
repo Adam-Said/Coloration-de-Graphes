@@ -398,11 +398,11 @@ int main(int argc, char *argv[])
         }
     printf("[Serveur] : Socket fermée !\n");*/
 
-    for(int i = 0; i <= nodeNumber; i++){
-        free(edgesConnexionTab[i]);
-        free(&nodesTab[i]);
-    }
-    //version fonctionnelle mac
+    // for(int i = 0; i <= nodeNumber; i++){
+    //     free(edgesConnexionTab[i]);
+    //     free(&nodesTab);
+    // }
+
 }
 
 
