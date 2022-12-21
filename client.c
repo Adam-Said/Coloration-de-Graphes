@@ -8,8 +8,8 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <stdlib.h>
-#include<arpa/inet.h>
-#include<string.h>
+#include <arpa/inet.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <math.h>
 #include <time.h>
@@ -218,7 +218,7 @@ int main(int argc, char *argv[]) {
     exit(0);
   }
 
-  /* etape 1 : créer une socket */   
+  /* etape 1 : créer une socket d'écoute */   
   int option = 1;
   int ds = socket(PF_INET, SOCK_STREAM, 0);
   setsockopt(ds, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
@@ -226,8 +226,8 @@ int main(int argc, char *argv[]) {
     perror("[Client] : pb creation socket :\n");
     exit(1);
   }
-  //printf("[Client] : creation de la socket réussie \n");
-  /* etape 1.2 : nommage de la socket client */
+
+  /* etape 1.2 : nommage de la socket d'écoute */
   struct sockaddr_in sock_clt;
   socklen_t size =sizeof(struct sockaddr_in);
   sock_clt.sin_family = AF_INET;
@@ -236,7 +236,7 @@ int main(int argc, char *argv[]) {
   int res = bind(ds, (struct sockaddr*) &sock_clt, size);
 
   if (res == -1){
-      perror("[Client] : pb nommage socket :\n");
+      perror("[Client] : Problème nommage socket :\n");
       exit(1);
   }
 
@@ -248,7 +248,6 @@ int main(int argc, char *argv[]) {
       perror("Problème creation socket :");
       exit(1);
   }
-  //printf("Création de la socket réussie \n");
 
   struct sockaddr_in sock_srv;
   sock_srv.sin_family = AF_INET;
@@ -257,17 +256,15 @@ int main(int argc, char *argv[]) {
   socklen_t lgAdr = sizeof(struct sockaddr_in);
   
   int resConnexion = connect(dsServ, (struct sockaddr *)&sock_srv, lgAdr);
-  if( resConnexion == 0){
-    printf("%s[Client] Première connexion au serveur réussie%s\n", AC_GREEN, AC_NORMAL);
-  } else {
+  if(resConnexion != 0){
     perror("Erreur lors de la connexion au serveur\n");
     exit(0);
   }
 
   int sock_list = listen(ds, 1000);
   if (sock_list == -1){
-        perror("[Client] : problème lors de la mise en écoute de la socket");
-        exit(1);
+		perror("[Client] : problème lors de la mise en écoute de la socket");
+		exit(1);
   }
 
   struct paquet msg;
@@ -541,6 +538,78 @@ int main(int argc, char *argv[]) {
   else{
     printf("[Client/Thread] Couleur finale envoyée : %i\n", decimalColor);
   }
+
+  int ordre2 = 0;
+  int resOrdre2 = recvTCP(dsServ, &ordre2, sizeof(int));
+  if (resOrdre2 == -1) {
+      perror("[Client/Thread] Erreur lors de la reception du second ordre\n");
+      exit(0);
+  }
+  printf("Démarrage du la recoloration\n");
+
+  for (size_t i = 0; i < allNeighbors; i++)
+  {
+      printf("%sNoeud numéro %i) Envoi de la couleur aux voisins...\n%s", AC_YELLOW, number, AC_NORMAL);
+      if (sendTCP(infos[i].socket, &decimalColor, sizeof(decimalColor)) == -1) {
+        perror("[Client/Thread] Problème lors de l'envoi de la couleur décimale\n");
+      }
+  }
+  int* finalColors = (int*)malloc(allNeighbors * sizeof(int));
+
+  for(int i = 1; i <= allNeighbors; i++){
+      int receivedColor = 0;
+      res = recvTCP(infos[i-1].socket, &receivedColor, sizeof(int));
+      if (res == -1 || res == 0) {
+          perror("[Serveur/Thread] Erreur lors de la reception de la couleur décimale d'un voisin\n");
+          exit(0);
+      } else {
+          finalColors[i-1] = receivedColor;
+          //printf("%s[Serveur/Thread] Couleur décimale reçue : %i\n%s", AC_GREEN, finalColors[i-1], AC_NORMAL);
+      } 
+  } 
+  int nombreReceive = 0;
+  for (size_t i = 0; i < allNeighbors; i++)
+  {
+    if(finalColors[i] < decimalColor) {
+      nombreReceive++;
+    }
+  }
+  
+  for (size_t i = 0; i < nombreReceive; i++)
+  {
+    res = recvTCP(infos[i-1].socket, &finalColors[i], sizeof(int));
+    if (res == -1 || res == 0) {
+      perror("[Serveur/Thread] Erreur lors de la reception de la nouvelle couleur décimale d'un voisin\n");
+      exit(0);
+    }
+  }
+
+  int myFinalColor = 0;
+  int finalColorValidity = 0;
+  while(finalColorValidity == 0) {
+    finalColorValidity = 1;
+    for (size_t i = 0; i < allNeighbors; i++)
+    {
+      if(finalColors[i] == myFinalColor) {
+        myFinalColor++;
+        finalColorValidity = 0;
+      }
+    }
+  }
+
+  for (size_t i = 0; i < allNeighbors; i++) // hanger allNeighbors par le nombre de voisins sortants
+  {
+      printf("%sNoeud numéro %i) Envoi de la couleur aux voisins...\n%s", AC_YELLOW, number, AC_NORMAL);
+      if (sendTCP(ds, &myFinalColor, sizeof(int)) == -1) {
+        perror("[Client/Thread] Problème lors de l'envoi de la couleur décimale\n");
+      }
+  }
+
+  if (sendTCP(dsServ, &myFinalColor, sizeof(int)) == -1) {
+    perror("[Client/Thread] Problème lors de l'envoi de la couleur finale au serveur\n");
+  }
+  
+  
 
   printf("[Travail] terminé le client s'arrête\n");
  

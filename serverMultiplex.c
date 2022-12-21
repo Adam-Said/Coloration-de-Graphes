@@ -130,7 +130,6 @@ int nextPlace(int * tab, int size){
 
 int main(int argc, char *argv[])
 {
-  /* etape 0 : gestion des paramètres si vous souhaitez en passer */
   if (argc != 3)
   {
     printf("Utilisation : [port_serveur] [File_name]\n");
@@ -138,7 +137,6 @@ int main(int argc, char *argv[])
   }
 
     // Partie parser
-    
     printf("Fichier à parser %s \n", argv[2]);
 
     //récupération du nombre de noeuds
@@ -149,7 +147,6 @@ int main(int argc, char *argv[])
     filepath[0] = '\0';
     strcat(filepath, "./Files/");
     strcat(filepath, argv[2]);
-    //printf("Le fichier est : %s\n", filepath);
 
     // Lecture du fichier
     FILE* file = fopen(filepath, "r");
@@ -163,7 +160,6 @@ int main(int argc, char *argv[])
     char buffer[bufferLength];
 
     //Récupération du nombres de noeuds connectés à chaque noeud
-
     int* nodesTab = (int*)malloc(nodeNumber * sizeof(int));
     int* incomingTab = (int*)malloc(nodeNumber * sizeof(int));
     int** edgesConnexionTab = (int**)malloc(nodeNumber * sizeof(int*));
