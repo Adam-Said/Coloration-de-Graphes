@@ -276,8 +276,8 @@ int main(int argc, char *argv[]) {
 
 				// Calcul du nombre de connexion entrantes
 				connIn = allNeighbors - connOut;
-				printf("[Client] Nombre de voisins à connecter : %i voisins\n", connOut);
-				printf("[Client] Nombre de connexions en attente : %i voisins\n", connIn);
+				// printf("[Client] Nombre de voisins à connecter : %i voisins\n", connOut);
+				// printf("[Client] Nombre de connexions en attente : %i voisins\n", connIn);
 
 				//Reception du numéro de noeud
 				res = recvTCP(dsServ, &myNumber, sizeof(myNumber));
@@ -331,8 +331,7 @@ int main(int argc, char *argv[]) {
 						if (sendTCP(dsVoisin, &msg, sizeof(struct nodeInfos)) <= 0){
 							printf("%s[Client/Interconnexions] Problème lors de l'envoi de l'adresse d'écoute%s\n", AC_RED, AC_WHITE);
 						}
-						//printf("%s[Client n°%i] Envoi de l'adresse d'écoute au voisin réussi%s\n", AC_GREEN, number, AC_NORMAL);
-						printf("[Client/Connexion] Connexion au voisin %i (%s:%i) réussie\n", i, inet_ntoa(connOutTab[i].address.sin_addr), ntohs(connOutTab[i].address.sin_port));
+						//printf("[Client/Connexion] Connexion au voisin %i (%s:%i) réussie\n", i, inet_ntoa(connOutTab[i].address.sin_addr), ntohs(connOutTab[i].address.sin_port));
 					}
 				}
 			}
@@ -396,9 +395,9 @@ int main(int argc, char *argv[]) {
 	int check = 1;
 	while(check == 1) {  
 		myColor = nextBinary(myColor);
-		// int binColor = getBinaryNumber(myColor);
-		// printf("[Client %i] Couleur choisie : %s\n", myNumber, myColor);
-		printf("RIEN DE SPECIAL");
+		printf("[Client %i] Couleur choisie : %s\n", myNumber, myColor);
+		//int binColor = getBinaryNumber("01");
+		//printf("RIEN DE SPECIAL");
 		// for (size_t i = 0; i < allNeighbors; i++) {
 		// 	if(allNodesTab[i].state == 1){
 		// 		allNodesTab[i].sendColor = binColor;
@@ -446,7 +445,7 @@ int main(int argc, char *argv[]) {
 		// }
 		
 		// if(verif == 1){
-		// 	check = 0;
+		check = 0;
 		// }
 	}
 }

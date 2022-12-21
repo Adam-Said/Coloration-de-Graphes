@@ -29,9 +29,11 @@ struct paquet {
 };
 
 struct infosColor {
-	char * receiveColor;
+    int sendDecimalColor;
+    int receiveDecimalColor;
     int socket;
     struct sockaddr_in adresse;
+    int order;
     int state;
 };
 
@@ -295,7 +297,7 @@ int main(int argc, char *argv[])
                     perror("[Serveur] : problème lors de l'envoi du nombre de connexions entrantes");
                     exit(1);
                 }
-                printf("%s[Serveur] Nombre de connexions entrantes du noeuds %i envoyé avec succès%s\n", AC_GREEN, nodeIndex, AC_NORMAL);
+                printf("%s[Serveur] Nombre de connexions entrantes du noeuds %i envoyé avec succès%s\n", AC_GREEN, nodeIndex, AC_WHITE);
                
                 // voisins[nodeIndex].adresse = sockClient; 
                 voisins[nodeIndex].socket = dsClient;
@@ -305,7 +307,7 @@ int main(int argc, char *argv[])
                     perror("[Serveur] : problème lors de l'envoi du nombre d'arêtes");
                     exit(1);
                 }
-                printf("%s[Serveur] Nombre de voisins du noeuds %i envoyé avec succès%s\n", AC_GREEN, nodeIndex, AC_NORMAL);
+                printf("%s[Serveur] Nombre de voisins du noeuds %i envoyé avec succès%s\n", AC_GREEN, nodeIndex, AC_WHITE);
 
                 
 
@@ -363,7 +365,7 @@ int main(int argc, char *argv[])
         if(allSend == 1) break;
     } 
 
-    printf("%sFin du multiplexage\n%s", AC_MAGENTA, AC_NORMAL);
+    printf("%sFin du multiplexage\n%s", AC_MAGENTA, AC_WHITE);
 
     //attente des couleurs des clients
     printf("Attente des noeuds...\n");
@@ -375,17 +377,17 @@ int main(int argc, char *argv[])
             exit(0);
         } else {
             finalColors[i-1] = receivedColor;
-            printf("%s[Serveur/Thread] Couleur finale reçue : %i\n%s", AC_GREEN, finalColors[i-1], AC_NORMAL);
+            printf("%s[Serveur/Thread] Couleur finale reçue : %i\n%s", AC_GREEN, finalColors[i-1], AC_WHITE);
         } 
     } 
     printf("----------------------------------------------------\n");
 
-    printf("%sCalcul du nombre de couleurs ...\n%s", AC_MAGENTA, AC_NORMAL);
+    printf("%sCalcul du nombre de couleurs ...\n%s", AC_MAGENTA, AC_WHITE);
     for(int i = 0; i < nodeNumber; i++){
         printf("Couleur n°%i : %i\n", i+1, finalColors[i]);
     }
     int nbColors = nodeNumber - doubleColor(finalColors, nodeNumber); 
-    printf("%sNombre de couleurs : %i %s\n", AC_BLUE, nbColors, AC_NORMAL);
+    printf("%sNombre de couleurs : %i %s\n", AC_BLUE, nbColors, AC_WHITE);
 
     /*FD_CLR(srv, &set);
         if(close(srv) == -1) {
