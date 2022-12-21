@@ -531,15 +531,24 @@ int main(int argc, char *argv[]) {
 		pthread_join(threads[i], NULL);
 	}
 
-  
-  int nombreReceive = 0;
-  for (size_t i = 0; i < allNeighbors; i++)
-  {
-    if(infos[i].receiveDecimalColor < myDecimalColor) {
-      nombreReceive++;
+  while(1){
+    int nombreReceive = 0;
+    int nombreSend = 0;
+    for (size_t i = 0; i < allNeighbors; i++)
+    {
+      if(infos[i].receiveDecimalColor > myDecimalColor) {
+        nombreReceive++;
+      } else if (infos[i].receiveDecimalColor < myDecimalColor) {
+        nombreSend++;
+      }
     }
-  }
-  // ARRETE  ICI
+
+    if(nombreSend == allNeighbors){ //je peux choisir la couleur que je veux
+      myDecimalColor = 0; //je choisis la couleur 0
+    }
+  } 
+  
+
   for (size_t i = 0; i < nombreReceive; i++)
   {
     res = recvTCP(infos[i-1].socket, &infos[i], sizeof(int));
@@ -548,21 +557,9 @@ int main(int argc, char *argv[]) {
       exit(0);
     }
   }
+  
 
-  int myFinalColor = 0;
-  int finalColorValidity = 0;
-  while(finalColorValidity == 0) {
-    finalColorValidity = 1;
-    for (size_t i = 0; i < allNeighbors; i++)
-    {
-      if(infos[i].receiveDecimalColor == myDecimalColor) {
-        myFinalColor++;
-        finalColorValidity = 0;
-      }
-    }
-  }
-
-  for (size_t i = 0; i < allNeighbors; i++) // hanger allNeighbors par le nombre de voisins sortants
+  for (size_t i = 0; i < allNeighbors; i++) // changer allNeighbors par le nombre de voisins sortants
   {
       printf("%sNoeud numéro %i) Envoi de la couleur aux voisins...\n%s", AC_YELLOW, number, AC_WHITE);
       if (sendTCP(ds, &myFinalColor, sizeof(int)) == -1) {
@@ -572,7 +569,9 @@ int main(int argc, char *argv[]) {
 
   if (sendTCP(dsServ, &myFinalColor, sizeof(int)) == -1) {
     perror("[Client/Thread] Problème lors de l'envoi de la couleur finale au serveur\n");
-  }
+  } else{
+    printf("[Client/Thread] Couleur finale envoyée : %i\n", decimalColor);
+  } 
   
   
 
