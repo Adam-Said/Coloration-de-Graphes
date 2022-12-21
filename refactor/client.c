@@ -36,6 +36,38 @@ struct nodeInfos {
 	int order;
 };
 
+int myPow(int x, int y) {
+    int result = 1;
+    for (int i = 0; i < y; i++) {
+        result *= x;
+    }
+    return result;
+}
+
+int* generatePowerOfTwo(int* tab, int length){
+    //generation des puissances de 2
+    for(int i = 0; i < length; i++){
+        tab[i] = myPow(2,i);
+    }
+    return tab;
+}
+
+int getBinaryNumber(char* str){
+    int binaryNumber = 0;
+    int* binaryColor = (int*)malloc(BINARY_LENGTH*sizeof(int));
+    for (int i = 0; i < BINARY_LENGTH; i++){
+      binaryColor[i] = 0;
+    }
+    binaryColor = generatePowerOfTwo(binaryColor, BINARY_LENGTH);
+
+    for(int i = 0; i < strlen(str); i++){
+        if(str[i] == '1'){
+            binaryNumber += binaryColor[i];
+        }
+    }
+    return binaryNumber;
+}
+
 int sendTCP(int sock, void* msg, int sizeMsg) {
 	int res;
 	int sent = 0;
@@ -71,6 +103,70 @@ int recvTCP(int sock, void* msg, int sizeMsg) {
 		
 	return received;
 }
+
+char* int_to_string(int n) {
+	// Allouer de l'espace pour la chaîne de caractères
+	char* str = malloc(sizeof(char) * 12); // 12 est la taille maximale d'un entier en C
+	// Convertir l'entier en chaîne de caractères
+	sprintf(str, "%d", n);
+	// Retourner la chaîne de caractères
+	return str;
+}
+
+char* nextBinary(char* str) {
+	// Générer un nombre aléatoire compris entre 0 et 1
+	printf("%sChaîne d'origine : %s %s\n", AC_CYAN, str, AC_NORMAL);
+	struct timespec finish;
+	srand(clock_gettime(CLOCK_REALTIME, &finish));
+	int rand_num = finish.tv_nsec % 2;
+	char * num = int_to_string(rand_num);// Allouer de l'espace pour la nouvelle chaîne de caractères
+	int len = strlen(str);
+	//printf("Taille de la chaîne d'origine : %i \n", len);
+	char *new_str = (char*)malloc((len+2)*sizeof(char));
+	//char* new_str = malloc(MAX_LENGTH * sizeof(char)); // Copier la chaîne de caractères d'origine dans la nouvelle chaîne
+	strcpy(new_str, str);  // Ajouter le nombre aléatoire à la fin de la nouvelle chaîne
+	strcat(new_str, num);
+	printf("Nouvelle chaîne : %s \n", new_str);
+	// Retourner la nouvelle chaîne de caractères 
+	return new_str;
+}
+
+
+void * recevoirCouleur (void * param){
+		
+	struct nodeInfos * args = (struct nodeInfos *) param;
+	int newColor = 0;
+	int dsVois = args->socket;
+
+	int res = recvTCP(dsVois, &newColor, sizeof(int));
+	if (res == -1 || res == 0) {
+		perror("[Client/Thread] Erreur lors de la reception de la couleur\n");
+		exit(0);
+	}
+	else
+	{
+		printf("[Client/Thread] Couleur reçue : %i\n", newColor);
+	}
+	
+	args->receiveColor = newColor;
+	pthread_exit(NULL);
+}
+
+void * envoyerCouleur (void * param){ 
+	struct nodeInfos * args = (struct nodeInfos *) param;
+	int newColor = args->sendColor;
+	int ds = args->socket;
+
+	if (sendTCP(ds, &newColor, sizeof(int)) == -1) {
+		perror("[Client/Thread] Problème lors de l'envoi de la couleur\n");
+	}
+	else
+	{
+		printf("[Client/Thread] Couleur envoyée : %i\n", newColor);
+	}
+	pthread_exit(NULL);
+}
+
 
 
 int main(int argc, char *argv[]) {
@@ -146,6 +242,7 @@ int main(int argc, char *argv[]) {
 	int connOut = 0; // Nombre de connexions sortantes
 	int connIn = 0; // Nombre de connexions entrantes
 	int receivedConn = 0; // Compteur de connexions entrantes reçues
+	char * myColor = (char*)malloc(MAX_LENGTH*sizeof(char)); // Couleur du client
 
 	struct nodeInfos* connInTab = (struct nodeInfos*)malloc(allNeighbors * sizeof(struct nodeInfos));
 	struct nodeInfos* connOutTab = (struct nodeInfos*)malloc(allNeighbors * sizeof(struct nodeInfos));
@@ -257,46 +354,99 @@ int main(int argc, char *argv[]) {
 		}
 
 		if(receivedConn == connIn) {
-			int cpt = 0;
-			for (size_t i = 0; i < connOut ; i++) {
-				if(&connInTab[i] != NULL) {
-					struct sockaddr_in sock_voisin = connOutTab[i].address;
-					int socket = connOutTab[i].socket;
-					struct nodeInfos newInfos;
-					newInfos.address = sock_voisin;
-					newInfos.receiveColor = (char*)malloc(MAX_LENGTH*sizeof(char));
-					newInfos.receiveColor = (char*)malloc(MAX_LENGTH*sizeof(char));
-					newInfos.socket = socket;
-					newInfos.state = 1;
-					newInfos.order = 0;
-					allNodesTab[cpt] = newInfos;
-					cpt++;
-				}
-				else {
-					break;
-				}
-			}
-
-			for (size_t i = 0; i < connIn ; i++) {
-				if(&connInTab[i] != NULL) {
-					struct sockaddr_in sock_voisin = connInTab[i].address;
-					int socket = connInTab[i].socket;
-					struct nodeInfos newInfos;
-					newInfos.address = sock_voisin;
-					newInfos.receiveColor = (char*)malloc(MAX_LENGTH*sizeof(char));
-					newInfos.receiveColor = (char*)malloc(MAX_LENGTH*sizeof(char));
-					newInfos.socket = socket;
-					newInfos.state = 1;
-					newInfos.order = 0;
-					allNodesTab[cpt] = newInfos;
-					cpt++;
-				}
-				else {
-					break;
-				}
-			}
-
-			
+			break;
 		}
+	}
+	int cpt = 0;
+	for (size_t i = 0; i < connOut ; i++) {
+		if(&connOutTab[i] != NULL) {
+			struct sockaddr_in sock_voisin = connOutTab[i].address;
+			int socket = connOutTab[i].socket;
+			struct nodeInfos newInfos;
+			newInfos.address = sock_voisin;
+			newInfos.sendColor = 0;
+			newInfos.receiveColor = 0;
+			newInfos.socket = socket;
+			newInfos.state = 1;
+			newInfos.order = 0;
+			allNodesTab[cpt] = newInfos;
+			cpt++;
+		}
+		else {
+			break;
+		}
+	}
+
+	for (size_t i = 0; i < connIn ; i++) {
+		struct sockaddr_in sock_voisin = connInTab[i].address;
+		int socket = connInTab[i].socket;
+		struct nodeInfos newInfos;
+		newInfos.address = sock_voisin;
+		newInfos.sendColor = 0;
+		newInfos.receiveColor = 0;
+		newInfos.socket = socket;
+		newInfos.state = 1;
+		newInfos.order = 0;
+		allNodesTab[cpt] = newInfos;
+		cpt++;
+	}
+	pthread_t threads[2*allNeighbors];
+
+	printf("Début de la coloration %i ..\n", myNumber);
+	int check = 1;
+	while(check == 1) {  
+		myColor = nextBinary(myColor);
+		// int binColor = getBinaryNumber(myColor);
+		// printf("[Client %i] Couleur choisie : %s\n", myNumber, myColor);
+		printf("RIEN DE SPECIAL");
+		// for (size_t i = 0; i < allNeighbors; i++) {
+		// 	if(allNodesTab[i].state == 1){
+		// 		allNodesTab[i].sendColor = binColor;
+		// 		if(pthread_create(&threads[i], NULL, envoyerCouleur, &allNodesTab[i]) != 0) {
+		// 			printf("Erreur lors de la création du thread %li", i);
+		// 		}
+		// 	}
+		// }
+
+		// for (size_t i = 0; i < allNeighbors; i++) {
+		// 	if(allNodesTab[i].state == 1){
+		// 		if(pthread_create(&threads[i+ allNeighbors], NULL, recevoirCouleur, &allNodesTab[i]) != 0) {
+		// 			printf("Erreur lors de la création du thread %li", i);
+		// 		}
+		// 	}
+		// }
+		// for (int i = 0; i < 2*allNeighbors; i++){
+		// 	if(i < allNeighbors){
+		// 		if(allNodesTab[i].state == 1) {
+		// 			pthread_join(threads[i], NULL);
+		// 		}
+		// 	}
+		// 	else {
+		// 		if(allNodesTab[i-allNeighbors].state == 1) {
+		// 			pthread_join(threads[i + allNeighbors], NULL);
+		// 		}
+		// 	}
+		// }
+
+		// printf("NODE %i MYCOLOR : %i\n", myNumber, binColor);
+		// for (size_t i = 0; i < allNeighbors; i++)
+		// {
+		// 	printf("infos[%li] : %i : %i\n", i, allNodesTab[i].receiveColor, allNodesTab[i].state);
+		// } 
+
+		// int verif = 1;
+		// for (size_t i = 0; i < allNeighbors; i++)
+		// {
+		// 	if(allNodesTab[i].receiveColor == binColor){
+		// 		allNodesTab[i].state = 0;
+		// 	}
+		// 	else {
+		// 		verif = 0;
+		// 	}
+		// }
+		
+		// if(verif == 1){
+		// 	check = 0;
+		// }
 	}
 }
