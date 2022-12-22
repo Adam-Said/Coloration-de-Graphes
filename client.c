@@ -150,14 +150,13 @@ void * recevoirCouleur (void * param){
   int newColor = 0;
   int dsVois = args->socket;
 
-	
   int res = recvTCP(dsVois, &newColor, sizeof(int));
   if (res == -1 || res == 0) {
-      perror("[Client/Thread] Erreur lors de la reception de la couleur\n");
+      perror("[Client/Thread] Erreur lors de la reception de la couleur \n");
       exit(0);
   }
   else {
-    printf("COULEUR RECUE\n");
+    printf("COULEUR RECUE : %i\n", newColor);
   }
   
 	args->receiveDecimalColor = newColor;
@@ -519,6 +518,7 @@ int main(int argc, char *argv[]) {
   	//int* finalColors = (int*)malloc(allNeighbors * sizeof(int));
   pthread_t threadsReduce[2*allNeighbors];
 
+  printf("N°%i Envoi de ma couleur %i à mes voisins\n", number, myDecimalColor);
 	for (size_t i = 0; i < allNeighbors; i++)
 	{
 		infos[i].sendDecimalColor = myDecimalColor;
@@ -538,7 +538,7 @@ int main(int argc, char *argv[]) {
 		pthread_join(threadsReduce[i], NULL);
 	}
 
-
+  printf("N°%i RECOLORATION\n", number);
     int nombreReceive = 0;
     int nombreSend = 0;
     for (size_t i = 0; i < allNeighbors; i++)
@@ -577,6 +577,14 @@ int main(int argc, char *argv[]) {
       for (int i = 0; i < nombreReceive; i++){
         pthread_join(threadsReceive[i], NULL);
       }
+
+      for (size_t i = 0; i < nombreReceive; i++)
+      {
+        if(infos[i].state == 2) {
+          printf("N°%i RECUE : %i\n", number, infos[i].receiveDecimalColor);
+        }
+      }
+      
     }
       
 
@@ -610,8 +618,10 @@ int main(int argc, char *argv[]) {
       }
     }
 
-
-  
+  // Envoi de la couleur finale au serveur
+  if (sendTCP(dsServ, &myDecimalColor, sizeof(int)) == -1) {
+    perror("[Client/Thread] Problème lors de l'envoi de la couleur finale au serveur\n");
+  }
   // printf("N°%i : MY FINAL COLOR : %i\n", number, myDecimalColor);
 
   printf("[Travail] terminé le client s'arrête\n");

@@ -398,6 +398,19 @@ int main(int argc, char *argv[])
             printf("[Serveur/Ordre] Problème lors de l'envoi du second ordre\n");
         }
     }
+
+    printf("Attente des noeuds...\n");
+    for(int i = 1; i <= nodeNumber; i++){
+        int receivedColor = 0;
+        res = recvTCP(voisins[i].socket, &receivedColor, sizeof(receivedColor));
+        if (res == -1 || res == 0) {
+            perror("[Serveur/Thread] Erreur lors de la reception de la couleur finale\n");
+            exit(0);
+        } else {
+            finalColors[i-1] = receivedColor;
+            printf("%s[Serveur/Thread] Couleur finale reçue : %i %s\n", AC_BLUE, finalColors[i-1], AC_WHITE);
+        } 
+    } 
     
 
     /*FD_CLR(srv, &set);
