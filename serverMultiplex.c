@@ -365,7 +365,7 @@ int main(int argc, char *argv[])
         if(allSend == 1) break;
     } 
 
-    printf("%sFin du multiplexage\n%s", AC_MAGENTA, AC_WHITE);
+    //printf("%sFin du multiplexage\n%s", AC_MAGENTA, AC_WHITE);
 
     //attente des couleurs des clients
     printf("Attente des noeuds...\n");
@@ -380,14 +380,25 @@ int main(int argc, char *argv[])
             printf("%s[Serveur/Thread] Couleur finale reçue : %i\n%s", AC_GREEN, finalColors[i-1], AC_WHITE);
         } 
     } 
-    printf("----------------------------------------------------\n");
+    // printf("----------------------------------------------------\n");
 
-    printf("%sCalcul du nombre de couleurs ...\n%s", AC_MAGENTA, AC_WHITE);
-    for(int i = 0; i < nodeNumber; i++){
-        printf("Couleur n°%i : %i\n", i+1, finalColors[i]);
-    }
+    // printf("%sCalcul du nombre de couleurs ...\n%s", AC_MAGENTA, AC_WHITE);
+    // for(int i = 0; i < nodeNumber; i++){
+    //     printf("Couleur n°%i : %i\n", i+1, finalColors[i]);
+    // }
     int nbColors = nodeNumber - doubleColor(finalColors, nodeNumber); 
     printf("%sNombre de couleurs : %i %s\n", AC_BLUE, nbColors, AC_WHITE);
+
+    sleep(1);
+    printf("Début REDUCE\n");
+
+    int ordre2 = 1;
+    for (int i = 1; i<=nodeNumber; i++) {
+        if (sendTCP(voisins[i].socket, &ordre2, sizeof(int)) <= 0) {
+            printf("[Serveur/Ordre] Problème lors de l'envoi du second ordre\n");
+        }
+    }
+    
 
     /*FD_CLR(srv, &set);
         if(close(srv) == -1) {
