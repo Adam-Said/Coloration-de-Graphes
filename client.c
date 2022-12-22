@@ -221,7 +221,7 @@ int main(int argc, char *argv[]) {
   setsockopt(dsServ, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
   if (dsServ == -1)
   {
-      perror("Problème creation socket :");
+      perror("Problème creation socket :\n");
       exit(1);
   }
 
@@ -239,7 +239,7 @@ int main(int argc, char *argv[]) {
 
   int sock_list = listen(ds, 1000);
   if (sock_list == -1){
-		perror("[Client] : problème lors de la mise en écoute de la socket");
+		perror("[Client] : problème lors de la mise en écoute de la socket\n");
 		exit(1);
   }
 
@@ -451,7 +451,8 @@ int main(int argc, char *argv[]) {
 				infos[i].sendDecimalColor = myDecimalColor;
 				//infos[i].color = myColor;
 				if(pthread_create(&threads[i], NULL, envoyerCouleur, &infos[i]) != 0) {
-					printf("Erreur lors de la création du thread %li", i);
+					perror("Erreur lors de la création du thread\n");
+          exit(1);
 				}
 			}
 		}
@@ -461,7 +462,8 @@ int main(int argc, char *argv[]) {
 				//struct infosColor newInfo = infos[i];
 				//printf("%sNODE %i Boucle de réception, thread n°%li %s\n", AC_YELLOW,number, i, AC_NORMAL);
 				if(pthread_create(&threads[i+ allNeighbors], NULL, recevoirCouleur, &infos[i]) != 0) {
-					printf("Erreur lors de la création du thread %li", i);
+					perror("Erreur lors de la création du thread\n");
+          exit(1);
 				}
 				//infos[i] = newInfo;
 			}
@@ -535,13 +537,15 @@ int main(int argc, char *argv[]) {
 		infos[i].sendDecimalColor = myDecimalColor;
 		//infos[i].color = myColor;
 		if(pthread_create(&threadsReduce[i], NULL, envoyerCouleur, &infos[i]) != 0) {
-			printf("Erreur lors de la création du thread %li", i);
+			perror("Erreur lors de la création du thread\n");
+      exit(1);
 		}
 	}
 	for (size_t i = 0; i < allNeighbors; i++)
 	{
 		if(pthread_create(&threadsReduce[i+ allNeighbors], NULL, recevoirCouleur, &infos[i]) != 0) {
-			printf("Erreur lors de la création du thread %li", i);
+			perror("Erreur lors de la création du thread\n");
+      exit(1);
 		}
 	}
 
@@ -579,7 +583,7 @@ int main(int argc, char *argv[]) {
         if (infos[i].state == 2) {
           //printf("N°%i j'écoute %li\n", number, i);
           if(pthread_create(&threadsReceive[i], NULL, recevoirCouleur, &infos[i]) != 0) {
-            printf("Erreur lors de la création du thread %li\n", i);
+            perror("Erreur lors de la création du thread\n");
             exit(1);
           }
         } 
@@ -629,7 +633,7 @@ int main(int argc, char *argv[]) {
           infos[i].sendDecimalColor = myDecimalColor;
           //printf("N°%i j'envoi %i à %li\n", number, myDecimalColor, i);
           if(pthread_create(&threadsSend[i], NULL, envoyerCouleur, &infos[i]) != 0) {
-            printf("Erreur lors de la création du thread %li\n", i);
+            perror("Erreur lors de la création du thread\n");
             exit(1);
           }
         }

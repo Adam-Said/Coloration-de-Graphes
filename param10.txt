@@ -1,2 +1,0 @@
-fileTest10.txt
-10000
