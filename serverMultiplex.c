@@ -148,7 +148,7 @@ int main(int argc, char *argv[])
     printf("Fichier à parser %s \n", argv[2]);
 
     //récupération du nombre de noeuds
-    int nodeNumber = getFirstNumber(argv[2]);
+    int nodeNumber = 0;
 
     //récupération filepath
     char* filepath = malloc(strlen(argv[2]) + 16); // ./Files/+nom fichier +\0
@@ -166,6 +166,14 @@ int main(int argc, char *argv[])
 
     int bufferLength = 255;
     char buffer[bufferLength];
+
+    while(fgets(buffer, bufferLength, file)) {
+        if(buffer[0] == 'e'){
+            nodeNumber = getFirstNumber(buffer);
+        }
+    }
+        
+    fseek(file, 0, SEEK_SET);
 
     //Récupération du nombres de noeuds connectés à chaque noeud
     int* nodesTab = (int*)malloc(nodeNumber * sizeof(int));
