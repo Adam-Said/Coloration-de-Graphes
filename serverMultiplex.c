@@ -223,7 +223,7 @@ int main(int argc, char *argv[])
             edgesConnexionTab[n][nextPlace(edgesConnexionTab[n], nodesTab[n])] = n2;
         }
     }
-    fclose(file);
+    
 
     int k = 1;
     for (int i = 1; i <= nodeNumber; i++) {
@@ -384,7 +384,7 @@ int main(int argc, char *argv[])
     //printf("%sFin du multiplexage\n%s", AC_MAGENTA, AC_WHITE);
 
     //attente des couleurs des clients
-    printf("Attente de la première coloration...\n");
+    printf("Coloration en cours...\n");
     for(int i = 1; i <= nodeNumber; i++){
         int receivedColor = 0;
         res = recvTCP(voisins[i].socket, &receivedColor, sizeof(receivedColor));
@@ -433,18 +433,18 @@ int main(int argc, char *argv[])
     printf("%sNombre de couleurs après réduction : %i %s\n", AC_MAGENTA, nbColors, AC_WHITE);
 
     
-
-    /*FD_CLR(srv, &set);
+    fclose(file);
+    FD_CLR(srv, &set);
         if(close(srv) == -1) {
             printf("[Serveur] : Problème lors de la fermeture de la socket\n");
             exit(1);
         }
-    printf("[Serveur] : Socket fermée !\n");*/
+    printf("[Serveur] : Socket fermée !\n");
 
-    // for(int i = 0; i <= nodeNumber; i++){
-    //     free(edgesConnexionTab[i]);
-    //     free(&nodesTab);
-    // }
+    for(int i = 0; i <= nodeNumber; i++){
+        free(edgesConnexionTab[i]);
+        free(&nodesTab[i]);
+    }
 
 }
 
