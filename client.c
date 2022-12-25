@@ -37,8 +37,13 @@ struct infosColor {
 		int receiveDecimalColor;
     int socket;
     struct sockaddr_in adresse;
-		int order;
     int state;
+};
+
+struct thread_params {
+  struct infosColor *infos;
+  int allNeighbors;
+  int color;
 };
 
 int myPow(int x, int y) {
@@ -145,46 +150,54 @@ int recvTCP(int sock, void* msg, int sizeMsg) {
 }
 
 void * recevoirCouleur (void * param){
-	
-  struct infosColor * args = (struct infosColor *) param;
+
+  struct thread_params * args = (struct thread_params *) param;
+  struct infosColor *infos = args->infos;
+  int allNeighbors = args->allNeighbors;
   int newColor = 0;
-  int dsVois = args->socket;
 
-  char adresses[INET_ADDRSTRLEN];
-  inet_ntop(AF_INET, &args->adresse.sin_addr, adresses, INET_ADDRSTRLEN);
-  int port = htons(args->adresse.sin_port);
+  for (size_t i = 0; i < allNeighbors; i++) {
+    if(infos[i].state == 1 || infos[i].state == 2) {
+      int dsVois = infos[i].socket;
+      char adresses[INET_ADDRSTRLEN];
+      inet_ntop(AF_INET, &infos[i].adresse.sin_addr, adresses, INET_ADDRSTRLEN);
+      int port = htons(infos[i].adresse.sin_port);
 
-  int res = recvTCP(dsVois, &newColor, sizeof(int));
-  if (res == -1 || res == 0) {
-    perror("[Client/Thread] Erreur lors de la reception de la couleur \n");
-    printf("[PROBLEME] ---> Reception de la couleur de : %s:%i\n", adresses, port);
+      int res = recvTCP(dsVois, &newColor, sizeof(int));
+      if (res == -1 || res == 0) {
+        perror("[Client/Thread] Erreur lors de la reception de la couleur \n");
+        printf("[PROBLEME] ---> Reception de la couleur de : %s:%i\n", adresses, port);
 
-    //exit(0);
+      }
+
+      infos[i].receiveDecimalColor = newColor;
+    }
   }
-  // else {
-  //   printf("COULEUR RECUE : %i\n", newColor);
-  // }
-  
-	args->receiveDecimalColor = newColor;
-  pthread_exit(NULL);
+pthread_exit(NULL);
 }
 
+
 void * envoyerCouleur (void * param){
-  struct infosColor * args = (struct infosColor *) param;
-  int newColor = args->sendDecimalColor;
-  int ds = args->socket;
+  struct thread_params * args = (struct thread_params *) param;
+  int newColor = args->color;
+  struct infosColor *infos = args->infos;
 
-  char adresses[INET_ADDRSTRLEN];
-  inet_ntop(AF_INET, &args->adresse.sin_addr, adresses, INET_ADDRSTRLEN);
-  int port = htons(args->adresse.sin_port);
+  int allNeighbors = args->allNeighbors;
 
-  if (sendTCP(ds, &newColor, sizeof(int)) == -1) {
-    perror("[Client/Thread] Problème lors de l'envoi de la couleur\n");
-    printf("[PROBLEME] ---> Envoi de la couleur à : %s:%i\n", adresses, port);
+  for (size_t i = 0; i < allNeighbors; i++) {
+    if(infos[i].state == 1 || infos[i].state == 3) {
+      int ds = infos[i].socket;
+
+      char adresses[INET_ADDRSTRLEN];
+      inet_ntop(AF_INET, &infos[i].adresse.sin_addr, adresses, INET_ADDRSTRLEN);
+      int port = htons(infos[i].adresse.sin_port);
+
+      if (sendTCP(ds, &newColor, sizeof(int)) == -1) {
+        perror("[Client/Thread] Problème lors de l'envoi de la couleur\n");
+        printf("[PROBLEME] ---> Envoi de la couleur à : %s:%i\n", adresses, port);
+      }
+    }
   }
-  // else {
-  //   printf("COULEUR ENVOYEE\n");
-  // }
   pthread_exit(NULL);
 }
 
@@ -333,7 +346,7 @@ int main(int argc, char *argv[]) {
             exit(0);
           }
 
-          sleep(2);
+          //sleep(2);
 
           //printf("\x1B[3%cm[Client] %i) Ordre de connexion reçu, je démarre les connexions%s\n", color, number, AC_WHITE);
 
@@ -398,7 +411,7 @@ int main(int argc, char *argv[]) {
       }
 
     }
-		sleep(1);
+		//sleep(1);
 		if(incomingConnexions == incoming){
 			break;
 		}
@@ -434,52 +447,32 @@ int main(int argc, char *argv[]) {
 		infos[cpt] = newInfos;
 		cpt++;
 	}
-	pthread_t threads[2*(toConnectNeighbors + incoming)];
+	pthread_t threads[2];
 
 	//printf("Début de la coloration %i ..\n", number);
 	int check = 1;
 	while(check == 1) {  
 		myColor = nextBinary(myColor);
 		myDecimalColor = getBinaryNumber(myColor);
-		//printf("[Client %i] Couleur choisie : %s\n", number, myColor);
+    struct thread_params params;
+    params.infos = infos;
+    params.allNeighbors = allNeighbors;
+    params.color = myDecimalColor;
 
-		for (size_t i = 0; i < allNeighbors; i++)
-		{
-			if(infos[i].state == 1){
-				//printf("%sNODE %i Boucle d'envoi, thread n°%li %s\n", AC_MAGENTA, number, i, AC_NORMAL);
-				//sprintf(infos[i].color, "%s", myColor);
-				infos[i].sendDecimalColor = myDecimalColor;
-				//infos[i].color = myColor;
-				if(pthread_create(&threads[i], NULL, envoyerCouleur, &infos[i]) != 0) {
-					perror("Erreur lors de la création du thread\n");
-          exit(1);
-				}
-			}
-		}
-		for (size_t i = 0; i < allNeighbors; i++)
-		{
-			if(infos[i].state == 1){
-				//struct infosColor newInfo = infos[i];
-				//printf("%sNODE %i Boucle de réception, thread n°%li %s\n", AC_YELLOW,number, i, AC_NORMAL);
-				if(pthread_create(&threads[i+ allNeighbors], NULL, recevoirCouleur, &infos[i]) != 0) {
-					perror("Erreur lors de la création du thread\n");
-          exit(1);
-				}
-				//infos[i] = newInfo;
-			}
-		}
 
-		for (int i = 0; i < 2*allNeighbors; i++){
-			if(i < allNeighbors){
-				if(infos[i].state == 1) {
-					pthread_join(threads[i], NULL);
-				}
-			}
-			else {
-				if(infos[i-allNeighbors].state == 1) {
-					pthread_join(threads[i], NULL);
-				}
-			}
+    if(pthread_create(&threads[0], NULL, envoyerCouleur, (void*)&params) != 0) {
+      perror("Erreur lors de la création du thread\n");
+      exit(1);
+    }
+		// printf("[Client %i] Couleur choisie : %s\n", number, myColor);
+
+    if(pthread_create(&threads[1], NULL, recevoirCouleur, (void*)&params) != 0) {
+      perror("Erreur lors de la création du thread\n");
+      exit(1);
+    }
+
+		for (int i = 0; i < 2; i++){
+			pthread_join(threads[i], NULL);
 		}
 
 		int verif = 1;
@@ -497,11 +490,10 @@ int main(int argc, char *argv[]) {
 			check = 0;
 		}
 
-		// print infos array and its content
 		// printf("NODE %i MYCOLOR : %s\n", number,myColor);
 		// for (size_t i = 0; i < toConnectNeighbors + incoming; i++)
 		// {
-		// 	printf("infos[%li] : %s : %i\n", i, infos[i].receiveColor, infos[i].state);
+		// 	printf("infos[%li] : %i : %i\n", i, infos[i].receiveDecimalColor, infos[i].state);
 		// } 
 	}
   //printf("Formatage de la couleur pour éviter les conflits\n");
@@ -509,7 +501,7 @@ int main(int argc, char *argv[]) {
   myDecimalColor = getBinaryNumber(myColor);
 	//printf("%s[Client %i] Couleur finale : %i %s\n", AC_RED, number, myDecimalColor, AC_WHITE);
 
-  //printf("Couleur décimale de %s : %i\n", myColor, decimalColor);
+  // printf("Couleur décimale de %s : %i\n", myColor, myDecimalColor);
 
   //printf("%sNoeud numéro %i) Envoi de la couleur au serveur...\n%s", AC_YELLOW, number, AC_WHITE);
   if (sendTCP(dsServ, &myDecimalColor, sizeof(int)) == -1) {
@@ -529,27 +521,27 @@ int main(int argc, char *argv[]) {
   //printf("Démarrage de la recoloration\n");
 
   //int* finalColors = (int*)malloc(allNeighbors * sizeof(int));
-  pthread_t threadsReduce[2*allNeighbors];
+  for (size_t i = 0; i < allNeighbors; i++) {
+		infos[i].state = 1;
+	}
+  
+  pthread_t threadsReduce[2];
+  struct thread_params params;
+  params.infos = infos;
+  params.color = myDecimalColor;
+  params.allNeighbors = allNeighbors;
 
   //printf("N°%i Envoi de ma couleur %i à mes voisins\n", number, myDecimalColor);
-	for (size_t i = 0; i < allNeighbors; i++)
-	{
-		infos[i].sendDecimalColor = myDecimalColor;
-		//infos[i].color = myColor;
-		if(pthread_create(&threadsReduce[i], NULL, envoyerCouleur, &infos[i]) != 0) {
-			perror("Erreur lors de la création du thread\n");
-      exit(1);
-		}
-	}
-	for (size_t i = 0; i < allNeighbors; i++)
-	{
-		if(pthread_create(&threadsReduce[i+ allNeighbors], NULL, recevoirCouleur, &infos[i]) != 0) {
-			perror("Erreur lors de la création du thread\n");
-      exit(1);
-		}
-	}
+	if(pthread_create(&threadsReduce[0], NULL, envoyerCouleur, (void*)&params) != 0) {
+    perror("Erreur lors de la création du thread\n");
+    exit(1);
+  }
+	if(pthread_create(&threadsReduce[1], NULL, recevoirCouleur, (void*)&params) != 0) {
+    perror("Erreur lors de la création du thread\n");
+    exit(1);
+  }
 
-	for (int i = 0; i < 2*allNeighbors; i++){
+	for (int i = 0; i < 2; i++){
 		pthread_join(threadsReduce[i], NULL);
 	}
 
@@ -574,27 +566,16 @@ int main(int argc, char *argv[]) {
     {
       infos[i].receiveDecimalColor = -1;
     }
-
     
     if(nombreReceive != 0) {
-      pthread_t threadsReceive[nombreReceive];
+      pthread_t threadsReceive[1];
 
-      for (size_t i = 0; i < allNeighbors; i++) {
-        if (infos[i].state == 2) {
-          //printf("N°%i j'écoute %li\n", number, i);
-          if(pthread_create(&threadsReceive[i], NULL, recevoirCouleur, &infos[i]) != 0) {
-            perror("Erreur lors de la création du thread\n");
-            exit(1);
-          }
-        } 
+      if(pthread_create(&threadsReceive[0], NULL, recevoirCouleur, (void*)&params) != 0) {
+        perror("Erreur lors de la création du thread\n");
+        exit(1);
       }
 
-      for (int i = 0; i < allNeighbors; i++){
-        if(infos[i].state == 2) {
-          pthread_join(threadsReceive[i], NULL);
-        }
-      }
-
+		  pthread_join(threadsReceive[0], NULL);
       // for (size_t i = 0; i < nombreReceive; i++)
       // {
       //   if(infos[i].state == 2) {
@@ -623,27 +604,18 @@ int main(int argc, char *argv[]) {
       }
     }
     
-    printf("N°%i : MY FINAL COLOR : %i\n", number, myDecimalColor);
-    
+    // printf("N°%i : MY FINAL COLOR : %i\n", number, myDecimalColor);
+    params.color = myDecimalColor;
+
     if(nombreSend != 0) {
-      pthread_t threadsSend[nombreSend];
-      for (size_t i = 0; i < allNeighbors; i++)
-      {
-        if(infos[i].state == 3) {
-          infos[i].sendDecimalColor = myDecimalColor;
-          //printf("N°%i j'envoi %i à %li\n", number, myDecimalColor, i);
-          if(pthread_create(&threadsSend[i], NULL, envoyerCouleur, &infos[i]) != 0) {
-            perror("Erreur lors de la création du thread\n");
-            exit(1);
-          }
-        }
+      pthread_t threadsSend[0];
+      if(pthread_create(&threadsSend[0], NULL, envoyerCouleur, (void*)&params) != 0) {
+        perror("Erreur lors de la création du thread\n");
+        exit(1);
       }
-    
-      for (int i = 0; i < allNeighbors; i++){
-        if(infos[i].state == 3) {
-          pthread_join(threadsSend[i], NULL);
-        }
-      }
+
+      pthread_join(threadsSend[0], NULL);
+
     }
 
   //printf("N°%i envoi de la couleur au serveur\n", number);

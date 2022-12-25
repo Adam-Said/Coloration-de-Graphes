@@ -32,11 +32,9 @@ call = "./bin/serverMultiplex " + str(port) + " " + file +" &"
 os.system(call)
 time.sleep(1)
 for x in range(0,nbNode) :
-  time.sleep(0.05)
+  time.sleep(0.005)
   tmpPort = port+x+1
   print("[Runner] Démarrage du client" , x , "sur" , str(s.getsockname()[0]) + ":" + str(tmpPort) ,"au serveur")
   call = "./bin/client "+ str(s.getsockname()[0]) + " " + str(port) + " " + str(s.getsockname()[0]) + " " + str(tmpPort) +" &"
   os.system(call)
   
-
-

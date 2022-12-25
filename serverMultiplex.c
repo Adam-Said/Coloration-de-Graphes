@@ -33,7 +33,6 @@ struct infosColor {
     int receiveDecimalColor;
     int socket;
     struct sockaddr_in adresse;
-    int order;
     int state;
 };
 
@@ -145,7 +144,7 @@ int main(int argc, char *argv[])
   }
 
     // Partie parser
-    printf("Fichier à parser %s \n", argv[2]);
+    //printf("Fichier à parser %s \n", argv[2]);
 
     //récupération du nombre de noeuds
     int nodeNumber = 0;
@@ -225,17 +224,17 @@ int main(int argc, char *argv[])
     }
     
 
-    int k = 1;
-    for (int i = 1; i <= nodeNumber; i++) {
-        printf("%i | Noeuds connectées : ", i);
-        for (int j = 0; j < nodesTab[k]; j++) {
-            printf(" %i ", edgesConnexionTab[i][j]);
-        }
-        printf("\n");
-        k++;
-    }
+    // int k = 1;
+    // for (int i = 1; i <= nodeNumber; i++) {
+    //     printf("%i | Noeuds connectées : ", i);
+    //     for (int j = 0; j < nodesTab[k]; j++) {
+    //         printf(" %i ", edgesConnexionTab[i][j]);
+    //     }
+    //     printf("\n");
+    //     k++;
+    // }
 
-    printf("Fichier : Le nombre de noeuds nécessaires est %i \n", nodeNumber);
+    // printf("Fichier : Le nombre de noeuds nécessaires est %i \n", nodeNumber);
 
     // Fin parser
 
@@ -384,7 +383,7 @@ int main(int argc, char *argv[])
     //printf("%sFin du multiplexage\n%s", AC_MAGENTA, AC_WHITE);
 
     //attente des couleurs des clients
-    printf("Coloration en cours...\n");
+    //printf("Coloration en cours...\n");
     for(int i = 1; i <= nodeNumber; i++){
         int receivedColor = 0;
         res = recvTCP(voisins[i].socket, &receivedColor, sizeof(receivedColor));
@@ -393,7 +392,7 @@ int main(int argc, char *argv[])
             exit(0);
         } else {
             finalColors[i-1] = receivedColor;
-            printf("%s[Serveur/Thread] Première couleur reçue : %i\n%s", AC_BLUE, finalColors[i-1], AC_WHITE);
+            //printf("%s[Serveur/Thread] Première couleur reçue : %i\n%s", AC_BLUE, finalColors[i-1], AC_WHITE);
         } 
     } 
     // printf("----------------------------------------------------\n");
@@ -403,7 +402,7 @@ int main(int argc, char *argv[])
     //     printf("Couleur n°%i : %i\n", i+1, finalColors[i]);
     // }
     int nbColors = doubleColor(finalColors, nodeNumber); 
-    printf("%sNombre de couleurs avant réduction : %i %s\n", AC_CYAN, nbColors, AC_WHITE);
+    //printf("%sNombre de couleurs avant réduction : %i %s\n", AC_CYAN, nbColors, AC_WHITE);
 
     sleep(1);
     // printf("Début REDUCE\n");
@@ -415,7 +414,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    printf("Calcul couleur minimale...\n");
+    //printf("Calcul couleur minimale...\n");
     for(int i = 1; i <= nodeNumber; i++){
         int receivedColor = 0;
         res = recvTCP(voisins[i].socket, &receivedColor, sizeof(receivedColor));
@@ -424,7 +423,7 @@ int main(int argc, char *argv[])
             exit(0);
         } else {
             finalColors[i-1] = receivedColor;
-            printf("%s[Serveur/Thread] Couleur finale reçue : %i %s\n", AC_GREEN, finalColors[i-1], AC_WHITE);
+            //printf("%s[Serveur/Thread] Couleur finale reçue : %i %s\n", AC_GREEN, finalColors[i-1], AC_WHITE);
         } 
     }
 
@@ -433,18 +432,18 @@ int main(int argc, char *argv[])
     printf("%sNombre de couleurs après réduction : %i %s\n", AC_MAGENTA, nbColors, AC_WHITE);
 
     
-    fclose(file);
     FD_CLR(srv, &set);
         if(close(srv) == -1) {
             printf("[Serveur] : Problème lors de la fermeture de la socket\n");
             exit(1);
         }
-    printf("[Serveur] : Socket fermée !\n");
+    //printf("[Serveur] : Socket fermée !\n");
 
     for(int i = 0; i <= nodeNumber; i++){
         free(edgesConnexionTab[i]);
-        free(&nodesTab[i]);
+        //free(&nodesTab[i]);
     }
+    //fclose(file);
 
 }
 
