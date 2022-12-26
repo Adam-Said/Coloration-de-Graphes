@@ -137,11 +137,12 @@ int nextPlace(int * tab, int size){
 
 int main(int argc, char *argv[])
 {
-  if (argc != 3)
+  if (argc != 4)
   {
-    printf("Utilisation : [port_serveur] [File_name]\n");
+    printf("Utilisation : [port_serveur] [File_name] [Mode Verbeux : Oui = 1, Non = 0] \n");
     exit(1);
   }
+  int verbose = atoi(argv[3]);
 
     // Partie parser
     //printf("Fichier à parser %s \n", argv[2]);
@@ -171,6 +172,7 @@ int main(int argc, char *argv[])
             nodeNumber = getFirstNumber(buffer);
         }
     }
+    printf("Nombre de noeuds : %d \n", nodeNumber);
         
     fseek(file, 0, SEEK_SET);
 
@@ -192,9 +194,10 @@ int main(int argc, char *argv[])
     }
     for(int i = 1; i <= nodeNumber; i++){
         if(nodesTab[i] != 0){
-            // printf("Tableau nodes indice : %i nombre de noeuds connectés : %i\n", i, nodesTab[i]);
-            // printf("%i attend %i connexions\n", i, incomingTab[i]);
-
+            if(verbose == 1){
+                printf("Tableau nodes indice : %i nombre de noeuds connectés : %i\n", i, nodesTab[i]);
+                printf("%i attend %i connexions\n", i, incomingTab[i]);
+            }
         }
     }
     int totalConnexions = 0;
@@ -203,8 +206,10 @@ int main(int argc, char *argv[])
         totalConnexions = totalConnexions + nodesTab[i];
         totalIncoming = totalIncoming + incomingTab[i];
     }
-    // printf("[Serveur] Nombres de connexions (sockets) attendues : %i\n", totalConnexions);
-    // printf("[Serveur] Nombres de connexions (sockets) à faire : %i\n", totalIncoming);
+    if(verbose == 1){
+        printf("[Serveur] Nombres de connexions (sockets) attendues : %i\n", totalConnexions);
+        printf("[Serveur] Nombres de connexions (sockets) à faire : %i\n", totalIncoming);
+    }
     for(int i = 1; i <= nodeNumber; i++){
         if(nodesTab[i] != 0){
             edgesConnexionTab[i] = (int*)malloc(sizeof(int*) * nodesTab[i]);
@@ -222,19 +227,25 @@ int main(int argc, char *argv[])
             edgesConnexionTab[n][nextPlace(edgesConnexionTab[n], nodesTab[n])] = n2;
         }
     }
+
+    fclose(file);
     
 
-    // int k = 1;
-    // for (int i = 1; i <= nodeNumber; i++) {
-    //     printf("%i | Noeuds connectées : ", i);
-    //     for (int j = 0; j < nodesTab[k]; j++) {
-    //         printf(" %i ", edgesConnexionTab[i][j]);
-    //     }
-    //     printf("\n");
-    //     k++;
-    // }
+    
 
-    // printf("Fichier : Le nombre de noeuds nécessaires est %i \n", nodeNumber);
+    if(verbose == 1){
+        int k = 1;
+        for (int i = 1; i <= nodeNumber; i++) {
+            printf("%i | Noeuds connectées : ", i);
+            for (int j = 0; j < nodesTab[k]; j++) {
+                printf(" %i ", edgesConnexionTab[i][j]);
+            }
+            printf("\n");
+            k++;
+        }
+        printf("Fichier : Le nombre de noeuds nécessaires est %i \n", nodeNumber);
+    } 
+    
 
     // Fin parser
 
@@ -275,7 +286,6 @@ int main(int argc, char *argv[])
     int maxDesc = srv;
     struct sockaddr_in sockClient; 
     socklen_t lgAdr;
-    //struct paquet* voisinsAdr = (struct paquet*)malloc(nodeNumber * sizeof(struct paquet));
     struct paquet voisins[nodeNumber];
     int nodeIndex = 1;
 
@@ -288,21 +298,13 @@ int main(int argc, char *argv[])
         }
         for(int df = 2; df <= maxDesc; df++){
             if(df == srv){
-                //socklen_t size = sizeof(sockClient);
                 if (!FD_ISSET(df, &settmp)) {continue;}
 
                 dsClient = accept(srv, (struct sockaddr *)&sockClient, &lgAdr);
-                //struct paquet msg; useless
                 if (recvTCP(dsClient, &voisins[nodeIndex], sizeof(struct paquet)) <= 0) {
                     printf("[Serveur] Problème lors de la réception de l'adresse d'écoute\n");
                     exit(0);
                 }
-                
-                // char adresse[INET_ADDRSTRLEN];
-                // inet_ntop(AF_INET, &voisins[nodeIndex].adresse.sin_addr, adresse, INET_ADDRSTRLEN);
-                // int port = htons(voisins[nodeIndex].adresse.sin_port);
-
-                // printf("[Serveur] %i) %s:%i\n", nodeIndex, adresse, port);
                 int numVoisins = nodesTab[nodeIndex];
                 numVoisins += incomingTab[nodeIndex];
                 res = sendTCP(dsClient, &numVoisins, sizeof(int));
@@ -310,20 +312,20 @@ int main(int argc, char *argv[])
                     perror("[Serveur] : problème lors de l'envoi du nombre de connexions entrantes");
                     exit(1);
                 }
-                // printf("%s[Serveur] Nombre de connexions entrantes du noeuds %i envoyé avec succès%s\n", AC_GREEN, nodeIndex, AC_WHITE);
                
-                // voisins[nodeIndex].adresse = sockClient; 
                 voisins[nodeIndex].socket = dsClient;
-                // printf("[Serveur] : Envoi du nombre de voisins du noeuds %i\n", nodeIndex);
+                
                 res = sendTCP(dsClient, &nodesTab[nodeIndex], sizeof(int));
                 if(res == -1) {
                     perror("[Serveur] : problème lors de l'envoi du nombre d'arêtes");
                     exit(1);
                 }
-                // printf("%s[Serveur] Nombre de voisins du noeuds %i envoyé avec succès%s\n", AC_GREEN, nodeIndex, AC_WHITE);
-
-                
-
+                if(verbose == 1){
+                    printf("%s[Serveur] Nombre de connexions entrantes du noeuds %i envoyé avec succès%s\n", AC_GREEN, nodeIndex, AC_WHITE);
+                    printf("[Serveur] : Envoi du nombre de voisins du noeuds %i\n", nodeIndex);
+                    printf("%s[Serveur] Nombre de voisins du noeuds %i envoyé avec succès%s\n", AC_GREEN, nodeIndex, AC_WHITE);
+                }  
+            
                 int nodeN = nodeIndex;
                 if (sendTCP(dsClient, &nodeN, sizeof(nodeN)) <= 0) {
                     printf("[Serveur/Ordre] Problème lors de l'envoi du numéro de noeuds\n");
@@ -337,7 +339,6 @@ int main(int argc, char *argv[])
         }
 
         if (nodeIndex == nodeNumber+1) {
-            //printf("[Serveur] Tous les anneaux sont connectés, envoi des adresses\n");
 
             //récupération des adresses correspondantes aux nombres dans edgesConnexionTab
             struct paquet ssAdr;
@@ -347,43 +348,49 @@ int main(int argc, char *argv[])
                     // printf("[Serveur/Envoi] Début de l'envoi des voisins du noeud %i\n", i);
                     for(int j = 0; j < nodesTab[i]; j++){ //parcours du sous tableau
                         ssAdr.adresse = voisins[edgesConnexionTab[i][j]].adresse;
-                        //printf("[Serveur/Envoi] Envoi de l'adresse du noeud %i\n", edgesConnexionTab[i][j]);
+                        if(verbose == 1){ printf("[Serveur/Envoi] Envoi de l'adresse du noeud %i\n", edgesConnexionTab[i][j]);}
                         char adresses[INET_ADDRSTRLEN];
                         inet_ntop(AF_INET, &voisins[edgesConnexionTab[i][j]].adresse.sin_addr, adresses, INET_ADDRSTRLEN);
-                        //int port = htons(voisins[edgesConnexionTab[i][j]].adresse.sin_port);
-                        //printf("[Serveur/Envoi] ---> Envoi de l'adresse: %s:%i\n", adresses, port);
+                        if(verbose == 1){
+                            int port = htons(voisins[edgesConnexionTab[i][j]].adresse.sin_port);
+                            printf("[Serveur/Envoi] ---> Envoi de l'adresse: %s:%i\n", adresses, port);
+                        } 
+                        
                         if (sendTCP(voisins[i].socket, &ssAdr, sizeof(struct paquet)) <= 0) {
                             printf("[Serveur/Envoi] Problème lors de l'envoi des adresses\n");
                         }
                     }
-                    // printf("[Serveur/Envoi] Toutes les adresses voisines du noeud %i ont été envoyées\n", i);
+                    if(verbose == 1){
+                        printf("[Serveur/Envoi] Toutes les adresses voisines du noeud %i ont été envoyées\n", i);
+                    } 
                 } 
-                // else {
-                //     printf("[Serveur/Envoi] Aucun noeuds à envoyer au noeuds %i, je passe au prochain\n", i);
-                // }
+                if(verbose == 1){
+                    printf("[Serveur/Envoi] Aucun noeuds à envoyer au noeuds %i, je passe au prochain\n", i);
+                } 
             }
 
             int ordre = 1;
-            // printf("[Serveur/Ordre] Envoi des ordres de connexion%i\n", ordre);
+            if(verbose == 1){
+                printf("[Serveur/Ordre] Envoi des ordres de connexion%i\n", ordre);
+            } 
+            
             for (int i = 1; i<=nodeNumber; i++) {
                 if (nodesTab[i] != 0) {
                     if (sendTCP(voisins[i].socket, &ordre, sizeof(ordre)) <= 0) {
                             printf("[Serveur/Ordre] Problème lors de l'envoi de l'ordre\n");
                     }
-                } 
-                // else {
-                //      printf("[Serveur/Envoi] Aucun ordre à envoyer pour le noeud%i\n", i);
-                // }
+                }
             }
             allSend = 1;
         }
         if(allSend == 1) break;
     } 
-
-    //printf("%sFin du multiplexage\n%s", AC_MAGENTA, AC_WHITE);
-
-    //attente des couleurs des clients
-    //printf("Coloration en cours...\n");
+    if(verbose == 1){
+        printf("%sFin du multiplexage\n%s", AC_MAGENTA, AC_WHITE);
+        //attente des couleurs des clients
+        printf("Coloration en cours...\n");
+    } 
+    
     for(int i = 1; i <= nodeNumber; i++){
         int receivedColor = 0;
         res = recvTCP(voisins[i].socket, &receivedColor, sizeof(receivedColor));
@@ -392,20 +399,15 @@ int main(int argc, char *argv[])
             exit(0);
         } else {
             finalColors[i-1] = receivedColor;
-            //printf("%s[Serveur/Thread] Première couleur reçue : %i\n%s", AC_BLUE, finalColors[i-1], AC_WHITE);
         } 
     } 
-    // printf("----------------------------------------------------\n");
-
-    // printf("%sCalcul du nombre de couleurs ...\n%s", AC_MAGENTA, AC_WHITE);
-    // for(int i = 0; i < nodeNumber; i++){
-    //     printf("Couleur n°%i : %i\n", i+1, finalColors[i]);
-    // }
+    
     int nbColors = doubleColor(finalColors, nodeNumber); 
-    //printf("%sNombre de couleurs avant réduction : %i %s\n", AC_CYAN, nbColors, AC_WHITE);
-
+    if(verbose == 1){
+        printf("%sNombre de couleurs avant réduction : %i %s\n", AC_CYAN, nbColors, AC_WHITE);
+    } 
+    
     sleep(1);
-    // printf("Début REDUCE\n");
 
     int ordre2 = 1;
     for (int i = 1; i<=nodeNumber; i++) {
@@ -414,7 +416,6 @@ int main(int argc, char *argv[])
         }
     }
 
-    //printf("Calcul couleur minimale...\n");
     for(int i = 1; i <= nodeNumber; i++){
         int receivedColor = 0;
         res = recvTCP(voisins[i].socket, &receivedColor, sizeof(receivedColor));
@@ -423,7 +424,10 @@ int main(int argc, char *argv[])
             exit(0);
         } else {
             finalColors[i-1] = receivedColor;
-            //printf("%s[Serveur/Thread] Couleur finale reçue : %i %s\n", AC_GREEN, finalColors[i-1], AC_WHITE);
+            if(verbose == 1){
+                printf("%s[Serveur/Thread] Couleur finale reçue : %i %s\n", AC_GREEN, finalColors[i-1], AC_WHITE);
+            } 
+            
         } 
     }
 
@@ -433,18 +437,26 @@ int main(int argc, char *argv[])
 
     
     FD_CLR(srv, &set);
-        if(close(srv) == -1) {
-            printf("[Serveur] : Problème lors de la fermeture de la socket\n");
-            exit(1);
-        }
-    //printf("[Serveur] : Socket fermée !\n");
+    if(close(srv) == -1) {
+        printf("[Serveur] : Problème lors de la fermeture de la socket\n");
+        exit(1);
+    }
+    if(verbose == 1){
+        printf("[Serveur] : Socket fermée !\n");
+    } 
 
     for(int i = 0; i <= nodeNumber; i++){
         free(edgesConnexionTab[i]);
-        //free(&nodesTab[i]);
     }
-    //fclose(file);
+    free(nodesTab);
 
+    //Fermeture des sockets des noeuds
+    for(int i = 1; i <= nodeNumber; i++){
+        close(voisins[i].socket);
+    }
+    printf("Socket fermée, arrêt du serveur\n");
+
+    return 0;
 }
 
 

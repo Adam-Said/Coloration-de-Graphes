@@ -21,6 +21,12 @@ portServeur = int(input())
 print("Port premier client \n")
 portClient = int(input())
 
+verboseChoise = input("Mode verbeux ? (y/n) \n")
+if verboseChoise == "y":
+    verbose = 1
+else:
+    verbose = 0
+
 
 print("Lancement de", nbClient , " clients")
 
@@ -28,7 +34,7 @@ for x in range(nbClient) :
   time.sleep(0.05)
   tmpPort = portClient+x+1
   print("[Runner] Démarrage du client" , x , "sur" , str(s.getsockname()[0]) + ":" + str(tmpPort) ,"au serveur")
-  call = "./bin/client "+ str(ipServeur) + " " + str(portServeur) + " " + str(s.getsockname()[0]) + " " + str(tmpPort) +" &"
+  call = "./bin/client "+ str(ipServeur) + " " + str(portServeur) + " " + str(s.getsockname()[0]) + " " + str(tmpPort) + " " + str(verbose) + " &"
   os.system(call)
   
 

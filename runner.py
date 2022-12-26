@@ -17,6 +17,12 @@ fileName = str(input())
 print("Port serveur \n")
 port = int(input())
 
+verboseChoise = input("Mode verbeux ? (y/n) \n")
+if verboseChoise == "y":
+    verbose = 1
+else:
+    verbose = 0
+
 f = open("Files/"+fileName, "r")
 nbNode = 0
 for x in f:
@@ -28,13 +34,13 @@ print("Besoin de",nbNode , "clients")
 
 file = '"' + fileName + '"'
 print("[Runner] Démarrage du serveur sur " + str(port))
-call = "./bin/serverMultiplex " + str(port) + " " + file +" &"
+call = "./bin/serverMultiplex " + str(port) + " " + file + " " + str(verbose) + " &"
 os.system(call)
 time.sleep(1)
 for x in range(0,nbNode) :
   time.sleep(0.005)
   tmpPort = port+x+1
   print("[Runner] Démarrage du client" , x , "sur" , str(s.getsockname()[0]) + ":" + str(tmpPort) ,"au serveur")
-  call = "./bin/client "+ str(s.getsockname()[0]) + " " + str(port) + " " + str(s.getsockname()[0]) + " " + str(tmpPort) +" &"
+  call = "./bin/client "+ str(s.getsockname()[0]) + " " + str(port) + " " + str(s.getsockname()[0]) + " " + str(tmpPort) + " " + str(verbose) + " &"
   os.system(call)
   

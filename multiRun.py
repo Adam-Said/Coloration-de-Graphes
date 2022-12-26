@@ -16,6 +16,11 @@ print("Fichier à parser \n")
 fileName = str(input())
 print("Port serveur \n")
 port = int(input())
+verboseChoise = input("Mode verbeux ? (y/n) \n")
+if verboseChoise == "y":
+    verbose = 1
+else:
+    verbose = 0
 print("Nombre de run \n")
 run = int(input())
 
@@ -31,7 +36,7 @@ print("Besoin de",nbNode , "clients")
 for i in range(run):
   file = '"' + fileName + '"'
   #print("[Runner] Démarrage du serveur sur " + str(port))
-  call = "./bin/serverMultiplex " + str(port+i*1000) + " " + file +" &"
+  call = "./bin/serverMultiplex " + str(port+i*1000) + " " + file + " " + str(verbose) + " &"
   os.system(call)    
 
 time.sleep(1)
@@ -40,6 +45,6 @@ for i in range(run):
     #time.sleep(0.005)
     tmpPort = port+x+1+(i*1000)
     #print("[Runner] Démarrage du client" , x , "sur" , str(s.getsockname()[0]) + ":" + str(tmpPort) ,"au serveur")
-    call = "./bin/client "+ str(s.getsockname()[0]) + " " + str(port+i*1000) + " " + str(s.getsockname()[0]) + " " + str(tmpPort) +" &"
+    call = "./bin/client "+ str(s.getsockname()[0]) + " " + str(port+i*1000) + " " + str(s.getsockname()[0]) + " " + str(tmpPort) + " " + str(verbose) + " &"
     os.system(call)
 

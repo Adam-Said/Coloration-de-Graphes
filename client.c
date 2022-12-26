@@ -202,10 +202,12 @@ void * envoyerCouleur (void * param){
 }
 
 int main(int argc, char *argv[]) {
-  if (argc != 5){
-    printf("utilisation : client ip_serveur port_serveur ip_client port_client\n");
+  if (argc != 6){
+    printf("utilisation : [ip_serveur] [port_serveur] [ip_client] [port_client] [Mode Verbeux : Oui  = 1, Non = 0]\n");
     exit(0);
   }
+
+  int verbose = atoi(argv[5]);
 
   /* etape 1 : créer une socket d'écoute */   
   int option = 1;
@@ -262,7 +264,9 @@ int main(int argc, char *argv[]) {
   if (sendTCP(dsServ, &msg, sizeof(struct paquet)) <= 0){
       printf("%s[Client] Problème lors de l'envoi de l'adresse d'écoute%s\n", AC_RED, AC_WHITE);
   }
-  //printf("%s[Client] Envoi de l'adresse d'écoute réussi%s\n", AC_GREEN, AC_NORMAL);
+  if(verbose == 1){
+    printf("%s[Client] Envoi de l'adresse d'écoute réussi%s\n", AC_GREEN, AC_NORMAL);
+  } 
   
   int allNeighbors = 0; //nombres de Connexion en attente reçu du serveur
   res = recvTCP(dsServ, &allNeighbors, sizeof(int));
@@ -301,18 +305,26 @@ int main(int argc, char *argv[]) {
 
       if(df == dsServ){
         //étape 1 : réception du nombre de noeuds auxquels se connecter
-        //printf("[Client/Reception] Réception du nombre de voisins\n");
         int res = recvTCP(dsServ, &toConnectNeighbors, sizeof(int));
         if (res == -1 || res == 0) {
             printf("%s[Client] Erreur lors de la reception du nombre de noeuds voisins%s\n", AC_RED, AC_WHITE);
             exit(0);
         }
-        //printf("[Client] Nombre de voisins à connecter : %i voisins\n", toConnectNeighbors);
+        if(verbose == 1){
+          printf("[Client] Nombre de voisins à connecter : %i voisins\n", toConnectNeighbors);
+        } 
+          
         incoming = allNeighbors - toConnectNeighbors;
-        //printf("[Client] Nombre de connexions en attente : %i voisins\n", incoming);
+        if(verbose == 1){
+          printf("[Client] Nombre de connexions en attente : %i voisins\n", incoming);
+        } 
+          
         //Reception du numéro de noeud
         int nodenumberReception = recvTCP(dsServ, &number, sizeof(number));
-        //printf("[Client] Numéro de noeud reçu, je suis le noeud numéro %i\n", number);
+        if(verbose == 1){
+          printf("[Client] Numéro de noeud reçu, je suis le noeud numéro %i\n", number);
+        } 
+          
         color = ((number%6)+1);
         if(color == 1) {
           color = 7;
@@ -320,7 +332,10 @@ int main(int argc, char *argv[]) {
         color = color + '0';
         //étape 2 : boucle avec for et i<nombreNoeud reception un part un de chaque adresses de noeuds et stockage dans la struct + création socket
         if(toConnectNeighbors != 0){
-          //printf("[Client/Reception] Reception et stockage des adresses voisines\n");
+          if(verbose == 1){
+            printf("[Client/Reception] Reception et stockage des adresses voisines\n");
+          } 
+            
           for(int i = 0; i < toConnectNeighbors; i++){
             struct paquet adr;
             int reception = recvTCP(dsServ, &adr, sizeof(adr));
@@ -329,9 +344,16 @@ int main(int argc, char *argv[]) {
               exit(0);
             }
             voisinsAdr[i].adresse = adr.adresse;
-            //printf("[Client] Une adresse voisine est %s:%i.\n", inet_ntoa(voisinsAdr[i].adresse.sin_addr), ntohs(voisinsAdr[i].adresse.sin_port));
+            if(verbose == 1){
+              printf("[Client] Une adresse voisine est %s:%i.\n", inet_ntoa(voisinsAdr[i].adresse.sin_addr), ntohs(voisinsAdr[i].adresse.sin_port));
+            } 
+              
           }
-          //printf("%s[Client] Attente de l'ordre pour démarrer les connexions%s\n", AC_MAGENTA, AC_WHITE);
+
+          if(verbose == 1){
+            printf("%s[Client] Attente de l'ordre pour démarrer les connexions%s\n", AC_MAGENTA, AC_WHITE);
+          } 
+          
           //Reception de l'ordre de démarrer les connexions
           int ordre;
           int ordreReception = recvTCP(dsServ, &ordre, sizeof(ordre));
@@ -340,22 +362,21 @@ int main(int argc, char *argv[]) {
             exit(0);
           }
 
-          //printf("Couleur : %i", color);
           if(nodenumberReception == -1 || nodenumberReception == 0){
             printf("%s[Client] Erreur lors de la reception du numéro d'identification%s\n", AC_RED, AC_WHITE);
             exit(0);
           }
-
-          //sleep(2);
-
-          //printf("\x1B[3%cm[Client] %i) Ordre de connexion reçu, je démarre les connexions%s\n", color, number, AC_WHITE);
+          if(verbose == 1){
+            printf("\x1B[3%cm[Client] %i) Ordre de connexion reçu, je démarre les connexions%s\n", color, number, AC_WHITE);
+          } 
 
           //étape 3 : boucle de connexion
-          //printf("\x1B[3%cm[Client/Connexions] Le noeuds %i démarre les connexions aux voisins%s\n",color, number, AC_WHITE);
+          
           for(int j = 0; j < toConnectNeighbors; j++){
-            //printf("\x1B[3%cm[Client/Connexions] Tentative de connexion au noeud %i %s\n",color, j, AC_WHITE);
             struct sockaddr_in sock_voisin = voisinsAdr[j].adresse;
-            
+            if(verbose == 1){
+              printf("\x1B[3%cm[Client/Connexions] Le noeuds %i démarre les connexions aux voisins%s\n",color, number, AC_WHITE);
+            } 
             socklen_t lgAdr = sizeof(struct sockaddr_in);
             int dsVoisins = socket(PF_INET, SOCK_STREAM, 0);
             setsockopt(dsVoisins, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
@@ -376,18 +397,18 @@ int main(int argc, char *argv[]) {
             if (sendTCP(dsVoisins, &msg, sizeof(struct paquet)) <= 0){
                 printf("%s[Client/Interconnexions] Problème lors de l'envoi de l'adresse d'écoute%s\n", AC_RED, AC_WHITE);
             }
-            //printf("%s[Client n°%i] Envoi de l'adresse d'écoute au voisin réussi%s\n", AC_GREEN, number, AC_NORMAL);
-            //printf("\x1B[3%cm[Client/Connexion] Connexion au voisin %i (%s:%i) réussie%s\n", color, j, inet_ntoa(voisinsAdr[j].adresse.sin_addr), ntohs(voisinsAdr[j].adresse.sin_port), AC_WHITE);
+            if(verbose == 1){
+              printf("%s[Client n°%i] Envoi de l'adresse d'écoute au voisin réussi%s\n", AC_GREEN, number, AC_NORMAL);
+              printf("\x1B[3%cm[Client/Connexion] Connexion au voisin %i (%s:%i) réussie%s\n", color, j, inet_ntoa(voisinsAdr[j].adresse.sin_addr), ntohs(voisinsAdr[j].adresse.sin_port), AC_WHITE);
+            } 
+            
           }
-          //printf("\e[0;100m\x1B[3%cm[Client/Connexion] Noeud %i, toutes les connexions sont réussies\e[0m%s\n", color, number, AC_WHITE);
-          //break;
+          if(verbose == 1){
+            printf("\e[0;100m\x1B[3%cm[Client/Connexion] Noeud %i, toutes les connexions sont réussies\e[0m%s\n", color, number, AC_WHITE);
+          } 
         }
-
-        /*         printf("Fermeture de la socket serveur\n");
-        FD_CLR(dsServ, &set); */
         
       } else {
-        // TODO Ajouter un compteur pour incrémenter le nombre de personne reçues et arrêter la boucle quand on a reçu tout le monde et commencer la coloration
         //Acceptation de la connexion d'un autre client
         struct paquet newClient;
         int dsC = accept(ds, (struct sockaddr *)&sock_clt, &size);
@@ -397,21 +418,12 @@ int main(int argc, char *argv[]) {
           exit(0);
         }     
         incomingConnexionsInfos[incomingConnexions] = newClient;
-        //char adresse[INET_ADDRSTRLEN];
-        //inet_ntop(AF_INET, &incomingConnexionsInfos[incomingConnexions].adresse.sin_addr, adresse, INET_ADDRSTRLEN);
-        //int port = htons(incomingConnexionsInfos[incomingConnexions].adresse.sin_port);
-      
-        //printf("[Client/Interconnexions] %i) %s:%i\n", incomingConnexions, adresse, port);
         
         incomingConnexionsInfos[incomingConnexions].socket = dsC;
         incomingConnexions++;
-        
-        // FD_SET(dsC, &set);
-        // if(maxDesc < dsC) maxDesc = dsC;
       }
 
     }
-		//sleep(1);
 		if(incomingConnexions == incoming){
 			break;
 		}
@@ -449,7 +461,6 @@ int main(int argc, char *argv[]) {
 	}
 	pthread_t threads[2];
 
-	//printf("Début de la coloration %i ..\n", number);
 	int check = 1;
 	while(check == 1) {  
 		myColor = nextBinary(myColor);
@@ -464,7 +475,10 @@ int main(int argc, char *argv[]) {
       perror("Erreur lors de la création du thread\n");
       exit(1);
     }
-		// printf("[Client %i] Couleur choisie : %s\n", number, myColor);
+
+    if(verbose == 1){
+    	printf("[Client %i] Couleur choisie : %s\n", number, myColor);
+    } 
 
     if(pthread_create(&threads[1], NULL, recevoirCouleur, (void*)&params) != 0) {
       perror("Erreur lors de la création du thread\n");
@@ -490,26 +504,27 @@ int main(int argc, char *argv[]) {
 			check = 0;
 		}
 
-		// printf("NODE %i MYCOLOR : %s\n", number,myColor);
-		// for (size_t i = 0; i < toConnectNeighbors + incoming; i++)
-		// {
-		// 	printf("infos[%li] : %i : %i\n", i, infos[i].receiveDecimalColor, infos[i].state);
-		// } 
+    if(verbose == 1){
+      printf("NODE %i MYCOLOR : %s\n", number,myColor);
+      for (size_t i = 0; i < toConnectNeighbors + incoming; i++)
+      {
+        printf("infos[%li] : %i : %i\n", i, infos[i].receiveDecimalColor, infos[i].state);
+      } 
+    } 
+		
 	}
   //printf("Formatage de la couleur pour éviter les conflits\n");
   myColor = makeValid(myColor);
   myDecimalColor = getBinaryNumber(myColor);
-	//printf("%s[Client %i] Couleur finale : %i %s\n", AC_RED, number, myDecimalColor, AC_WHITE);
-
-  // printf("Couleur décimale de %s : %i\n", myColor, myDecimalColor);
-
-  //printf("%sNoeud numéro %i) Envoi de la couleur au serveur...\n%s", AC_YELLOW, number, AC_WHITE);
+  if(verbose == 1){
+    printf("%s[Client %i] Couleur finale : %i %s\n", AC_RED, number, myDecimalColor, AC_WHITE);
+    printf("Couleur décimale de %s : %i\n", myColor, myDecimalColor);
+    printf("%sNoeud numéro %i) Envoi de la couleur au serveur...\n%s", AC_YELLOW, number, AC_WHITE);
+  } 
+	
   if (sendTCP(dsServ, &myDecimalColor, sizeof(int)) == -1) {
     perror("[Client/Thread] Problème lors de l'envoi de la couleur finale\n");
   }
-  // else{
-  //   printf("[Client/Thread] Couleur finale envoyée : %i\n", decimalColor);
-  // }
 
   int ordre2 = 0;
   int resOrdre2 = recvTCP(dsServ, &ordre2, sizeof(int));
@@ -518,9 +533,6 @@ int main(int argc, char *argv[]) {
       exit(1);
   }
 
-  //printf("Démarrage de la recoloration\n");
-
-  //int* finalColors = (int*)malloc(allNeighbors * sizeof(int));
   for (size_t i = 0; i < allNeighbors; i++) {
 		infos[i].state = 1;
 	}
@@ -531,7 +543,10 @@ int main(int argc, char *argv[]) {
   params.color = myDecimalColor;
   params.allNeighbors = allNeighbors;
 
-  //printf("N°%i Envoi de ma couleur %i à mes voisins\n", number, myDecimalColor);
+  if(verbose == 1){
+    printf("N°%i Envoi de ma couleur %i à mes voisins\n", number, myDecimalColor);
+  } 
+  
 	if(pthread_create(&threadsReduce[0], NULL, envoyerCouleur, (void*)&params) != 0) {
     perror("Erreur lors de la création du thread\n");
     exit(1);
@@ -545,11 +560,10 @@ int main(int argc, char *argv[]) {
 		pthread_join(threadsReduce[i], NULL);
 	}
 
-  //printf("N°%i RECOLORATION\n", number);
     int nombreReceive = 0;
     int nombreSend = 0;
     for (size_t i = 0; i < allNeighbors; i++)
-    { // STATE = 3 si je dois envoyer || STATE = 2 si je dois recevoir
+    {
       if(infos[i].receiveDecimalColor < myDecimalColor) {
         nombreReceive++;
         infos[i].state = 2;
@@ -559,8 +573,10 @@ int main(int argc, char *argv[]) {
       }
     }
 
-    // printf("N°%i, %i voisins à contacter\n", number, nombreSend);
-    // printf("N°%i, %i couleurs à recevoir\n", number, nombreReceive);
+    if(verbose == 1){
+      printf("N°%i, %i voisins à contacter\n", number, nombreSend);
+      printf("N°%i, %i couleurs à recevoir\n", number, nombreReceive);
+    } 
 
     for (size_t i = 0; i < allNeighbors; i++)
     {
@@ -576,17 +592,18 @@ int main(int argc, char *argv[]) {
       }
 
 		  pthread_join(threadsReceive[0], NULL);
-      // for (size_t i = 0; i < nombreReceive; i++)
-      // {
-      //   if(infos[i].state == 2) {
-      //     printf("N°%i RECUE : %i\n", number, infos[i].receiveDecimalColor);
-      //   }
-      // }
+      if(verbose == 1){
+        for (size_t i = 0; i < nombreReceive; i++)
+        {
+          if(infos[i].state == 2) {
+            printf("N°%i RECUE : %i\n", number, infos[i].receiveDecimalColor);
+          }
+        }
+      } 
+      
       
     }
       
-    //int sizeInfos = sizeof(infos) / sizeof(infos[0]);
-    //myDecimalColor = find_next_minimal_int(infos, sizeInfos);; //je choisis la couleur 0 par défaut
     myDecimalColor = 0;
     for (int i = 0; i < allNeighbors; i++)
     {
@@ -604,7 +621,6 @@ int main(int argc, char *argv[]) {
       }
     }
     
-    // printf("N°%i : MY FINAL COLOR : %i\n", number, myDecimalColor);
     params.color = myDecimalColor;
 
     if(nombreSend != 0) {
@@ -618,20 +634,36 @@ int main(int argc, char *argv[]) {
 
     }
 
-  //printf("N°%i envoi de la couleur au serveur\n", number);
   // Envoi de la couleur finale au serveur
   if (sendTCP(dsServ, &myDecimalColor, sizeof(int)) == -1) {
     perror("[Client/Thread] Problème lors de l'envoi de la couleur finale au serveur\n");
   }
-  // printf("N°%i : MY FINAL COLOR : %i\n", number, myDecimalColor);
+  if(verbose == 1){
+    printf("N°%i : MY FINAL COLOR : %i\n", number, myDecimalColor);
+    printf("[Travail] terminé le client s'arrête\n");
+  } 
+  
 
-  //printf("[Travail] terminé le client s'arrête\n");
+  for(int i = 0; i < allNeighbors; i++) {
+    close(infos[i].socket);
+  }
  
-  // if(close(ds) == -1) {
-  //   printf("[Client] : Problème lors de la fermeture socket\n");
-  //   exit(1);
-  // }
-  // printf("[Client] : Socket fermée !\n");
+  if(close(ds) == -1) {
+    printf("%s[Client] : Problème lors de la fermeture socket client%s\n", AC_RED, AC_NORMAL);
+    exit(1);
+  }
+  if(verbose == 1){
+    printf("[Client] : Socket noeud fermée !\n");
+  } 
+  
+
+  if(close(dsServ) == -1) {
+    printf("%s[Client] : Problème lors de la fermeture socket serveur%s\n", AC_RED, AC_NORMAL);
+    exit(1);
+  }
+  if(verbose == 1){
+    printf("[Client] : Socket serveur fermée !\n");
+  } 
 
   return 0;
 }
