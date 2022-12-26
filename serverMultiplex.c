@@ -435,6 +435,41 @@ int main(int argc, char *argv[])
 
     printf("%sNombre de couleurs après réduction : %i %s\n", AC_MAGENTA, nbColors, AC_WHITE);
 
+    FILE *fp = fopen("output.txt", "w");
+    if (fp == NULL)
+    {
+        printf("Error opening file!\n");
+        exit(1);
+    }
+
+    // Loop through each node
+    for (int i = 1; i <= nodeNumber; i++)
+    {
+        // Write node index
+        fprintf(fp, "%d - ", i);
+
+        // Write list of neighbors
+        //fprintf(fp, "Neighbors: ");
+        if(nodesTab[i] == 0){
+            fprintf(fp, "0 ");
+        }
+        else{
+            for (int j = 0; j < nodesTab[i]; j++)
+            {
+                fprintf(fp, "%d ", edgesConnexionTab[i][j]);
+            }
+        }
+
+        // Write node color
+        fprintf(fp, "- %d\n", finalColors[i-1]+1);
+    }
+
+    // Close file
+    fclose(fp);
+    sleep(1);
+    system("python3 color.py output.txt");
+    printf("Fichier output.svg créé\n");
+
     
     FD_CLR(srv, &set);
     if(close(srv) == -1) {

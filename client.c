@@ -46,6 +46,7 @@ struct thread_params {
   int color;
 };
 
+
 int myPow(int x, int y) {
     int result = 1;
     for (int i = 0; i < y; i++) {
@@ -638,6 +639,8 @@ int main(int argc, char *argv[]) {
   if (sendTCP(dsServ, &myDecimalColor, sizeof(int)) == -1) {
     perror("[Client/Thread] Problème lors de l'envoi de la couleur finale au serveur\n");
   }
+
+
   if(verbose == 1){
     printf("N°%i : MY FINAL COLOR : %i\n", number, myDecimalColor);
     printf("[Travail] terminé le client s'arrête\n");
