@@ -73,7 +73,11 @@ def generate_svg(nodes, edges, colors):
     # draw the nodes
     for node, pos in nodes.items():
         x, y = pos
-        color = color_map[colors[node]]
+        color = 0
+        if(colors[node]%20 == 0) :
+            color = 20
+        else :
+            color = color_map[colors[node]%20]
         svg += f'  <circle cx="{x - min_x + 50}" cy="{y - min_y + 50}" r="10" fill="{color}" />\n'
         svg += f'  <text x="{x - min_x + 50}" y="{y - min_y + 50}" text-anchor="middle" alignment-baseline="central" font-size="12">{node}</text>\n'
 
@@ -96,7 +100,7 @@ def main():
             color = int(parts[2])
 
             # assign a random position to the node
-            nodes[node] = (random.randint(0, 400), random.randint(0, 400))
+            nodes[node] = (random.randint(0, 100*node), random.randint(0, 100*node))
 
             # add the edges
             for neighbor in neighbors:
