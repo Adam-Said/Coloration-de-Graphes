@@ -468,8 +468,6 @@ int main(int argc, char *argv[])
     fclose(fp);
     sleep(1);
     system("python3 color.py output.txt");
-    printf("Fichier output.svg créé\n");
-
     
     FD_CLR(srv, &set);
     if(close(srv) == -1) {

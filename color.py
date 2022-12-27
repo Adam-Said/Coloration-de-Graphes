@@ -1,4 +1,5 @@
 import random
+import sys
 
 #function to create a circle
 def create_circle(node, color):
@@ -8,20 +9,6 @@ def create_circle(node, color):
 def create_line(node1, node2):
     return '<line x1="' + str(node1) + '" y1="' + str(node1) + '" x2="' + str(node2) + '" y2="' + str(node2) + '" style="stroke:rgb(0,0,0);stroke-width:2" />'
 
-#open the input file
-f = open("input.txt", "r")
-
-#initialize the list of circles and lines
-circles = []
-lines = []
-
-#iterate through each line in the file
-for line in f:
-
-    #split the line by '-'
-    data = line.split(" - ")
-    #node is the first element
-import sys
 
 
 def generate_svg(nodes, edges, colors):
@@ -116,6 +103,8 @@ def main():
     # write the SVG to a file
     with open('graph.svg', 'w') as f:
         f.write(svg)
+
+    print("Fichier graph.svg généré avec succès !")
 
 
 if __name__ == '__main__':

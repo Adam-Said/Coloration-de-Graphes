@@ -98,7 +98,7 @@ char* int_to_string(int n) {
 
 char* nextBinary(char* str) {
   // Générer un nombre aléatoire compris entre 0 et 1
-  // printf("%sChaîne d'origine : %s %s\n", AC_CYAN, str, AC_NORMAL);
+  // printf("%sChaîne d'origine : %s %s\n", AC_CYAN, str, AC_WHITE);
 	struct timespec finish;
   srand(clock_gettime(CLOCK_REALTIME, &finish));
   int rand_num = finish.tv_nsec % 2;
@@ -266,7 +266,7 @@ int main(int argc, char *argv[]) {
       printf("%s[Client] Problème lors de l'envoi de l'adresse d'écoute%s\n", AC_RED, AC_WHITE);
   }
   if(verbose == 1){
-    printf("%s[Client] Envoi de l'adresse d'écoute réussi%s\n", AC_GREEN, AC_NORMAL);
+    printf("%s[Client] Envoi de l'adresse d'écoute réussi%s\n", AC_GREEN, AC_WHITE);
   } 
   
   int allNeighbors = 0; //nombres de Connexion en attente reçu du serveur
@@ -399,7 +399,7 @@ int main(int argc, char *argv[]) {
                 printf("%s[Client/Interconnexions] Problème lors de l'envoi de l'adresse d'écoute%s\n", AC_RED, AC_WHITE);
             }
             if(verbose == 1){
-              printf("%s[Client n°%i] Envoi de l'adresse d'écoute au voisin réussi%s\n", AC_GREEN, number, AC_NORMAL);
+              printf("%s[Client n°%i] Envoi de l'adresse d'écoute au voisin réussi%s\n", AC_GREEN, number, AC_WHITE);
               printf("\x1B[3%cm[Client/Connexion] Connexion au voisin %i (%s:%i) réussie%s\n", color, j, inet_ntoa(voisinsAdr[j].adresse.sin_addr), ntohs(voisinsAdr[j].adresse.sin_port), AC_WHITE);
             } 
             
@@ -652,7 +652,7 @@ int main(int argc, char *argv[]) {
   }
  
   if(close(ds) == -1) {
-    printf("%s[Client] : Problème lors de la fermeture socket client%s\n", AC_RED, AC_NORMAL);
+    printf("%s[Client] : Problème lors de la fermeture socket client%s\n", AC_RED, AC_WHITE);
     exit(1);
   }
   if(verbose == 1){
@@ -661,7 +661,7 @@ int main(int argc, char *argv[]) {
   
 
   if(close(dsServ) == -1) {
-    printf("%s[Client] : Problème lors de la fermeture socket serveur%s\n", AC_RED, AC_NORMAL);
+    printf("%s[Client] : Problème lors de la fermeture socket serveur%s\n", AC_RED, AC_WHITE);
     exit(1);
   }
   if(verbose == 1){
